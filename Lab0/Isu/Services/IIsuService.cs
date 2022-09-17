@@ -1,5 +1,5 @@
 using Isu.Entities;
-using Isu.Models;
+using Isu.Models.IsuInformationDetails;
 
 namespace Isu.Services;
 
@@ -10,11 +10,11 @@ public interface IIsuService
 
     Student GetStudent(int id);
     Student? FindStudent(int id);
-    List<Student> FindStudents(GroupName groupName);
-    List<Student> FindStudents(CourseNumber courseNumber);
+    IReadOnlyList<Student> FindStudents(GroupName groupName);
+    IReadOnlyList<Student> FindStudents(CourseNumber courseNumber);
 
     Group? FindGroup(GroupName groupName);
-    List<Group> FindGroups(CourseNumber courseNumber);
+    IReadOnlyList<Group> FindGroups(CourseNumber courseNumber);
 
     void ChangeStudentGroup(Student student, Group newGroup);
 }
