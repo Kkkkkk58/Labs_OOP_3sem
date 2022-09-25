@@ -14,6 +14,7 @@ public class MoneyAmountException : ShopsException
 
     public static MoneyAmountException DifferentCurrenciesException(char currencySign, char otherCurrencySign)
     {
-        throw new MoneyAmountException($"Can't perform operations with different currencies: {currencySign} and {otherCurrencySign}");
+        throw new MoneyAmountException(
+            $"Can't perform operations with different currencies: {currencySign} and {otherCurrencySign}");
     }
 }

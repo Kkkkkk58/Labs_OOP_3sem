@@ -17,6 +17,7 @@ public class BankAccountException : ShopsException
 
     public static BankAccountException NotEnoughMoneyException(BankAccount account, MoneyAmount moneyToSend)
     {
-        throw new BankAccountException($"The bank account with id={account.Id} has {account.Balance} which is less than requested: {moneyToSend}");
+        throw new BankAccountException(
+            $"The bank account with id={account.Id} has {account.Balance} which is less than requested: {moneyToSend}");
     }
 }

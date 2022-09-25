@@ -21,7 +21,8 @@ public class ShopServiceTest
     {
         Shop shop = _shopService.CreateShop("Walmart", new Address("2960 Kingsway Dr"));
         Product product = _shopService.RegisterProduct("Reese's 202");
-        var productSupplyInformation = new ProductSupplyInformation(product, new ProductAmount(10), new MoneyAmount(12));
+        var productSupplyInformation =
+            new ProductSupplyInformation(product, new ProductAmount(10), new MoneyAmount(12));
         var supply = new ProductSupply();
         supply.AddItem(productSupplyInformation);
 
@@ -37,13 +38,9 @@ public class ShopServiceTest
     {
         Shop shop = _shopService.CreateShop("Walmart", new Address("2960 Kingsway Dr"));
         Product product = _shopService.RegisterProduct("Reese's 202");
-
         var initialProductAmount = new ProductAmount(200);
         var price = new MoneyAmount(5);
-        var info = new ProductSupplyInformation(product, initialProductAmount, price);
-        var supply = new ProductSupply();
-        supply.AddItem(info);
-        shop.AddSupply(supply);
+        CreateSupplyInShop(shop, product, initialProductAmount, price);
 
         var initialBalance = new MoneyAmount(50);
         var buyer = new Buyer("Artyom Shvetsov", new BankAccount(initialBalance));
@@ -64,13 +61,9 @@ public class ShopServiceTest
     {
         Shop shop = _shopService.CreateShop("Walmart", new Address("2960 Kingsway Dr"));
         Product product = _shopService.RegisterProduct("Reese's 202");
-
         var initialProductAmount = new ProductAmount(200);
         var price = new MoneyAmount(5);
-        var info = new ProductSupplyInformation(product, initialProductAmount, price);
-        var supply = new ProductSupply();
-        supply.AddItem(info);
-        shop.AddSupply(supply);
+        CreateSupplyInShop(shop, product, initialProductAmount, price);
 
         var initialBalance = new MoneyAmount(10);
         var buyer = new Buyer("Artyom Shvetsov", new BankAccount(initialBalance));
@@ -87,13 +80,10 @@ public class ShopServiceTest
     {
         Shop shop = _shopService.CreateShop("Walmart", new Address("2960 Kingsway Dr"));
         Product product = _shopService.RegisterProduct("Reese's 202");
-
-        var initialProductAmount = new ProductAmount(200);
+        var productAmount = new ProductAmount(200);
         var price = new MoneyAmount(5);
-        var info = new ProductSupplyInformation(product, initialProductAmount, price);
-        var supply = new ProductSupply();
-        supply.AddItem(info);
-        shop.AddSupply(supply);
+        CreateSupplyInShop(shop, product, productAmount, price);
+
         var newPrice = new MoneyAmount(10000);
         shop.ChangePrice(product, newPrice);
 
@@ -105,17 +95,12 @@ public class ShopServiceTest
     {
         Shop shop = _shopService.CreateShop("Walmart", new Address("2960 Kingsway Dr"));
         Product product = _shopService.RegisterProduct("Reese's 202");
-
-        var initialProductAmount = new ProductAmount(200);
+        var productAmount = new ProductAmount(200);
         var price = new MoneyAmount(5);
-        var info = new ProductSupplyInformation(product, initialProductAmount, price);
-        var supply = new ProductSupply();
-        supply.AddItem(info);
-        shop.AddSupply(supply);
+        CreateSupplyInShop(shop, product, productAmount, price);
+
         var newPrice = new MoneyAmount(10000);
-        var newSupply = new ProductSupply();
-        newSupply.AddItem(new ProductSupplyInformation(product, new ProductAmount(20), newPrice));
-        shop.AddSupply(newSupply);
+        CreateSupplyInShop(shop, product, productAmount, newPrice);
 
         Assert.Equal(newPrice, shop.GetPrice(product));
     }
@@ -125,37 +110,33 @@ public class ShopServiceTest
     {
         Product product = _shopService.RegisterProduct("Milka Strawberry Cheesecake");
         var amount = new ProductAmount(15);
+
         Shop cheapShop = _shopService.CreateShop("Sainsbury's", new Address("Brooks Rd"));
         var cheapPrice = new MoneyAmount(2);
-        var cheapSupply = new ProductSupply();
-        cheapSupply.AddItem(new ProductSupplyInformation(product, amount, cheapPrice));
-        cheapShop.AddSupply(cheapSupply);
+        CreateSupplyInShop(cheapShop, product, amount, cheapPrice);
+
         Shop expensiveShop = _shopService.CreateShop("Tesco Superstore", new Address("172 East Rd"));
         var expensivePrice = new MoneyAmount(5);
-        var expensiveSupply = new ProductSupply();
-        expensiveSupply.AddItem(new ProductSupplyInformation(product, amount, expensivePrice));
-        expensiveShop.AddSupply(expensiveSupply);
+        CreateSupplyInShop(expensiveShop, product, amount, expensivePrice);
 
         var shoppingList = new ShoppingList();
         shoppingList.AddItem(new ShoppingListItem(product, amount));
 
         Assert.Equal(cheapShop, _shopService.GetCheapestShop(shoppingList));
-        Assert.NotNull(_shopService.FindCheapestShop(shoppingList));
+        Assert.Equal(cheapShop, _shopService.FindCheapestShop(shoppingList));
     }
 
     [Fact]
     public void SearchingTheCheapestShopIfDoesNotExist_ErrorHandled()
     {
         Product product = _shopService.RegisterProduct("Milka Strawberry Cheesecake");
-        var littleAmount = new ProductAmount(15);
+        var insufficientAmount = new ProductAmount(1);
         Shop shop = _shopService.CreateShop("Sainsbury's", new Address("Brooks Rd"));
-        var cheapSupply = new ProductSupply();
-        cheapSupply.AddItem(new ProductSupplyInformation(product, littleAmount, new MoneyAmount(1)));
-        shop.AddSupply(cheapSupply);
+        CreateSupplyInShop(shop, product, insufficientAmount, new MoneyAmount(11));
 
-        var bigAmount = new ProductAmount(99);
+        var desiredAmount = new ProductAmount(99);
         var shoppingList = new ShoppingList();
-        shoppingList.AddItem(new ShoppingListItem(product, bigAmount));
+        shoppingList.AddItem(new ShoppingListItem(product, desiredAmount));
 
         Assert.Throws<ShopServiceException>(() => _shopService.GetCheapestShop(shoppingList));
         Assert.Null(_shopService.FindCheapestShop(shoppingList));
@@ -165,9 +146,10 @@ public class ShopServiceTest
     public void FindShopsByName_ReturnAllShopsWithName()
     {
         const string commonName = "Perekrestok";
-        _shopService.CreateShop("Pitnica", new Address("Moskovskaya 65a"));
+
         Shop shop1 = _shopService.CreateShop(commonName, new Address("Plekhanova 19"));
         Shop shop2 = _shopService.CreateShop(commonName, new Address("Suvorova 144a"));
+        _shopService.CreateShop("Pitnica", new Address("Moskovskaya 65a"));
 
         IReadOnlyCollection<Shop> suitableShops = _shopService.FindShops(commonName).ToList();
 
@@ -179,17 +161,24 @@ public class ShopServiceTest
     [Fact]
     public void FindShopsByAddress_ReturnAllShopsWithAddress()
     {
-        var address1 = new Address("Vyazemskii pereulok 5/7");
-        var address2 = new Address("Kronverkskiy prospekt 49");
+        var commonAddress = new Address("Vyazemskii pereulok 5/7");
 
-        Shop shop1 = _shopService.CreateShop("50r04ka", address1);
-        Shop shop2 = _shopService.CreateShop("DickSee", address1);
-        _shopService.CreateShop("ITMO Store", address2);
+        Shop shop1 = _shopService.CreateShop("50r04ka", commonAddress);
+        Shop shop2 = _shopService.CreateShop("DickSee", commonAddress);
+        _shopService.CreateShop("ITMO Store", new Address("Kronverkskiy prospekt 49"));
 
-        IReadOnlyCollection<Shop> suitableShops = _shopService.FindShops(address1).ToList();
+        IReadOnlyCollection<Shop> suitableShops = _shopService.FindShops(commonAddress).ToList();
 
-        Assert.True(suitableShops.All(shop => shop.Address.Equals(address1)));
+        Assert.True(suitableShops.All(shop => shop.Address.Equals(commonAddress)));
         Assert.Contains(shop1, suitableShops);
         Assert.Contains(shop2, suitableShops);
+    }
+
+    private static void CreateSupplyInShop(Shop shop, Product product, ProductAmount amount, MoneyAmount price)
+    {
+        var supply = new ProductSupply();
+        var supplyItem = new ProductSupplyInformation(product, amount, price);
+        supply.AddItem(supplyItem);
+        shop.AddSupply(supply);
     }
 }

@@ -14,7 +14,8 @@ public class ShopException : ShopsException
 
     public static ShopException LackOfItemsException(Guid shopId)
     {
-        return new ShopException($"The shop with id={shopId} has a lack of resources to buy. Calculation of cost is unavailable");
+        return new ShopException(
+            $"The shop with id={shopId} has a lack of resources to buy. Calculation of cost is unavailable");
     }
 
     public static ShopException MismatchingCurrenciesException(Guid shopId, char shopCurrencySign)
