@@ -21,6 +21,12 @@ public class ProductSupply
 
     public IReadOnlyCollection<ProductSupplyInformation> Items => _items.Values;
 
+    public void AddItem(ProductSupplyInformation info)
+    {
+        if (!_items.TryAdd(info.Product, info))
+            throw ProductSupplyException.ProductAlreadyInSupply();
+    }
+
     private static void ValidateItems(Dictionary<Product, ProductSupplyInformation> items)
     {
         if (items.Any(kvp => !kvp.Key.Equals(kvp.Value.Product)))

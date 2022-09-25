@@ -25,7 +25,7 @@ public class ShopService : IShopService
     public IReadOnlyList<Shop> Shops => _shops;
     public IReadOnlyList<Product> Products => _products;
 
-    public Shop AddShop(string name, Address address, decimal initialBalance = 0)
+    public Shop CreateShop(string name, Address address, decimal initialBalance = 0)
     {
         var initialMoneyAmount = new MoneyAmount(initialBalance, _shopServiceOptions.CurrencySign);
         var shopBankAccount = new BankAccount(initialMoneyAmount);
@@ -59,7 +59,7 @@ public class ShopService : IShopService
             .ToList();
     }
 
-    public Product RegisterProduct(string name, string? description)
+    public Product RegisterProduct(string name, string? description = null)
     {
         var product = new Product(name, description);
         _products.Add(product);
@@ -81,7 +81,7 @@ public class ShopService : IShopService
     public Shop? FindCheapestShop(ShoppingList shoppingList)
     {
         Shop? result = null;
-        var minCost = new MoneyAmount(0, _shopServiceOptions.CurrencySign);
+        var minCost = new MoneyAmount(decimal.MaxValue, _shopServiceOptions.CurrencySign);
         foreach (Shop shop in _shops)
         {
             if (!shop.TryGetCost(shoppingList, out MoneyAmount cost) || cost >= minCost)

@@ -5,7 +5,7 @@ namespace Shops.Services;
 
 public interface IShopService
 {
-    Shop AddShop(string name, Address address, decimal initialBalance);
+    Shop CreateShop(string name, Address address, decimal initialBalance);
     Shop GetShop(Guid shopId);
     Shop? FindShop(Guid shopId);
     IEnumerable<Shop> FindShops(string name);
