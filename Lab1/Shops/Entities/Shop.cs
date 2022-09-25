@@ -130,7 +130,9 @@ public class Shop : IEquatable<Shop>
 
     private bool HasMismatchingCurrencies(ProductSupply supply)
     {
-        return supply.Items.Any(item => !item.KeepOldPrice && _bankAccount.Balance.HasDifferentCurrency(item.NewPrice));
+        return supply
+            .Items
+            .Any(item => !item.KeepOldPrice && _bankAccount.Balance.HasDifferentCurrency(item.NewPrice));
     }
 
     private bool HasMismatchingCurrency(MoneyAmount amount)

@@ -55,8 +55,7 @@ public class ShopService : IShopService
     public IEnumerable<Shop> FindShops(Address address)
     {
         return _shops
-            .Where(shop => shop.Address.Equals(address))
-            .ToList();
+            .Where(shop => shop.Address.Equals(address));
     }
 
     public Product RegisterProduct(string name, string? description = null)
