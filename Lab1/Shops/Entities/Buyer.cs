@@ -23,7 +23,7 @@ public class Buyer : IEquatable<Buyer>
 
     public void SpendMoneyInShop(MoneyAmount expenditure, BankAccount shopsAccount)
     {
-        _bankAccount.SendMoney(expenditure, shopsAccount);
+        _bankAccount.SendMoney(shopsAccount, expenditure);
     }
 
     public override bool Equals(object? obj)

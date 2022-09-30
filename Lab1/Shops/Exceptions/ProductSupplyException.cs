@@ -17,7 +17,7 @@ public class ProductSupplyException : ShopsException
         return new ProductSupplyException("Tried to access new price that was not set");
     }
 
-    public static ProductSupplyException ProductAlreadyInSupply()
+    public static ProductSupplyException ProductAlreadyInSupplyException()
     {
         return new ProductSupplyException("Product is already added to supply");
     }

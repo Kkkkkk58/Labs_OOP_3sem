@@ -83,11 +83,11 @@ public class ShopService : IShopService
         var minCost = new MoneyAmount(decimal.MaxValue, _shopServiceOptions.CurrencySign);
         foreach (Shop shop in _shops)
         {
-            if (!shop.TryGetCost(shoppingList, out MoneyAmount cost) || cost >= minCost)
+            if (!shop.TryGetCost(shoppingList, out MoneyAmount? cost) || cost >= minCost)
                 continue;
 
             result = shop;
-            minCost = cost;
+            minCost = (MoneyAmount)cost;
         }
 
         return result;

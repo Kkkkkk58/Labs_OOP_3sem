@@ -14,7 +14,7 @@ public class BankAccount : IEquatable<BankAccount>
     public Guid Id { get; }
     public MoneyAmount Balance { get; private set; }
 
-    public MoneyAmount SendMoney(MoneyAmount moneyToSend, BankAccount receiver)
+    public MoneyAmount SendMoney(BankAccount receiver, MoneyAmount moneyToSend)
     {
         if (Equals(receiver))
             throw BankAccountException.TransactionToSameAccountException(receiver);
@@ -35,8 +35,7 @@ public class BankAccount : IEquatable<BankAccount>
 
     public bool Equals(BankAccount? other)
     {
-        return other is not null
-               && Id.Equals(other.Id);
+        return other is not null && Id.Equals(other.Id);
     }
 
     public override int GetHashCode()

@@ -48,6 +48,11 @@ public class ProductInventory
         return item;
     }
 
+    public bool HasMatchingCurrency(char shopCurrencySign)
+    {
+        return _items.Values.All(item => item.Price.CurrencySign.Equals(shopCurrencySign));
+    }
+
     private static void CombineItemWithExistingOne(ShopItem existingItem, ShopItem newItem)
     {
         existingItem.IncreaseAmount(newItem.Amount);

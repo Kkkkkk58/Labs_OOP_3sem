@@ -24,7 +24,12 @@ public class ProductSupply
     public void AddItem(ProductSupplyInformation info)
     {
         if (!_items.TryAdd(info.Product, info))
-            throw ProductSupplyException.ProductAlreadyInSupply();
+            throw ProductSupplyException.ProductAlreadyInSupplyException();
+    }
+
+    public bool HasMatchingCurrency(char shopCurrencySign)
+    {
+        return _items.Values.All(item => !item.KeepOldPrice || item.NewPrice.CurrencySign.Equals(shopCurrencySign));
     }
 
     private static void ValidateItems(Dictionary<Product, ProductSupplyInformation> items)

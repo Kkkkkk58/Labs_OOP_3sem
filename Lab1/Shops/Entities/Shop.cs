@@ -1,4 +1,5 @@
-﻿using Shops.Exceptions;
+﻿using System.Diagnostics.CodeAnalysis;
+using Shops.Exceptions;
 using Shops.Models;
 
 namespace Shops.Entities;
@@ -23,7 +24,7 @@ public class Shop : IEquatable<Shop>
         Address = address;
         _bankAccount = bankAccount;
 
-        if (HasMismatchingCurrencies(inventory))
+        if (!inventory.HasMatchingCurrency(_bankAccount.Balance.CurrencySign))
             throw ShopException.MismatchingCurrenciesException(Id, _bankAccount.Balance.CurrencySign);
 
         _inventory = inventory;
@@ -45,7 +46,7 @@ public class Shop : IEquatable<Shop>
 
     public void AddSupply(ProductSupply supply)
     {
-        if (HasMismatchingCurrencies(supply))
+        if (!supply.HasMatchingCurrency(_bankAccount.Balance.CurrencySign))
             throw ShopException.MismatchingCurrenciesException(Id, _bankAccount.Balance.CurrencySign);
 
         foreach (ProductSupplyInformation info in supply.Items)
@@ -57,7 +58,7 @@ public class Shop : IEquatable<Shop>
 
     public void ChangePrice(Product product, MoneyAmount newPrice)
     {
-        if (HasMismatchingCurrency(newPrice))
+        if (_bankAccount.Balance.HasDifferentCurrency(newPrice))
             throw ShopException.MismatchingCurrenciesException(Id, _bankAccount.Balance.CurrencySign);
 
         ShopItem item = _inventory.GetItemByProduct(product);
@@ -73,28 +74,16 @@ public class Shop : IEquatable<Shop>
 
     public MoneyAmount GetCost(ShoppingList shoppingList)
     {
-        if (!TryGetCost(shoppingList, out MoneyAmount cost))
-            throw ShopException.LackOfItemsException(Id);
+        if (!TryGetCost(shoppingList, out MoneyAmount? cost))
+            throw ShopException.NotEnoughItemsException(Id);
 
-        return cost;
+        return (MoneyAmount)cost;
     }
 
-    public bool TryGetCost(ShoppingList shoppingList, out MoneyAmount cost)
+    public bool TryGetCost(ShoppingList shoppingList, [NotNullWhen(true)] out MoneyAmount? cost)
     {
-        char currencySign = _bankAccount.Balance.CurrencySign;
-        cost = new MoneyAmount(0, currencySign);
-
-        foreach (ShoppingListItem shoppingListItem in shoppingList.Items)
-        {
-            ShopItem shopItem = _inventory.GetItemByProduct(shoppingListItem.Product);
-            if (shopItem.Amount < shoppingListItem.Amount)
-                return false;
-
-            decimal itemCost = shopItem.Price.Value * shoppingListItem.Amount.Value;
-            cost += new MoneyAmount(itemCost, currencySign);
-        }
-
-        return true;
+        cost = CalculateCostIfPossible(shoppingList);
+        return cost is not null;
     }
 
     public ProductAmount GetAmount(Product product)
@@ -120,24 +109,22 @@ public class Shop : IEquatable<Shop>
         return Id.GetHashCode();
     }
 
-    private bool HasMismatchingCurrencies(ProductInventory inventory)
+    private MoneyAmount? CalculateCostIfPossible(ShoppingList shoppingList)
     {
-        return inventory
-            .Products
-            .Select(inventory.GetItemByProduct)
-            .Any(item => _bankAccount.Balance.HasDifferentCurrency(item.Price));
-    }
+        char currencySign = _bankAccount.Balance.CurrencySign;
+        var cost = new MoneyAmount(0, currencySign);
 
-    private bool HasMismatchingCurrencies(ProductSupply supply)
-    {
-        return supply
-            .Items
-            .Any(item => !item.KeepOldPrice && _bankAccount.Balance.HasDifferentCurrency(item.NewPrice));
-    }
+        foreach (ShoppingListItem shoppingListItem in shoppingList.Items)
+        {
+            ShopItem shopItem = _inventory.GetItemByProduct(shoppingListItem.Product);
+            if (shopItem.Amount < shoppingListItem.Amount)
+                return null;
 
-    private bool HasMismatchingCurrency(MoneyAmount amount)
-    {
-        return _bankAccount.Balance.HasDifferentCurrency(amount);
+            decimal itemCost = shopItem.Price.Value * shoppingListItem.Amount.Value;
+            cost += new MoneyAmount(itemCost, currencySign);
+        }
+
+        return cost;
     }
 
     private void ExtractGoodsFromShoppingList(ShoppingList shoppingList)
@@ -153,10 +140,5 @@ public class Shop : IEquatable<Shop>
     {
         MoneyAmount newPrice = info.KeepOldPrice ? GetPrice(info.Product) : info.NewPrice;
         return new ShopItem(info.Product, info.Amount, newPrice);
-    }
-
-    private bool HasDifferentCurrency(MoneyAmount moneyAmount)
-    {
-        return _bankAccount.Balance.HasDifferentCurrency(moneyAmount);
     }
 }
