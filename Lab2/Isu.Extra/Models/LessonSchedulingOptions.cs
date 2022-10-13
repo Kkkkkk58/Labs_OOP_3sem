@@ -2,7 +2,12 @@
 
 public record LessonSchedulingOptions : ILessonSchedulingOptions
 {
-    public LessonSchedulingOptions(Lesson lesson, ICollection<Lesson> schedule, DateOnly scheduleStart, DateOnly scheduleEnd, int lessonRepeatNumber)
+    public LessonSchedulingOptions(
+        Lesson lesson,
+        ICollection<Lesson> schedule,
+        DateOnly scheduleStart,
+        DateOnly scheduleEnd,
+        int lessonRepeatNumber)
     {
         if (scheduleStart > scheduleEnd)
             throw new NotImplementedException();

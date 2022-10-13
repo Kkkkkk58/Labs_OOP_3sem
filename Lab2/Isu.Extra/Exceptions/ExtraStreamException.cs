@@ -31,6 +31,7 @@ public class ExtraStreamException : IsuExtraException
 
     public static ExtraStreamException StreamBelongsToOtherExtraCourse(Guid courseId, Guid streamId, Guid otherCourseId)
     {
-        throw new ExtraStreamException($"Can't add stream {streamId} to course {courseId} because it belongs to course {otherCourseId}");
+        throw new ExtraStreamException(
+            $"Can't add stream {streamId} to course {courseId} because it belongs to course {otherCourseId}");
     }
 }

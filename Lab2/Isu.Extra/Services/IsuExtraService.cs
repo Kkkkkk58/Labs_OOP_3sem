@@ -94,6 +94,27 @@ public class IsuExtraService : IIsuExtraService
         studentDecorator.ChangeDecoratedGroup(newGroupDecorator, newGroup);
     }
 
+    public StudentDecorator GetStudentDecorator(Student student)
+    {
+        if (_studentDecorators.TryGetValue(student, out StudentDecorator? studentDecorator))
+            return studentDecorator;
+
+        if (_isuService.FindStudent(student.PersonalInfo.Id.Value) is null)
+            throw new NotImplementedException();
+
+        GroupDecorator groupDecorator = GetGroupDecorator(student.Group);
+        studentDecorator = new StudentDecorator(student, groupDecorator, _options.StudentExtraCoursesLimit);
+        _studentDecorators.Add(student, studentDecorator);
+        return studentDecorator;
+    }
+
+    public GroupDecorator GetGroupDecorator(Group group)
+    {
+        if (_groupDecorators.TryGetValue(group, out GroupDecorator? groupDecorator))
+            return groupDecorator;
+        throw new NotImplementedException();
+    }
+
     public Group AddGroup(GroupName name)
     {
         return _isuService.AddGroup(name);
@@ -132,26 +153,5 @@ public class IsuExtraService : IIsuExtraService
     public IReadOnlyList<Group> FindGroups(CourseNumber courseNumber)
     {
         return _isuService.FindGroups(courseNumber);
-    }
-
-    private StudentDecorator GetStudentDecorator(Student student)
-    {
-        if (_studentDecorators.TryGetValue(student, out StudentDecorator? studentDecorator))
-            return studentDecorator;
-
-        if (_isuService.FindStudent(student.PersonalInfo.Id.Value) is null)
-            throw new NotImplementedException();
-
-        GroupDecorator groupDecorator = GetGroupDecorator(student.Group);
-        studentDecorator = new StudentDecorator(student, groupDecorator, _options.ExtraStreamsLimit);
-        _studentDecorators.Add(student, studentDecorator);
-        return studentDecorator;
-    }
-
-    private GroupDecorator GetGroupDecorator(Group group)
-    {
-        if (_groupDecorators.TryGetValue(group, out GroupDecorator? groupDecorator))
-            return groupDecorator;
-        throw new NotImplementedException();
     }
 }

@@ -9,9 +9,13 @@ public class LessonSchedulerException : IsuExtraException
     {
     }
 
-    public static LessonSchedulerException LessonTimeOutOfSchedule(LessonTime lessonTime, DateOnly scheduleStart, DateOnly scheduleEnd)
+    public static LessonSchedulerException LessonTimeOutOfSchedule(
+        LessonTime lessonTime,
+        DateOnly scheduleStart,
+        DateOnly scheduleEnd)
     {
-        throw new LessonSchedulerException($"Lesson time: {lessonTime.Begin}-{lessonTime.End} was out of range: {scheduleStart}-{scheduleEnd}");
+        throw new LessonSchedulerException(
+            $"Lesson time: {lessonTime.Begin}-{lessonTime.End} was out of range: {scheduleStart}-{scheduleEnd}");
     }
 
     public static LessonSchedulerException InvalidSingleTimeRepeatNumber(int lessonRepeatNumber)

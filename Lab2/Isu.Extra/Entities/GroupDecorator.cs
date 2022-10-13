@@ -6,6 +6,7 @@ namespace Isu.Extra.Entities;
 public class GroupDecorator : IEquatable<GroupDecorator>
 {
     private readonly Group _group;
+
     public GroupDecorator(Group group, Schedule schedule)
     {
         _group = group ?? throw new ArgumentNullException(nameof(group));

@@ -9,16 +9,24 @@ public abstract class LessonScheduler : ILessonScheduler
     public void ExpandSchedule(ILessonSchedulingOptions options)
     {
         if (LessonDoesNotFitIntoSchedule(options.Lesson.Time, options.ScheduleStart, options.ScheduleEnd))
-            throw LessonSchedulerException.LessonTimeOutOfSchedule(options.Lesson.Time, options.ScheduleStart, options.ScheduleEnd);
+        {
+            throw LessonSchedulerException.LessonTimeOutOfSchedule(
+                options.Lesson.Time,
+                options.ScheduleStart,
+                options.ScheduleEnd);
+        }
 
         MakeExpansion(options);
     }
 
     protected abstract void MakeExpansion(ILessonSchedulingOptions options);
 
-    private static bool LessonDoesNotFitIntoSchedule(LessonTime lessonTime, DateOnly scheduleStart, DateOnly scheduleEnd)
+    private static bool LessonDoesNotFitIntoSchedule(
+        LessonTime lessonTime,
+        DateOnly scheduleStart,
+        DateOnly scheduleEnd)
     {
-        return lessonTime.Begin > scheduleStart.ToDateTimeWithSameTime(lessonTime.Begin)
+        return lessonTime.Begin < scheduleStart.ToDateTimeWithSameTime(lessonTime.Begin)
                || lessonTime.End > scheduleEnd.ToDateTimeWithSameTime(lessonTime.End);
     }
 }

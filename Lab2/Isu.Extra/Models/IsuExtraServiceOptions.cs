@@ -2,13 +2,13 @@
 
 public struct IsuExtraServiceOptions
 {
-    public IsuExtraServiceOptions(int extraStreamsLimit)
+    public IsuExtraServiceOptions(int studentExtraCoursesLimit)
     {
-        if (extraStreamsLimit < 0)
-            throw new ArgumentOutOfRangeException(nameof(extraStreamsLimit));
+        if (studentExtraCoursesLimit < 0)
+            throw new ArgumentOutOfRangeException(nameof(studentExtraCoursesLimit));
 
-        ExtraStreamsLimit = extraStreamsLimit;
+        StudentExtraCoursesLimit = studentExtraCoursesLimit;
     }
 
-    public int ExtraStreamsLimit { get; }
+    public int StudentExtraCoursesLimit { get; }
 }

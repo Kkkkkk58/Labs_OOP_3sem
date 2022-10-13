@@ -52,6 +52,11 @@ public class LessonSchedulingOptionsBuilder : ILessonSchedulingOptionsBuilder
             throw new NotImplementedException();
         _lessonRepeatNumber ??= 1;
 
-        return new LessonSchedulingOptions(_lesson, _schedule, _scheduleStart.Value, _scheduleEnd.Value, _lessonRepeatNumber.Value);
+        return new LessonSchedulingOptions(
+            _lesson,
+            _schedule,
+            _scheduleStart.Value,
+            _scheduleEnd.Value,
+            _lessonRepeatNumber.Value);
     }
 }

@@ -17,7 +17,13 @@ public class StudentDecorator : IEquatable<StudentDecorator>
         _groupDecorator = groupDecorator ?? throw new ArgumentNullException(nameof(groupDecorator));
 
         if (!_groupDecorator.Name.Equals(_student.Group.Name))
-            throw StudentDecoratorException.InvalidGroupDecorator(_student.PersonalInfo.Id, _student.Group.Name, groupDecorator.Name);
+        {
+            throw StudentDecoratorException.InvalidGroupDecorator(
+                _student.PersonalInfo.Id,
+                _student.Group.Name,
+                groupDecorator.Name);
+        }
+
         if (extraStreamsLimit < 0)
             throw StudentDecoratorException.ExtraStreamsLimitOutOfRange(extraStreamsLimit);
 
@@ -58,6 +64,8 @@ public class StudentDecorator : IEquatable<StudentDecorator>
         Schedule extraSchedule = GetExtraSchedule();
         if (extraSchedule.HasIntersections(newGroupDecorator.Schedule))
             throw new NotImplementedException();
+        if (_extraStreams.Any(stream => IsExtraStreamProvidedByGroupMegaFaculty(stream, decoratedGroup)))
+            throw new NotImplementedException();
 
         _student.ChangeGroup(decoratedGroup);
         _groupDecorator = newGroupDecorator;
@@ -78,22 +86,34 @@ public class StudentDecorator : IEquatable<StudentDecorator>
         return _student.GetHashCode();
     }
 
+    private static bool IsExtraStreamProvidedByGroupMegaFaculty(ExtraStream extraStream, Group curGroup)
+    {
+        return extraStream.Course.Provider.Faculties
+            .Any(faculty => faculty.Letter.Equals(curGroup.Name.Details.FacultyLetter));
+    }
+
     private void ValidateSigningUpAbility(ExtraStream extraStream)
     {
         if (IsAssignedToAllStreams)
             throw StudentDecoratorException.StreamsLimitReached(PersonalInfo.Id, _extraStreamsLimit);
         if (_extraStreams.Any(stream => stream.Course.Equals(extraStream.Course)))
-            throw StudentDecoratorException.AlreadySignedForCourse(PersonalInfo.Id, extraStream.Course.Id, extraStream.Id);
-        if (IsExtraStreamProvidedByStudentMegaFaculty(extraStream))
-            throw StudentDecoratorException.SameCourseMegaFaculty(PersonalInfo.Id, extraStream.Course.Provider.Id, extraStream.Id);
+        {
+            throw StudentDecoratorException.AlreadySignedForCourse(
+                PersonalInfo.Id,
+                extraStream.Course.Id,
+                extraStream.Id);
+        }
+
+        if (IsExtraStreamProvidedByGroupMegaFaculty(extraStream, _student.Group))
+        {
+            throw StudentDecoratorException.SameCourseMegaFaculty(
+                PersonalInfo.Id,
+                extraStream.Course.Provider.Id,
+                extraStream.Id);
+        }
+
         if (Schedule.HasIntersections(extraStream.Schedule))
             throw StudentDecoratorException.ScheduleIntersectsWithExtraStream(PersonalInfo.Id, extraStream.Id);
-    }
-
-    private bool IsExtraStreamProvidedByStudentMegaFaculty(ExtraStream extraStream)
-    {
-        return extraStream.Course.Provider.Faculties
-            .Any(faculty => faculty.Letter.Equals(_student.Group.Name.Details.FacultyLetter));
     }
 
     private Schedule GetSchedule()

@@ -31,9 +31,10 @@ public class EveryNWeeksLessonScheduler : LessonScheduler
 
     private Lesson GetLessonForNextNthWeek(Lesson curLesson)
     {
+        DateTime shiftedDate = curLesson.Time.Begin + TimeSpan.FromDays(DaysInWeek * _weeksNumber);
         return curLesson with
         {
-            Time = new LessonTime(curLesson.Time.Begin + TimeSpan.FromDays(DaysInWeek * _weeksNumber), curLesson.Time.Duration),
+            Time = new LessonTime(shiftedDate, curLesson.Time.Duration),
         };
     }
 
@@ -56,6 +57,7 @@ public class EveryNWeeksLessonScheduler : LessonScheduler
 
     private bool RepeatNumberExceedsNumberOfAvailableWeeks(ILessonSchedulingOptions options)
     {
-        return options.ScheduleEnd.GetDifferenceInWeeks(options.Lesson.Time.End) % _weeksNumber > options.LessonRepeatNumber;
+        return options.ScheduleEnd.GetDifferenceInWeeks(options.Lesson.Time.End) / _weeksNumber <
+               options.LessonRepeatNumber;
     }
 }

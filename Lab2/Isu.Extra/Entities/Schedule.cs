@@ -69,7 +69,9 @@ public class Schedule
             return this;
         }
 
-        public ScheduleBuilder AddLesson(ILessonScheduler lessonScheduler, ILessonSchedulingOptionsBuilder optionsBuilder)
+        public ScheduleBuilder AddLesson(
+            ILessonScheduler lessonScheduler,
+            ILessonSchedulingOptionsBuilder optionsBuilder)
         {
             ArgumentNullException.ThrowIfNull(lessonScheduler);
             ArgumentNullException.ThrowIfNull(optionsBuilder);
