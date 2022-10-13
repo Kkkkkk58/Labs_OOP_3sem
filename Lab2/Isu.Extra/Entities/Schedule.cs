@@ -54,7 +54,7 @@ public class Schedule
         public ScheduleBuilder SetStartDate(DateOnly startDate)
         {
             if (startDate > _endDate)
-                throw new NotImplementedException();
+                throw ScheduleBuilderException.StartDateExceedsEndDate(startDate, _endDate.Value);
 
             _startDate = startDate;
             return this;
@@ -63,7 +63,7 @@ public class Schedule
         public ScheduleBuilder SetEndDate(DateOnly endDate)
         {
             if (endDate < _startDate)
-                throw new NotImplementedException();
+                throw ScheduleBuilderException.EndDatePrecedesStartDate(endDate, _startDate.Value);
 
             _endDate = endDate;
             return this;

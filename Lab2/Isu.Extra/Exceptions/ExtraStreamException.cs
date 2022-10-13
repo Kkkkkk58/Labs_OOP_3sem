@@ -1,4 +1,5 @@
-﻿using Isu.Models.IsuInformationDetails;
+﻿using Isu.Extra.Entities;
+using Isu.Models.IsuInformationDetails;
 
 namespace Isu.Extra.Exceptions;
 
@@ -9,29 +10,18 @@ public class ExtraStreamException : IsuExtraException
     {
     }
 
-    public static ExtraStreamException EmptyName()
+    public static ExtraStreamException StudentAlreadyExists(ExtraStream extraStream, IsuId studentId)
     {
-        throw new ExtraStreamException("The name of an extra stream can't be empty");
+        throw new ExtraStreamException($"Student with id={studentId} is already assigned to stream {extraStream.Id}");
     }
 
-    public static ExtraStreamException StudentAlreadyExists(Guid extraStreamId, IsuId studentId)
+    public static ExtraStreamException StreamLimitReached(ExtraStream extraStream, int streamLimit)
     {
-        throw new ExtraStreamException($"Student with id={studentId} is already assigned to stream {extraStreamId}");
+        throw new ExtraStreamException($"Stream {extraStream.Id} limit of {streamLimit} students is reached");
     }
 
-    public static ExtraStreamException StreamLimitReached(Guid extraStreamId, int streamLimit)
+    public static ExtraStreamException StudentNotFound(ExtraStream extraStream, IsuId studentId)
     {
-        throw new ExtraStreamException($"Stream {extraStreamId} limit of {streamLimit} students is reached");
-    }
-
-    public static ExtraStreamException StudentNotFound(Guid extraStreamId, IsuId studentId)
-    {
-        throw new ExtraStreamException($"$Stream {extraStreamId} doesn't contain student {studentId}");
-    }
-
-    public static ExtraStreamException StreamBelongsToOtherExtraCourse(Guid courseId, Guid streamId, Guid otherCourseId)
-    {
-        throw new ExtraStreamException(
-            $"Can't add stream {streamId} to course {courseId} because it belongs to course {otherCourseId}");
+        throw new ExtraStreamException($"$Stream {extraStream.Id} doesn't contain student {studentId}");
     }
 }

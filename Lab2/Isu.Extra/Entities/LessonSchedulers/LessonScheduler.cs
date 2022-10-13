@@ -9,12 +9,7 @@ public abstract class LessonScheduler : ILessonScheduler
     public void ExpandSchedule(ILessonSchedulingOptions options)
     {
         if (LessonDoesNotFitIntoSchedule(options.Lesson.Time, options.ScheduleStart, options.ScheduleEnd))
-        {
-            throw LessonSchedulerException.LessonTimeOutOfSchedule(
-                options.Lesson.Time,
-                options.ScheduleStart,
-                options.ScheduleEnd);
-        }
+            throw LessonSchedulerException.LessonTimeOutOfSchedule(options.Lesson.Time, options.ScheduleStart, options.ScheduleEnd);
 
         MakeExpansion(options);
     }

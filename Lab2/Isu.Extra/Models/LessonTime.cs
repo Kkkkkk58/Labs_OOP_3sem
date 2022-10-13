@@ -1,4 +1,6 @@
-﻿namespace Isu.Extra.Models;
+﻿using Isu.Extra.Exceptions;
+
+namespace Isu.Extra.Models;
 
 public readonly record struct LessonTime
 {
@@ -9,7 +11,7 @@ public readonly record struct LessonTime
         End = begin + Duration;
 
         if (End.Date != Begin.Date)
-            throw new NotImplementedException();
+            throw LessonTimeException.InvalidLessonDates(Begin, End);
     }
 
     public DateTime Begin { get; }

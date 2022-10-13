@@ -23,13 +23,13 @@ public class LessonSchedulerException : IsuExtraException
         throw new LessonSchedulerException($"Lesson repeat number expected to be 1 but was {lessonRepeatNumber}");
     }
 
-    public static LessonSchedulerException InvalidWeeksNumber(int weeksNumber)
-    {
-        throw new LessonSchedulerException($"The number of weeks was incorrect: {weeksNumber}");
-    }
-
     public static LessonSchedulerException RepeatNumberOutOfRange(int lessonRepeatNumber)
     {
         throw new LessonSchedulerException($"Lesson's repeat number was out of range: {lessonRepeatNumber}");
+    }
+
+    public static LessonSchedulerException IntersectsWithGivenSchedule()
+    {
+        throw new LessonSchedulerException("Can't perform scheduling: intersections will appear in the schedule");
     }
 }

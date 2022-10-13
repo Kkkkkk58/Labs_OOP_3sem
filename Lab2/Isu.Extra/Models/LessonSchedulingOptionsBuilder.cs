@@ -1,4 +1,6 @@
-﻿namespace Isu.Extra.Models;
+﻿using Isu.Extra.Exceptions;
+
+namespace Isu.Extra.Models;
 
 public class LessonSchedulingOptionsBuilder : ILessonSchedulingOptionsBuilder
 {
@@ -45,11 +47,11 @@ public class LessonSchedulingOptionsBuilder : ILessonSchedulingOptionsBuilder
     public ILessonSchedulingOptions Build()
     {
         if (_lesson is null)
-            throw new NotImplementedException();
+            throw LessonSchedulingOptionsBuilderException.UnsetLesson();
         if (_schedule is null)
-            throw new NotImplementedException();
+            throw LessonSchedulingOptionsBuilderException.UnsetSchedule();
         if (_scheduleStart is null || _scheduleEnd is null)
-            throw new NotImplementedException();
+            throw LessonSchedulingOptionsBuilderException.UnsetTimeRange();
         _lessonRepeatNumber ??= 1;
 
         return new LessonSchedulingOptions(

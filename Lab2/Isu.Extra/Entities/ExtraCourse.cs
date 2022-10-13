@@ -9,7 +9,7 @@ public class ExtraCourse : IEquatable<ExtraCourse>
     public ExtraCourse(MegaFaculty provider, string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw ExtraCourseException.EmptyName();
+            throw new ArgumentOutOfRangeException(nameof(name));
 
         Id = Guid.NewGuid();
         Provider = provider ?? throw new ArgumentNullException(nameof(provider));
@@ -27,9 +27,9 @@ public class ExtraCourse : IEquatable<ExtraCourse>
         ArgumentNullException.ThrowIfNull(stream);
 
         if (_streams.Contains(stream))
-            throw ExtraCourseException.StreamAlreadyExists(Id, stream.Id);
+            throw ExtraCourseException.StreamAlreadyExists(this, stream);
         if (!Equals(stream.Course))
-            throw ExtraStreamException.StreamBelongsToOtherExtraCourse(Id, stream.Id, stream.Course.Id);
+            throw ExtraCourseException.StreamBelongsToOtherExtraCourse(stream, this, stream.Course);
 
         _streams.Add(stream);
         return stream;

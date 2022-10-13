@@ -1,4 +1,6 @@
-﻿namespace Isu.Extra.Models;
+﻿using Isu.Extra.Exceptions;
+
+namespace Isu.Extra.Models;
 
 public record LessonSchedulingOptions : ILessonSchedulingOptions
 {
@@ -10,9 +12,9 @@ public record LessonSchedulingOptions : ILessonSchedulingOptions
         int lessonRepeatNumber)
     {
         if (scheduleStart > scheduleEnd)
-            throw new NotImplementedException();
+            throw LessonSchedulingOptionsException.InvalidScheduleTimeRange(scheduleStart, scheduleEnd);
         if (lessonRepeatNumber <= 0)
-            throw new NotImplementedException();
+            throw new ArgumentOutOfRangeException(nameof(lessonRepeatNumber));
 
         Lesson = lesson ?? throw new ArgumentNullException(nameof(lesson));
         Schedule = schedule ?? throw new ArgumentNullException(nameof(schedule));

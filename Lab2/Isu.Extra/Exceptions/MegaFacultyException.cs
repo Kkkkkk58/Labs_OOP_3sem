@@ -1,4 +1,6 @@
-﻿namespace Isu.Extra.Exceptions;
+﻿using Isu.Extra.Entities;
+
+namespace Isu.Extra.Exceptions;
 
 public class MegaFacultyException : IsuExtraException
 {
@@ -7,13 +9,8 @@ public class MegaFacultyException : IsuExtraException
     {
     }
 
-    public static MegaFacultyException EmptyName()
+    public static Exception FacultyAlreadyExists(MegaFaculty megaFaculty, Faculty faculty)
     {
-        throw new MegaFacultyException("The name of a megaFaculty can't be empty");
-    }
-
-    public static Exception FacultyAlreadyExists(Guid megaFacultyId, Guid facultyId)
-    {
-        throw new MegaFacultyException($"Faculty {facultyId} already exists in megaFaculty {megaFacultyId}");
+        throw new MegaFacultyException($"Faculty {faculty.Id} already exists in megaFaculty {megaFaculty.Id}");
     }
 }

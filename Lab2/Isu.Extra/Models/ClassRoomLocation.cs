@@ -1,6 +1,4 @@
-﻿using Isu.Extra.Exceptions;
-
-namespace Isu.Extra.Models;
+﻿namespace Isu.Extra.Models;
 
 public record struct ClassRoomLocation
 {
@@ -9,7 +7,7 @@ public record struct ClassRoomLocation
     public ClassRoomLocation(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw ClassRoomLocationException.EmptyValue();
+            throw new ArgumentOutOfRangeException(nameof(value));
 
         _value = value;
     }

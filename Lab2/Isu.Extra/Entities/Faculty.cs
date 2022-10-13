@@ -1,5 +1,4 @@
-﻿using Isu.Extra.Exceptions;
-using Isu.Models.IsuInformationDetails;
+﻿using Isu.Models.IsuInformationDetails;
 
 namespace Isu.Extra.Entities;
 
@@ -8,7 +7,7 @@ public class Faculty : IEquatable<Faculty>
     public Faculty(string name, FacultyLetter letter)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw FacultyException.EmptyName();
+            throw new ArgumentOutOfRangeException(nameof(name));
 
         Id = Guid.NewGuid();
         Name = name;

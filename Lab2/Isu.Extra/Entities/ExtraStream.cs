@@ -10,7 +10,7 @@ public class ExtraStream : IEquatable<ExtraStream>
     public ExtraStream(string name, int? streamLimit, ExtraCourse course, Schedule schedule)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw ExtraStreamException.EmptyName();
+            throw new ArgumentOutOfRangeException(nameof(name));
 
         Id = Guid.NewGuid();
         Name = name;
@@ -32,9 +32,9 @@ public class ExtraStream : IEquatable<ExtraStream>
         ArgumentNullException.ThrowIfNull(student);
 
         if (_students.Contains(student))
-            throw ExtraStreamException.StudentAlreadyExists(Id, student.PersonalInfo.Id);
+            throw ExtraStreamException.StudentAlreadyExists(this, student.PersonalInfo.Id);
         if (_streamLimit.HasValue && _students.Count == _streamLimit)
-            throw ExtraStreamException.StreamLimitReached(Id, _streamLimit.Value);
+            throw ExtraStreamException.StreamLimitReached(this, _streamLimit.Value);
 
         _students.Add(student);
         return student;
@@ -45,7 +45,7 @@ public class ExtraStream : IEquatable<ExtraStream>
         ArgumentNullException.ThrowIfNull(student);
 
         if (!_students.Remove(student))
-            throw ExtraStreamException.StudentNotFound(Id, student.PersonalInfo.Id);
+            throw ExtraStreamException.StudentNotFound(this, student.PersonalInfo.Id);
     }
 
     public override bool Equals(object? obj)

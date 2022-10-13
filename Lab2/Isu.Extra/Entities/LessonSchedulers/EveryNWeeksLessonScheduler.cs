@@ -47,7 +47,7 @@ public class EveryNWeeksLessonScheduler : LessonScheduler
         {
             lessons.Add(curLesson);
             if (schedule.Any(scheduledLesson => scheduledLesson.Time.Intersects(curLesson.Time)))
-                throw new NotImplementedException();
+                throw LessonSchedulerException.IntersectsWithGivenSchedule();
 
             curLesson = GetLessonForNextNthWeek(curLesson);
         }
@@ -57,7 +57,6 @@ public class EveryNWeeksLessonScheduler : LessonScheduler
 
     private bool RepeatNumberExceedsNumberOfAvailableWeeks(ILessonSchedulingOptions options)
     {
-        return options.ScheduleEnd.GetDifferenceInWeeks(options.Lesson.Time.End) / _weeksNumber <
-               options.LessonRepeatNumber;
+        return options.ScheduleEnd.GetDifferenceInWeeks(options.Lesson.Time.End) / _weeksNumber < options.LessonRepeatNumber;
     }
 }

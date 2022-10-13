@@ -1,13 +1,11 @@
-﻿using Isu.Extra.Exceptions;
-
-namespace Isu.Extra.Entities;
+﻿namespace Isu.Extra.Entities;
 
 public class Teacher : IEquatable<Teacher>
 {
     public Teacher(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw TeacherException.EmptyName();
+            throw new ArgumentOutOfRangeException(nameof(name));
 
         Id = Guid.NewGuid();
         Name = name;

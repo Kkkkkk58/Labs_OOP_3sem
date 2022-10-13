@@ -9,7 +9,7 @@ public class MegaFaculty : IEquatable<MegaFaculty>
     public MegaFaculty(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw MegaFacultyException.EmptyName();
+            throw new ArgumentOutOfRangeException(nameof(name));
 
         Id = Guid.NewGuid();
         Name = name;
@@ -25,7 +25,7 @@ public class MegaFaculty : IEquatable<MegaFaculty>
         ArgumentNullException.ThrowIfNull(faculty);
 
         if (_faculties.Contains(faculty))
-            throw MegaFacultyException.FacultyAlreadyExists(Id, faculty.Id);
+            throw MegaFacultyException.FacultyAlreadyExists(this, faculty);
 
         _faculties.Add(faculty);
         return faculty;

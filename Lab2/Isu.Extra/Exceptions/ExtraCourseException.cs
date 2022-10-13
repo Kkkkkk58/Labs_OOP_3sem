@@ -1,4 +1,6 @@
-﻿namespace Isu.Extra.Exceptions;
+﻿using Isu.Extra.Entities;
+
+namespace Isu.Extra.Exceptions;
 
 public class ExtraCourseException : IsuExtraException
 {
@@ -7,13 +9,14 @@ public class ExtraCourseException : IsuExtraException
     {
     }
 
-    public static ExtraCourseException EmptyName()
+    public static ExtraCourseException StreamAlreadyExists(ExtraCourse course, ExtraStream stream)
     {
-        throw new ExtraCourseException("The name of a course can't be empty");
+        throw new ExtraCourseException($"The course {course.Id} already provides stream {stream.Id}");
     }
 
-    public static ExtraCourseException StreamAlreadyExists(Guid courseId, Guid streamId)
+    public static ExtraCourseException StreamBelongsToOtherExtraCourse(ExtraStream stream, ExtraCourse curCourse, ExtraCourse otherCourse)
     {
-        throw new ExtraCourseException($"The course {courseId} already provides stream {streamId}");
+        throw new ExtraCourseException(
+            $"Can't add stream {stream.Id} to course {curCourse.Id} because it already belongs to thes course {otherCourse.Id}");
     }
 }
