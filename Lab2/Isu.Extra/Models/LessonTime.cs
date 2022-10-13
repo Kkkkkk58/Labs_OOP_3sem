@@ -1,6 +1,6 @@
 ﻿namespace Isu.Extra.Models;
 
-public record LessonTime
+public readonly record struct LessonTime
 {
     public LessonTime(DateTime begin, TimeSpan duration)
     {

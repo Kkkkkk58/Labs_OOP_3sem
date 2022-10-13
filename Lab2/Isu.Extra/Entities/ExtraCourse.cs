@@ -1,4 +1,6 @@
-﻿namespace Isu.Extra.Models;
+﻿using Isu.Extra.Exceptions;
+
+namespace Isu.Extra.Entities;
 
 public class ExtraCourse : IEquatable<ExtraCourse>
 {
@@ -7,10 +9,10 @@ public class ExtraCourse : IEquatable<ExtraCourse>
     public ExtraCourse(MegaFaculty provider, string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new NotImplementedException();
+            throw ExtraCourseException.EmptyName();
 
         Id = Guid.NewGuid();
-        Provider = provider;
+        Provider = provider ?? throw new ArgumentNullException(nameof(provider));
         Name = name;
         _streams = new List<ExtraStream>();
     }
@@ -22,10 +24,12 @@ public class ExtraCourse : IEquatable<ExtraCourse>
 
     public ExtraStream AddStream(ExtraStream stream)
     {
+        ArgumentNullException.ThrowIfNull(stream);
+
         if (_streams.Contains(stream))
-            throw new NotImplementedException();
+            throw ExtraCourseException.StreamAlreadyExists(Id, stream.Id);
         if (!Equals(stream.Course))
-            throw new NotImplementedException();
+            throw ExtraStreamException.StreamBelongsToOtherExtraCourse(Id, stream.Id, stream.Course.Id);
 
         _streams.Add(stream);
         return stream;

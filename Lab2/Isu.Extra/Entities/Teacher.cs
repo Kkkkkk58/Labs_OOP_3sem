@@ -1,11 +1,13 @@
-﻿namespace Isu.Extra.Entities;
+﻿using Isu.Extra.Exceptions;
+
+namespace Isu.Extra.Entities;
 
 public class Teacher : IEquatable<Teacher>
 {
     public Teacher(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new NotImplementedException();
+            throw TeacherException.EmptyName();
 
         Id = Guid.NewGuid();
         Name = name;

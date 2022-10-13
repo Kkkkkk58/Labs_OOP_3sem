@@ -1,6 +1,7 @@
 ﻿using Isu.Entities;
 using Isu.Extra.Entities;
 using Isu.Extra.Models;
+using Isu.Models.IsuInformationDetails;
 using Isu.Services;
 
 namespace Isu.Extra.Services;
@@ -24,12 +25,19 @@ public class IsuExtraService : IIsuExtraService
         _extraCourses = new List<ExtraCourse>();
     }
 
+    public IReadOnlyList<StudentDecorator> Students => _studentDecorators.Values.ToList().AsReadOnly();
+    public IReadOnlyList<GroupDecorator> Groups => _groupDecorators.Values.ToList().AsReadOnly();
     public IReadOnlyList<MegaFaculty> MegaFaculties => _megaFaculties.AsReadOnly();
+    public IReadOnlyList<Faculty> Faculties =>
+        MegaFaculties.SelectMany(megaFaculty => megaFaculty.Faculties).ToList().AsReadOnly();
     public IReadOnlyList<ExtraCourse> ExtraCourses => _extraCourses.AsReadOnly();
+    public IReadOnlyList<ExtraStream> ExtraStreams => ExtraCourses.SelectMany(course => course.Streams).ToList().AsReadOnly();
 
     public MegaFaculty AddMegaFaculty(MegaFaculty megaFaculty)
     {
         if (_megaFaculties.Contains(megaFaculty))
+            throw new NotImplementedException();
+        if (Faculties.Any(faculty => megaFaculty.Faculties.Contains(faculty)))
             throw new NotImplementedException();
         _megaFaculties.Add(megaFaculty);
         return megaFaculty;
@@ -38,6 +46,8 @@ public class IsuExtraService : IIsuExtraService
     public ExtraCourse AddExtraCourse(ExtraCourse extraCourse)
     {
         if (_extraCourses.Contains(extraCourse))
+            throw new NotImplementedException();
+        if (!_megaFaculties.Contains(extraCourse.Provider))
             throw new NotImplementedException();
         _extraCourses.Add(extraCourse);
         return extraCourse;
@@ -76,23 +86,71 @@ public class IsuExtraService : IIsuExtraService
             .AsReadOnly();
     }
 
-    private StudentDecorator GetStudentDecorator(Student decoratee)
+    public void ChangeStudentGroup(Student student, Group newGroup)
     {
-        if (_studentDecorators.TryGetValue(decoratee, out StudentDecorator? studentDecorator))
+        StudentDecorator studentDecorator = GetStudentDecorator(student);
+        GroupDecorator newGroupDecorator = GetGroupDecorator(newGroup);
+
+        studentDecorator.ChangeDecoratedGroup(newGroupDecorator, newGroup);
+    }
+
+    public Group AddGroup(GroupName name)
+    {
+        return _isuService.AddGroup(name);
+    }
+
+    public Student AddStudent(Group group, string name)
+    {
+        return _isuService.AddStudent(group, name);
+    }
+
+    public Student GetStudent(int id)
+    {
+        return _isuService.GetStudent(id);
+    }
+
+    public Student? FindStudent(int id)
+    {
+        return _isuService.FindStudent(id);
+    }
+
+    public IReadOnlyList<Student> FindStudents(GroupName groupName)
+    {
+        return _isuService.FindStudents(groupName);
+    }
+
+    public IReadOnlyList<Student> FindStudents(CourseNumber courseNumber)
+    {
+        return _isuService.FindStudents(courseNumber);
+    }
+
+    public Group? FindGroup(GroupName groupName)
+    {
+        return _isuService.FindGroup(groupName);
+    }
+
+    public IReadOnlyList<Group> FindGroups(CourseNumber courseNumber)
+    {
+        return _isuService.FindGroups(courseNumber);
+    }
+
+    private StudentDecorator GetStudentDecorator(Student student)
+    {
+        if (_studentDecorators.TryGetValue(student, out StudentDecorator? studentDecorator))
             return studentDecorator;
 
-        if (_isuService.FindStudent(decoratee.PersonalInfo.Id.Value) is null)
+        if (_isuService.FindStudent(student.PersonalInfo.Id.Value) is null)
             throw new NotImplementedException();
 
-        GroupDecorator groupDecorator = GetGroupDecorator(decoratee.Group);
-        studentDecorator = new StudentDecorator(decoratee, groupDecorator, _options.ExtraStreamsLimit);
-        _studentDecorators.Add(decoratee, studentDecorator);
+        GroupDecorator groupDecorator = GetGroupDecorator(student.Group);
+        studentDecorator = new StudentDecorator(student, groupDecorator, _options.ExtraStreamsLimit);
+        _studentDecorators.Add(student, studentDecorator);
         return studentDecorator;
     }
 
-    private GroupDecorator GetGroupDecorator(Group decoratee)
+    private GroupDecorator GetGroupDecorator(Group group)
     {
-        if (_groupDecorators.TryGetValue(decoratee, out GroupDecorator? groupDecorator))
+        if (_groupDecorators.TryGetValue(group, out GroupDecorator? groupDecorator))
             return groupDecorator;
         throw new NotImplementedException();
     }

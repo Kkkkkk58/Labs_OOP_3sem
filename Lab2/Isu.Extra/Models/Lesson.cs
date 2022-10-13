@@ -4,16 +4,16 @@ namespace Isu.Extra.Models;
 
 public record Lesson
 {
-    public Lesson(LessonTime time, Teacher teacher, ClassRoomNumber classRoomNumber)
+    public Lesson(string name, LessonTime time, Teacher teacher, ClassRoomLocation classRoomLocation)
     {
-        Id = Guid.NewGuid();
+        Name = name ?? throw new ArgumentNullException(nameof(name));
         Time = time;
-        Teacher = teacher;
-        ClassRoomNumber = classRoomNumber;
+        Teacher = teacher ?? throw new ArgumentNullException(nameof(teacher));
+        ClassRoomLocation = classRoomLocation;
     }
 
-    public Guid Id { get; }
+    public string Name { get; }
     public LessonTime Time { get; init; }
     public Teacher Teacher { get; }
-    public ClassRoomNumber ClassRoomNumber { get; }
+    public ClassRoomLocation ClassRoomLocation { get; }
 }

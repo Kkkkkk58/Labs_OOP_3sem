@@ -1,18 +1,19 @@
 ﻿using Isu.Entities;
-using Isu.Extra.Models;
+using Isu.Models.IsuInformationDetails;
 
 namespace Isu.Extra.Entities;
 
 public class GroupDecorator : IEquatable<GroupDecorator>
 {
-    public GroupDecorator(Group groupDecoratee, Schedule schedule)
+    private readonly Group _group;
+    public GroupDecorator(Group group, Schedule schedule)
     {
-        GroupDecoratee = groupDecoratee;
-        Schedule = schedule;
+        _group = group ?? throw new ArgumentNullException(nameof(group));
+        Schedule = schedule ?? throw new ArgumentNullException(nameof(schedule));
     }
 
-    public Group GroupDecoratee { get; }
     public Schedule Schedule { get; }
+    public GroupName Name => _group.Name;
 
     public override bool Equals(object? obj)
     {
@@ -21,11 +22,11 @@ public class GroupDecorator : IEquatable<GroupDecorator>
 
     public bool Equals(GroupDecorator? other)
     {
-        return other is not null && GroupDecoratee.Equals(other.GroupDecoratee);
+        return other is not null && _group.Equals(other._group);
     }
 
     public override int GetHashCode()
     {
-        return GroupDecoratee.GetHashCode();
+        return _group.GetHashCode();
     }
 }

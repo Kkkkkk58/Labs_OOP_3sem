@@ -1,6 +1,6 @@
 ﻿namespace Isu.Extra.Models;
 
-public struct LessonSchedulingOptions
+public record LessonSchedulingOptions : ILessonSchedulingOptions
 {
     public LessonSchedulingOptions(Lesson lesson, ICollection<Lesson> schedule, DateOnly scheduleStart, DateOnly scheduleEnd, int lessonRepeatNumber)
     {
@@ -9,8 +9,8 @@ public struct LessonSchedulingOptions
         if (lessonRepeatNumber <= 0)
             throw new NotImplementedException();
 
-        Lesson = lesson;
-        Schedule = schedule;
+        Lesson = lesson ?? throw new ArgumentNullException(nameof(lesson));
+        Schedule = schedule ?? throw new ArgumentNullException(nameof(schedule));
         ScheduleStart = scheduleStart;
         ScheduleEnd = scheduleEnd;
         LessonRepeatNumber = lessonRepeatNumber;

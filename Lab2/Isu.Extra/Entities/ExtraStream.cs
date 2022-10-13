@@ -1,8 +1,8 @@
-﻿using Isu.Extra.Entities;
+﻿using Isu.Extra.Exceptions;
 
-namespace Isu.Extra.Models;
+namespace Isu.Extra.Entities;
 
-public class ExtraStream : IStudyStream, IEquatable<ExtraStream>
+public class ExtraStream : IEquatable<ExtraStream>
 {
     private readonly List<StudentDecorator> _students;
     private readonly int? _streamLimit;
@@ -10,15 +10,15 @@ public class ExtraStream : IStudyStream, IEquatable<ExtraStream>
     public ExtraStream(string name, int? streamLimit, ExtraCourse course, Schedule schedule)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new NotImplementedException();
+            throw ExtraStreamException.EmptyName();
 
         Id = Guid.NewGuid();
         Name = name;
         _streamLimit = streamLimit;
         _students = new List<StudentDecorator>();
-        Course = course;
+        Course = course ?? throw new ArgumentNullException(nameof(course));
+        Schedule = schedule ?? throw new ArgumentNullException(nameof(schedule));
         Course.AddStream(this);
-        Schedule = schedule;
     }
 
     public Guid Id { get; }
@@ -29,11 +29,12 @@ public class ExtraStream : IStudyStream, IEquatable<ExtraStream>
 
     public StudentDecorator AddStudent(StudentDecorator student)
     {
-        if (_students.Contains(student))
-            throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(student);
 
+        if (_students.Contains(student))
+            throw ExtraStreamException.StudentAlreadyExists(Id, student.PersonalInfo.Id);
         if (_streamLimit.HasValue && _students.Count == _streamLimit)
-            throw new NotImplementedException();
+            throw ExtraStreamException.StreamLimitReached(Id, _streamLimit.Value);
 
         _students.Add(student);
         return student;
@@ -41,8 +42,10 @@ public class ExtraStream : IStudyStream, IEquatable<ExtraStream>
 
     public void RemoveStudent(StudentDecorator student)
     {
+        ArgumentNullException.ThrowIfNull(student);
+
         if (!_students.Remove(student))
-            throw new NotImplementedException();
+            throw ExtraStreamException.StudentNotFound(Id, student.PersonalInfo.Id);
     }
 
     public override bool Equals(object? obj)

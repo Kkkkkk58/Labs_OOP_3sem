@@ -1,36 +1,42 @@
-﻿namespace Isu.Extra.Models;
+﻿using Isu.Extra.Entities.LessonSchedulers;
+using Isu.Extra.Exceptions;
+using Isu.Extra.Models;
+
+namespace Isu.Extra.Entities;
 
 public class Schedule
 {
-    private readonly List<Lesson> _lessons;
+    private readonly IReadOnlyList<Lesson> _lessons;
 
-    private Schedule(List<Lesson> lessons)
+    private Schedule(IEnumerable<Lesson> lessons)
     {
-        _lessons = lessons;
-        SortLessonsByBegin();
+        _lessons = lessons
+            .OrderBy(lesson => lesson.Time.Begin)
+            .ToList()
+            .AsReadOnly();
     }
 
     public static ScheduleBuilder Builder => new ScheduleBuilder();
 
     public bool HasIntersections(Schedule other)
     {
-        return _lessons.Any(curLesson => other._lessons.Any(otherLesson => otherLesson.Time.Intersects(curLesson.Time)));
+        ArgumentNullException.ThrowIfNull(other);
+
+        return _lessons
+            .Any(curLesson => other._lessons.Any(otherLesson => otherLesson.Time.Intersects(curLesson.Time)));
     }
 
     public Schedule Combine(Schedule other)
     {
+        ArgumentNullException.ThrowIfNull(other);
+
         if (HasIntersections(other))
-            throw new NotImplementedException();
+            throw ScheduleException.ScheduleCombinationIntersects();
 
         var newLessons = new List<Lesson>(_lessons);
         newLessons.AddRange(other._lessons);
 
         return new Schedule(newLessons);
-    }
-
-    private void SortLessonsByBegin()
-    {
-        _lessons.Sort((lhs, rhs) => (rhs.Time.Begin - lhs.Time.Begin).Seconds);
     }
 
     public class ScheduleBuilder
@@ -63,19 +69,18 @@ public class Schedule
             return this;
         }
 
-        public ScheduleBuilder AddLesson(Lesson lesson, LessonScheduler lessonScheduler, int repeatNumber)
+        public ScheduleBuilder AddLesson(ILessonScheduler lessonScheduler, ILessonSchedulingOptionsBuilder optionsBuilder)
         {
-            if (_startDate is null || _endDate is null)
-                throw new NotImplementedException();
-            if (_lessons.Contains(lesson))
-                throw new NotImplementedException();
+            ArgumentNullException.ThrowIfNull(lessonScheduler);
+            ArgumentNullException.ThrowIfNull(optionsBuilder);
 
-            LessonSchedulingOptions options = new LessonSchedulingOptionsBuilder()
+            if (_startDate is null || _endDate is null)
+                throw ScheduleBuilderException.NoTimeLimitsProvided();
+
+            ILessonSchedulingOptions options = optionsBuilder
                 .SetStart(_startDate.Value)
                 .SetEnd(_endDate.Value)
                 .SetSchedule(_lessons)
-                .SetLesson(lesson)
-                .SetLessonRepeatNumber(repeatNumber)
                 .Build();
 
             lessonScheduler.ExpandSchedule(options);

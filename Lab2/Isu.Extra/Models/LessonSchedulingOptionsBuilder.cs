@@ -1,6 +1,6 @@
 ﻿namespace Isu.Extra.Models;
 
-public class LessonSchedulingOptionsBuilder
+public class LessonSchedulingOptionsBuilder : ILessonSchedulingOptionsBuilder
 {
     private Lesson? _lesson;
     private ICollection<Lesson>? _schedule;
@@ -12,37 +12,37 @@ public class LessonSchedulingOptionsBuilder
     {
     }
 
-    public LessonSchedulingOptionsBuilder SetLesson(Lesson lesson)
+    public ILessonSchedulingOptionsBuilder SetLesson(Lesson lesson)
     {
         _lesson = lesson;
         return this;
     }
 
-    public LessonSchedulingOptionsBuilder SetSchedule(ICollection<Lesson> schedule)
+    public ILessonSchedulingOptionsBuilder SetSchedule(ICollection<Lesson> schedule)
     {
         _schedule = schedule;
         return this;
     }
 
-    public LessonSchedulingOptionsBuilder SetStart(DateOnly scheduleStart)
+    public ILessonSchedulingOptionsBuilder SetStart(DateOnly scheduleStart)
     {
         _scheduleStart = scheduleStart;
         return this;
     }
 
-    public LessonSchedulingOptionsBuilder SetEnd(DateOnly scheduleEnd)
+    public ILessonSchedulingOptionsBuilder SetEnd(DateOnly scheduleEnd)
     {
         _scheduleEnd = scheduleEnd;
         return this;
     }
 
-    public LessonSchedulingOptionsBuilder SetLessonRepeatNumber(int lessonRepeatNumber)
+    public ILessonSchedulingOptionsBuilder SetLessonRepeatNumber(int lessonRepeatNumber)
     {
         _lessonRepeatNumber = lessonRepeatNumber;
         return this;
     }
 
-    public LessonSchedulingOptions Build()
+    public ILessonSchedulingOptions Build()
     {
         if (_lesson is null)
             throw new NotImplementedException();

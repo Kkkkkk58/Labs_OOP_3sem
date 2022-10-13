@@ -1,43 +1,40 @@
 ﻿using Isu.Entities;
-using Isu.Extra.Models;
+using Isu.Extra.Exceptions;
+using Isu.Models.IsuInformationDetails;
 
 namespace Isu.Extra.Entities;
 
 public class StudentDecorator : IEquatable<StudentDecorator>
 {
+    private readonly Student _student;
     private readonly List<ExtraStream> _extraStreams;
-    private readonly GroupDecorator _groupDecorator;
     private readonly int _extraStreamsLimit;
+    private GroupDecorator _groupDecorator;
 
-    public StudentDecorator(Student studentDecoratee, GroupDecorator groupDecorator, int extraStreamsLimit)
+    public StudentDecorator(Student student, GroupDecorator groupDecorator, int extraStreamsLimit)
     {
-        if (!studentDecoratee.Group.Equals(groupDecorator.GroupDecoratee))
-            throw new NotImplementedException();
-        if (_extraStreamsLimit < 0)
-            throw new NotImplementedException();
+        _student = student ?? throw new ArgumentNullException(nameof(student));
+        _groupDecorator = groupDecorator ?? throw new ArgumentNullException(nameof(groupDecorator));
 
-        StudentDecoratee = studentDecoratee;
-        _groupDecorator = groupDecorator;
-        _extraStreams = new List<ExtraStream>();
+        if (!_groupDecorator.Name.Equals(_student.Group.Name))
+            throw StudentDecoratorException.InvalidGroupDecorator(_student.PersonalInfo.Id, _student.Group.Name, groupDecorator.Name);
+        if (extraStreamsLimit < 0)
+            throw StudentDecoratorException.ExtraStreamsLimitOutOfRange(extraStreamsLimit);
+
         _extraStreamsLimit = extraStreamsLimit;
+        _extraStreams = new List<ExtraStream>(_extraStreamsLimit);
     }
 
-    public Student StudentDecoratee { get; }
     public IReadOnlyList<ExtraStream> ExtraStreams => _extraStreams;
     public bool IsAssignedToAllStreams => _extraStreams.Count == _extraStreamsLimit;
     public Schedule Schedule => GetSchedule();
+    public PersonalInformation PersonalInfo => _student.PersonalInfo;
 
     public void SignUpToExtraStream(ExtraStream extraStream)
     {
-        if (IsAssignedToAllStreams)
-            throw new NotImplementedException();
-        if (_extraStreams.Any(stream => stream.Course.Equals(extraStream.Course)))
-            throw new NotImplementedException();
-        if (extraStream.Course.Provider.Faculties.Any(faculty =>
-                faculty.Letter.Equals(StudentDecoratee.Group.Name.Details.FacultyLetter)))
-            throw new NotImplementedException();
-        if (Schedule.HasIntersections(extraStream.Schedule))
-            throw new NotImplementedException();
+        if (extraStream is null)
+            throw new ArgumentNullException(nameof(extraStream));
+        ValidateSigningUpAbility(extraStream);
 
         extraStream.AddStudent(this);
         _extraStreams.Add(extraStream);
@@ -45,9 +42,25 @@ public class StudentDecorator : IEquatable<StudentDecorator>
 
     public void ResetExtraStream(ExtraStream extraStream)
     {
+        if (extraStream is null)
+            throw new ArgumentNullException(nameof(extraStream));
+
         extraStream.RemoveStudent(this);
         if (!_extraStreams.Remove(extraStream))
             throw new NotImplementedException();
+    }
+
+    public void ChangeDecoratedGroup(GroupDecorator newGroupDecorator, Group decoratedGroup)
+    {
+        if (!newGroupDecorator.Name.Equals(decoratedGroup.Name))
+            throw new NotImplementedException();
+
+        Schedule extraSchedule = GetExtraSchedule();
+        if (extraSchedule.HasIntersections(newGroupDecorator.Schedule))
+            throw new NotImplementedException();
+
+        _student.ChangeGroup(decoratedGroup);
+        _groupDecorator = newGroupDecorator;
     }
 
     public override bool Equals(object? obj)
@@ -57,22 +70,49 @@ public class StudentDecorator : IEquatable<StudentDecorator>
 
     public bool Equals(StudentDecorator? other)
     {
-        return other is not null && StudentDecoratee.Equals(other.StudentDecoratee);
+        return other is not null && _student.Equals(other._student);
     }
 
     public override int GetHashCode()
     {
-        return StudentDecoratee.GetHashCode();
+        return _student.GetHashCode();
+    }
+
+    private void ValidateSigningUpAbility(ExtraStream extraStream)
+    {
+        if (IsAssignedToAllStreams)
+            throw StudentDecoratorException.StreamsLimitReached(PersonalInfo.Id, _extraStreamsLimit);
+        if (_extraStreams.Any(stream => stream.Course.Equals(extraStream.Course)))
+            throw StudentDecoratorException.AlreadySignedForCourse(PersonalInfo.Id, extraStream.Course.Id, extraStream.Id);
+        if (IsExtraStreamProvidedByStudentMegaFaculty(extraStream))
+            throw StudentDecoratorException.SameCourseMegaFaculty(PersonalInfo.Id, extraStream.Course.Provider.Id, extraStream.Id);
+        if (Schedule.HasIntersections(extraStream.Schedule))
+            throw StudentDecoratorException.ScheduleIntersectsWithExtraStream(PersonalInfo.Id, extraStream.Id);
+    }
+
+    private bool IsExtraStreamProvidedByStudentMegaFaculty(ExtraStream extraStream)
+    {
+        return extraStream.Course.Provider.Faculties
+            .Any(faculty => faculty.Letter.Equals(_student.Group.Name.Details.FacultyLetter));
     }
 
     private Schedule GetSchedule()
     {
-        Schedule schedule = _groupDecorator.Schedule;
+        Schedule mainSchedule = _groupDecorator.Schedule;
+        Schedule extraSchedule = GetExtraSchedule();
+
+        return mainSchedule.Combine(extraSchedule);
+    }
+
+    private Schedule GetExtraSchedule()
+    {
+        Schedule extraSchedule = Schedule.Builder.Build();
+
         foreach (ExtraStream extraStream in ExtraStreams)
         {
-            schedule.Combine(extraStream.Schedule);
+            extraSchedule.Combine(extraStream.Schedule);
         }
 
-        return schedule;
+        return extraSchedule;
     }
 }

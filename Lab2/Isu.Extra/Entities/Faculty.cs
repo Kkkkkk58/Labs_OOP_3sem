@@ -1,17 +1,18 @@
-﻿using Isu.Models.IsuInformationDetails;
+﻿using Isu.Extra.Exceptions;
+using Isu.Models.IsuInformationDetails;
 
-namespace Isu.Extra.Models;
+namespace Isu.Extra.Entities;
 
 public class Faculty : IEquatable<Faculty>
 {
     public Faculty(string name, FacultyLetter letter)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new NotImplementedException();
+            throw FacultyException.EmptyName();
 
         Id = Guid.NewGuid();
         Name = name;
-        Letter = letter;
+        Letter = letter ?? throw new ArgumentNullException(nameof(letter));
     }
 
     public Guid Id { get; }

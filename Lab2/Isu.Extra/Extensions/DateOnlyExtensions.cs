@@ -6,4 +6,9 @@ public static class DateOnlyExtensions
     {
         return a.ToDateTime(new TimeOnly(b.Hour, b.Minute, b.Second, b.Millisecond));
     }
+
+    public static int GetDifferenceInWeeks(this DateOnly a, DateTime b)
+    {
+        return (int)Math.Abs((a.ToDateTimeWithSameTime(b) - b).TotalDays) / 7;
+    }
 }

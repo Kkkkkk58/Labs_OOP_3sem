@@ -1,24 +1,19 @@
-﻿namespace Isu.Extra.Models;
+﻿using Isu.Extra.Exceptions;
+
+namespace Isu.Extra.Entities;
 
 public class MegaFaculty : IEquatable<MegaFaculty>
 {
     private readonly List<Faculty> _faculties;
 
     public MegaFaculty(string name)
-        : this(name, new List<Faculty>())
-    {
-    }
-
-    public MegaFaculty(string name, List<Faculty> faculties)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new NotImplementedException();
-        if (faculties.Distinct().Count() < faculties.Count)
-            throw new NotImplementedException();
+            throw MegaFacultyException.EmptyName();
 
         Id = Guid.NewGuid();
         Name = name;
-        _faculties = faculties;
+        _faculties = new List<Faculty>();
     }
 
     public Guid Id { get; }
@@ -27,8 +22,10 @@ public class MegaFaculty : IEquatable<MegaFaculty>
 
     public Faculty AddFaculty(Faculty faculty)
     {
+        ArgumentNullException.ThrowIfNull(faculty);
+
         if (_faculties.Contains(faculty))
-            throw new NotImplementedException();
+            throw MegaFacultyException.FacultyAlreadyExists(Id, faculty.Id);
 
         _faculties.Add(faculty);
         return faculty;

@@ -1,18 +1,20 @@
-﻿using Isu.Extra.Extensions;
+﻿using Isu.Extra.Exceptions;
+using Isu.Extra.Extensions;
+using Isu.Extra.Models;
 
-namespace Isu.Extra.Models;
+namespace Isu.Extra.Entities.LessonSchedulers;
 
-public abstract class LessonScheduler
+public abstract class LessonScheduler : ILessonScheduler
 {
-    public void ExpandSchedule(LessonSchedulingOptions options)
+    public void ExpandSchedule(ILessonSchedulingOptions options)
     {
         if (LessonDoesNotFitIntoSchedule(options.Lesson.Time, options.ScheduleStart, options.ScheduleEnd))
-            throw new NotImplementedException();
+            throw LessonSchedulerException.LessonTimeOutOfSchedule(options.Lesson.Time, options.ScheduleStart, options.ScheduleEnd);
 
         MakeExpansion(options);
     }
 
-    protected abstract void MakeExpansion(LessonSchedulingOptions options);
+    protected abstract void MakeExpansion(ILessonSchedulingOptions options);
 
     private static bool LessonDoesNotFitIntoSchedule(LessonTime lessonTime, DateOnly scheduleStart, DateOnly scheduleEnd)
     {
