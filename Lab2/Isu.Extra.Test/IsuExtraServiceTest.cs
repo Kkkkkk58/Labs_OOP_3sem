@@ -29,8 +29,8 @@ public class IsuExtraServiceTest
     [Fact]
     public void AddNewExtraCourse_ExtraCourseAdded()
     {
-        MegaFaculty mf = _isuExtraService.AddMegaFaculty(new MegaFaculty("TILT"));
-        ExtraCourse course = _isuExtraService.AddExtraCourse(new ExtraCourse(mf, "SE"));
+        MegaFaculty mf = SetUpMegaFaculty();
+        ExtraCourse course = SetUpExtraCourse(mf);
 
         Assert.Contains(course, _isuExtraService.ExtraCourses);
     }
@@ -38,14 +38,14 @@ public class IsuExtraServiceTest
     [Fact]
     public void SignUpStudentForExtraCourse_StudentDecoratorContainsChosenStream()
     {
-        MegaFaculty mf = _isuExtraService.AddMegaFaculty(new MegaFaculty("TILT"));
+        MegaFaculty mf = SetUpMegaFaculty();
         mf.AddFaculty(new Faculty("BBBB", new FacultyLetter('B')));
-        ExtraCourse course = _isuExtraService.AddExtraCourse(new ExtraCourse(mf, "SE"));
+        ExtraCourse course = SetUpExtraCourse(mf);
         Schedule streamSchedule = GetSimpleSchedule(new DateTime(2022, 10, 14, 11, 40, 0));
 
         var stream = new ExtraStream("Stream", 12, course, streamSchedule);
-        Group group = _isuExtraService.AddGroup(new GroupName("M32021"));
-        Student student = _isuExtraService.AddStudent(group, "KSlacker");
+        Group group = SetUpGroup();
+        Student student = SetUpStudent(group);
         Schedule groupSchedule = GetDetailedSchedule();
         _isuExtraService.InitGroupSchedule(group, groupSchedule);
 
@@ -59,15 +59,15 @@ public class IsuExtraServiceTest
     [Fact]
     public void ResetStudentExtraCourse_StudentDecoratorDoesNotContainChosenStream()
     {
-        MegaFaculty mf = _isuExtraService.AddMegaFaculty(new MegaFaculty("TILT"));
-        ExtraCourse course1 = _isuExtraService.AddExtraCourse(new ExtraCourse(mf, "SE"));
-        ExtraCourse course2 = _isuExtraService.AddExtraCourse(new ExtraCourse(mf, "K"));
+        MegaFaculty mf = SetUpMegaFaculty();
+        ExtraCourse course1 = SetUpExtraCourse(mf);
+        ExtraCourse course2 = SetUpExtraCourse(mf);
         Schedule stream1Schedule = GetSimpleSchedule(new DateTime(2022, 10, 14, 11, 40, 0));
         Schedule stream2Schedule = GetSimpleSchedule(new DateTime(2022, 10, 10, 13, 50, 0));
         var stream1 = new ExtraStream("Stream1", 12, course1, stream1Schedule);
         var stream2 = new ExtraStream("Stream2", 15, course2, stream2Schedule);
-        Group group = _isuExtraService.AddGroup(new GroupName("M32021"));
-        Student student = _isuExtraService.AddStudent(group, "KSlacker");
+        Group group = SetUpGroup();
+        Student student = SetUpStudent(group);
         Schedule groupSchedule = GetDetailedSchedule();
         _isuExtraService.InitGroupSchedule(group, groupSchedule);
 
@@ -79,22 +79,23 @@ public class IsuExtraServiceTest
         Assert.DoesNotContain(stream1, sd.ExtraStreams);
         Assert.DoesNotContain(sd, stream1.Students);
         Assert.Contains(stream2, sd.ExtraStreams);
+        Assert.Contains(sd, stream2.Students);
     }
 
     [Fact]
     public void GetUnassignedStudentsByGroup_ReturnStudentsWithNotFullSetOfCourses()
     {
-        MegaFaculty mf = _isuExtraService.AddMegaFaculty(new MegaFaculty("TILT"));
-        ExtraCourse course1 = _isuExtraService.AddExtraCourse(new ExtraCourse(mf, "SE"));
-        ExtraCourse course2 = _isuExtraService.AddExtraCourse(new ExtraCourse(mf, "K"));
+        MegaFaculty mf = SetUpMegaFaculty();
+        ExtraCourse course1 = SetUpExtraCourse(mf);
+        ExtraCourse course2 = SetUpExtraCourse(mf);
         Schedule stream1Schedule = GetSimpleSchedule(new DateTime(2022, 10, 14, 11, 40, 0));
         Schedule stream2Schedule = GetSimpleSchedule(new DateTime(2022, 10, 10, 13, 50, 0));
         var stream1 = new ExtraStream("Stream1", 12, course1, stream1Schedule);
         var stream2 = new ExtraStream("Stream2", 15, course2, stream2Schedule);
 
-        Group group = _isuExtraService.AddGroup(new GroupName("M32021"));
-        Student student1 = _isuExtraService.AddStudent(group, "KSlacker");
-        Student student2 = _isuExtraService.AddStudent(group, "Joseph Craig");
+        Group group = SetUpGroup();
+        Student student1 = SetUpStudent(group, "KSlacker");
+        Student student2 = SetUpStudent(group, "Joseph Craig");
         Schedule groupSchedule = GetDetailedSchedule();
         _isuExtraService.InitGroupSchedule(group, groupSchedule);
 
@@ -104,21 +105,22 @@ public class IsuExtraServiceTest
         StudentDecorator sd1 = _isuExtraService.GetStudentDecorator(student1);
         StudentDecorator sd2 = _isuExtraService.GetStudentDecorator(student2);
 
-        Assert.Contains(sd1, _isuExtraService.GetUnassignedStudents(group));
-        Assert.DoesNotContain(sd2, _isuExtraService.GetUnassignedStudents(group));
+        IReadOnlyCollection<StudentDecorator> students = _isuExtraService.GetUnassignedStudents(group);
+        Assert.Contains(sd1, students);
+        Assert.DoesNotContain(sd2, students);
     }
 
     [Fact]
     public void AddStudentToFullExtraStream_ThrowException()
     {
-        MegaFaculty mf = _isuExtraService.AddMegaFaculty(new MegaFaculty("TILT"));
-        ExtraCourse course = _isuExtraService.AddExtraCourse(new ExtraCourse(mf, "SE"));
+        MegaFaculty mf = SetUpMegaFaculty();
+        ExtraCourse course = SetUpExtraCourse(mf);
         Schedule streamSchedule = GetSimpleSchedule(new DateTime(2022, 10, 14, 11, 40, 0));
 
         var stream = new ExtraStream("Stream", 1, course, streamSchedule);
-        Group group = _isuExtraService.AddGroup(new GroupName("M32021"));
-        Student student1 = _isuExtraService.AddStudent(group, "KSlacker");
-        Student student2 = _isuExtraService.AddStudent(group, "Yo Landi");
+        Group group = SetUpGroup();
+        Student student1 = SetUpStudent(group, "KSlacker");
+        Student student2 = SetUpStudent(group, "KrackerS");
         Schedule groupSchedule = GetDetailedSchedule();
         _isuExtraService.InitGroupSchedule(group, groupSchedule);
 
@@ -129,14 +131,14 @@ public class IsuExtraServiceTest
     [Fact]
     public void SignUpForTheSameMegaFacultyExtraCourse_ThrowException()
     {
-        MegaFaculty mf = _isuExtraService.AddMegaFaculty(new MegaFaculty("TILT"));
+        MegaFaculty mf = SetUpMegaFaculty();
         mf.AddFaculty(new Faculty("FITP", new FacultyLetter('M')));
-        ExtraCourse course = _isuExtraService.AddExtraCourse(new ExtraCourse(mf, "SE"));
+        ExtraCourse course = SetUpExtraCourse(mf);
         Schedule streamSchedule = GetSimpleSchedule(new DateTime(2022, 10, 14, 11, 40, 0));
 
         var stream = new ExtraStream("Stream", 12, course, streamSchedule);
-        Group group = _isuExtraService.AddGroup(new GroupName("M32021"));
-        Student student = _isuExtraService.AddStudent(group, "KSlacker");
+        Group group = SetUpGroup();
+        Student student = SetUpStudent(group);
         Schedule groupSchedule = GetDetailedSchedule();
         _isuExtraService.InitGroupSchedule(group, groupSchedule);
 
@@ -146,13 +148,13 @@ public class IsuExtraServiceTest
     [Fact]
     public void SchedulesHaveIntersections_ThrowException()
     {
-        MegaFaculty mf = _isuExtraService.AddMegaFaculty(new MegaFaculty("TILT"));
-        ExtraCourse course = _isuExtraService.AddExtraCourse(new ExtraCourse(mf, "SE"));
+        MegaFaculty mf = SetUpMegaFaculty();
+        ExtraCourse course = SetUpExtraCourse(mf);
         Schedule streamSchedule = GetSimpleSchedule(new DateTime(2022, 10, 15, 11, 40, 0));
 
         var stream = new ExtraStream("Stream", 12, course, streamSchedule);
-        Group group = _isuExtraService.AddGroup(new GroupName("M32021"));
-        Student student = _isuExtraService.AddStudent(group, "KSlacker");
+        Group group = SetUpGroup();
+        Student student = SetUpStudent(group);
         Schedule groupSchedule = GetDetailedSchedule();
         _isuExtraService.InitGroupSchedule(group, groupSchedule);
 
@@ -162,10 +164,10 @@ public class IsuExtraServiceTest
     [Fact]
     public void SignUpToMoreThanNeededCourses_ThrowException()
     {
-        MegaFaculty mf = _isuExtraService.AddMegaFaculty(new MegaFaculty("TILT"));
-        ExtraCourse course1 = _isuExtraService.AddExtraCourse(new ExtraCourse(mf, "SE"));
-        ExtraCourse course2 = _isuExtraService.AddExtraCourse(new ExtraCourse(mf, "SE"));
-        ExtraCourse course3 = _isuExtraService.AddExtraCourse(new ExtraCourse(mf, "SE"));
+        MegaFaculty mf = SetUpMegaFaculty();
+        ExtraCourse course1 = SetUpExtraCourse(mf);
+        ExtraCourse course2 = SetUpExtraCourse(mf);
+        ExtraCourse course3 = SetUpExtraCourse(mf);
         Schedule stream1Schedule = GetSimpleSchedule(new DateTime(2022, 10, 14, 11, 40, 0));
         Schedule stream2Schedule = GetSimpleSchedule(new DateTime(2022, 9, 12, 11, 40, 0));
         Schedule stream3Schedule = GetSimpleSchedule(new DateTime(2023, 05, 07, 8, 20, 0));
@@ -173,8 +175,8 @@ public class IsuExtraServiceTest
         var stream1 = new ExtraStream("Stream1", 12, course1, stream1Schedule);
         var stream2 = new ExtraStream("Stream2", 9, course2, stream2Schedule);
         var stream3 = new ExtraStream("Stream3", 50, course3, stream3Schedule);
-        Group group = _isuExtraService.AddGroup(new GroupName("M32021"));
-        Student student = _isuExtraService.AddStudent(group, "KSlacker");
+        Group group = SetUpGroup();
+        Student student = SetUpStudent(group);
         Schedule groupSchedule = GetDetailedSchedule();
         _isuExtraService.InitGroupSchedule(group, groupSchedule);
 
@@ -182,6 +184,27 @@ public class IsuExtraServiceTest
         _isuExtraService.SignUpStudentForExtraStream(student, stream2);
 
         Assert.Throws<StudentDecoratorException>(() => _isuExtraService.SignUpStudentForExtraStream(student, stream3));
+    }
+
+    [Fact]
+    public void GetStudentSchedule_CombineGroupAndExtraStreamsSchedules()
+    {
+        MegaFaculty mf = SetUpMegaFaculty();
+        ExtraCourse course = SetUpExtraCourse(mf);
+        Schedule streamSchedule = GetSimpleSchedule(new DateTime(2022, 10, 14, 11, 40, 0));
+        var stream = new ExtraStream("Stream", 9, course, streamSchedule);
+
+        Group group = SetUpGroup();
+        Student student = SetUpStudent(group);
+        Schedule groupSchedule = GetDetailedSchedule();
+        _isuExtraService.InitGroupSchedule(group, groupSchedule);
+        _isuExtraService.SignUpStudentForExtraStream(student, stream);
+
+        Schedule studentSchedule = _isuExtraService.GetStudentDecorator(student).Schedule;
+        int expectedLessonsCount = streamSchedule.Lessons.Count + groupSchedule.Lessons.Count;
+        Assert.Equal(expectedLessonsCount, studentSchedule.Lessons.Count);
+        Assert.True(studentSchedule.Lessons.Intersect(groupSchedule.Lessons).Any());
+        Assert.True(studentSchedule.Lessons.Intersect(streamSchedule.Lessons).Any());
     }
 
     private static IIsuService GetOldService()
@@ -196,6 +219,26 @@ public class IsuExtraServiceTest
         IIsuService oldService = GetOldService();
         var options = new IsuExtraServiceOptions(_coursesLimit);
         return new IsuExtraService(options, oldService);
+    }
+
+    private MegaFaculty SetUpMegaFaculty()
+    {
+        return _isuExtraService.AddMegaFaculty(new MegaFaculty("TILT"));
+    }
+
+    private ExtraCourse SetUpExtraCourse(MegaFaculty megaFaculty)
+    {
+        return _isuExtraService.AddExtraCourse(new ExtraCourse(megaFaculty, "Test Course"));
+    }
+
+    private Group SetUpGroup(string name = "M32021")
+    {
+        return _isuExtraService.AddGroup(new GroupName(name));
+    }
+
+    private Student SetUpStudent(Group group, string name = "KSlacker")
+    {
+        return _isuExtraService.AddStudent(group, name);
     }
 
     private Schedule GetSimpleSchedule(DateTime lessonDate)
