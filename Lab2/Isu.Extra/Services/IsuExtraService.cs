@@ -94,14 +94,16 @@ public class IsuExtraService : IIsuExtraService
         _groupDecorators.Add(group, groupDecorator);
     }
 
-    public IReadOnlyCollection<StudentDecorator> GetUnassignedStudents(Group group)
+    public IReadOnlyCollection<Student> GetUnassignedStudents(Group group)
     {
         ArgumentNullException.ThrowIfNull(group);
 
+        if (!_groupDecorators.ContainsKey(group))
+            return group.Students;
+
         return group
             .Students
-            .Select(GetStudentDecorator)
-            .Where(studentDecorator => !studentDecorator.IsAssignedToAllStreams)
+            .Where(student => !GetStudentDecorator(student).IsAssignedToAllStreams)
             .ToList()
             .AsReadOnly();
     }

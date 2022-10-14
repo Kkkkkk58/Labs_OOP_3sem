@@ -102,12 +102,10 @@ public class IsuExtraServiceTest
         _isuExtraService.SignUpStudentForExtraStream(student1, stream1);
         _isuExtraService.SignUpStudentForExtraStream(student2, stream1);
         _isuExtraService.SignUpStudentForExtraStream(student2, stream2);
-        StudentDecorator sd1 = _isuExtraService.GetStudentDecorator(student1);
-        StudentDecorator sd2 = _isuExtraService.GetStudentDecorator(student2);
 
-        IReadOnlyCollection<StudentDecorator> students = _isuExtraService.GetUnassignedStudents(group);
-        Assert.Contains(sd1, students);
-        Assert.DoesNotContain(sd2, students);
+        IReadOnlyCollection<Student> students = _isuExtraService.GetUnassignedStudents(group);
+        Assert.Contains(student1, students);
+        Assert.DoesNotContain(student2, students);
     }
 
     [Fact]

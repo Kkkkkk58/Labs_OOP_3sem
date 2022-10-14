@@ -11,5 +11,5 @@ public interface IExtraCoursesService
     ExtraCourse AddExtraCourse(ExtraCourse extraCourse);
     void SignUpStudentForExtraStream(Student student, ExtraStream extraStream);
     void ResetStudentExtraStream(Student student, ExtraStream extraStream);
-    IReadOnlyCollection<StudentDecorator> GetUnassignedStudents(Group group);
+    IReadOnlyCollection<Student> GetUnassignedStudents(Group group);
 }
