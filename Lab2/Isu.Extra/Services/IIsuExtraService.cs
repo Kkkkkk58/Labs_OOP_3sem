@@ -6,10 +6,10 @@ namespace Isu.Extra.Services;
 
 public interface IIsuExtraService : IIsuService, IExtraCoursesService
 {
-    IReadOnlyList<MegaFaculty> MegaFaculties { get; }
-    IReadOnlyList<Faculty> Faculties { get; }
-    IReadOnlyList<StudentDecorator> Students { get; }
-    IReadOnlyList<GroupDecorator> Groups { get; }
+    IReadOnlyCollection<MegaFaculty> MegaFaculties { get; }
+    IReadOnlyCollection<Faculty> Faculties { get; }
+    IReadOnlyCollection<StudentDecorator> Students { get; }
+    IReadOnlyCollection<GroupDecorator> Groups { get; }
 
     StudentDecorator GetStudentDecorator(Student student);
     GroupDecorator GetGroupDecorator(Group group);

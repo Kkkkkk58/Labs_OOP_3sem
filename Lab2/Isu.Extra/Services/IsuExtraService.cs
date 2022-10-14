@@ -26,13 +26,13 @@ public class IsuExtraService : IIsuExtraService
         _extraCourses = new List<ExtraCourse>();
     }
 
-    public IReadOnlyList<StudentDecorator> Students => _studentDecorators.Values.ToList().AsReadOnly();
-    public IReadOnlyList<GroupDecorator> Groups => _groupDecorators.Values.ToList().AsReadOnly();
-    public IReadOnlyList<MegaFaculty> MegaFaculties => _megaFaculties.AsReadOnly();
-    public IReadOnlyList<Faculty> Faculties =>
+    public IReadOnlyCollection<StudentDecorator> Students => _studentDecorators.Values;
+    public IReadOnlyCollection<GroupDecorator> Groups => _groupDecorators.Values;
+    public IReadOnlyCollection<MegaFaculty> MegaFaculties => _megaFaculties.AsReadOnly();
+    public IReadOnlyCollection<Faculty> Faculties =>
         MegaFaculties.SelectMany(megaFaculty => megaFaculty.Faculties).ToList().AsReadOnly();
-    public IReadOnlyList<ExtraCourse> ExtraCourses => _extraCourses.AsReadOnly();
-    public IReadOnlyList<ExtraStream> ExtraStreams => ExtraCourses.SelectMany(course => course.Streams).ToList().AsReadOnly();
+    public IReadOnlyCollection<ExtraCourse> ExtraCourses => _extraCourses.AsReadOnly();
+    public IReadOnlyCollection<ExtraStream> ExtraStreams => ExtraCourses.SelectMany(course => course.Streams).ToList().AsReadOnly();
 
     public MegaFaculty AddMegaFaculty(MegaFaculty megaFaculty)
     {
@@ -90,7 +90,7 @@ public class IsuExtraService : IIsuExtraService
         _groupDecorators.Add(group, groupDecorator);
     }
 
-    public IReadOnlyList<StudentDecorator> GetUnassignedStudents(Group group)
+    public IReadOnlyCollection<StudentDecorator> GetUnassignedStudents(Group group)
     {
         ArgumentNullException.ThrowIfNull(group);
 

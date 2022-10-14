@@ -5,11 +5,11 @@ namespace Isu.Extra.Services;
 
 public interface IExtraCoursesService
 {
-    IReadOnlyList<ExtraCourse> ExtraCourses { get; }
-    IReadOnlyList<ExtraStream> ExtraStreams { get; }
+    IReadOnlyCollection<ExtraCourse> ExtraCourses { get; }
+    IReadOnlyCollection<ExtraStream> ExtraStreams { get; }
 
     ExtraCourse AddExtraCourse(ExtraCourse extraCourse);
     void SignUpStudentForExtraStream(Student student, ExtraStream extraStream);
     void ResetStudentExtraStream(Student student, ExtraStream extraStream);
-    IReadOnlyList<StudentDecorator> GetUnassignedStudents(Group group);
+    IReadOnlyCollection<StudentDecorator> GetUnassignedStudents(Group group);
 }
