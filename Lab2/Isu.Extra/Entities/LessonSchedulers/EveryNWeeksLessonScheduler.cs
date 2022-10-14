@@ -57,6 +57,7 @@ public class EveryNWeeksLessonScheduler : LessonScheduler
 
     private bool RepeatNumberExceedsNumberOfAvailableWeeks(ILessonSchedulingOptions options)
     {
-        return options.ScheduleEnd.GetDifferenceInWeeks(options.Lesson.Time.End) / _weeksNumber < options.LessonRepeatNumber;
+        return options.ScheduleEnd.GetDifferenceInWeeks(options.Lesson.Time.End) / _weeksNumber <
+               options.LessonRepeatNumber;
     }
 }

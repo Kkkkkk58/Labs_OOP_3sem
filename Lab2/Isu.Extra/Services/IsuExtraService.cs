@@ -29,10 +29,14 @@ public class IsuExtraService : IIsuExtraService
     public IReadOnlyCollection<StudentDecorator> Students => _studentDecorators.Values;
     public IReadOnlyCollection<GroupDecorator> Groups => _groupDecorators.Values;
     public IReadOnlyCollection<MegaFaculty> MegaFaculties => _megaFaculties.AsReadOnly();
+
     public IReadOnlyCollection<Faculty> Faculties =>
         MegaFaculties.SelectMany(megaFaculty => megaFaculty.Faculties).ToList().AsReadOnly();
+
     public IReadOnlyCollection<ExtraCourse> ExtraCourses => _extraCourses.AsReadOnly();
-    public IReadOnlyCollection<ExtraStream> ExtraStreams => ExtraCourses.SelectMany(course => course.Streams).ToList().AsReadOnly();
+
+    public IReadOnlyCollection<ExtraStream> ExtraStreams =>
+        ExtraCourses.SelectMany(course => course.Streams).ToList().AsReadOnly();
 
     public MegaFaculty AddMegaFaculty(MegaFaculty megaFaculty)
     {

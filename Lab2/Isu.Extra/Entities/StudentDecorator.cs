@@ -17,7 +17,12 @@ public class StudentDecorator : IEquatable<StudentDecorator>
         _groupDecorator = groupDecorator ?? throw new ArgumentNullException(nameof(groupDecorator));
 
         if (!_groupDecorator.Name.Equals(_student.Group.Name))
-            throw StudentDecoratorException.InvalidGroupDecorator(_student.PersonalInfo.Id, _student.Group, groupDecorator);
+        {
+            throw StudentDecoratorException.InvalidGroupDecorator(
+                _student.PersonalInfo.Id,
+                _student.Group,
+                groupDecorator);
+        }
 
         if (extraStreamsLimit < 0)
             throw new ArgumentOutOfRangeException(nameof(extraStreamsLimit));
@@ -58,7 +63,11 @@ public class StudentDecorator : IEquatable<StudentDecorator>
         if (extraSchedule.HasIntersections(newGroupDecorator.Schedule))
             throw StudentDecoratorException.TransferGroupScheduleHasIntersections(PersonalInfo.Id, decoratedGroup);
         if (_extraStreams.Any(stream => IsExtraStreamProvidedByGroupMegaFaculty(stream, decoratedGroup)))
-            throw StudentDecoratorException.TransferGroupHasSameMegaFacultyWithExtraCourse(PersonalInfo.Id, decoratedGroup);
+        {
+            throw StudentDecoratorException.TransferGroupHasSameMegaFacultyWithExtraCourse(
+                PersonalInfo.Id,
+                decoratedGroup);
+        }
 
         _student.ChangeGroup(decoratedGroup);
         _groupDecorator = newGroupDecorator;
@@ -94,7 +103,12 @@ public class StudentDecorator : IEquatable<StudentDecorator>
             throw StudentDecoratorException.AlreadySignedForCourse(PersonalInfo.Id, extraStream.Course, extraStream);
 
         if (IsExtraStreamProvidedByGroupMegaFaculty(extraStream, _student.Group))
-            throw StudentDecoratorException.SameCourseMegaFaculty(PersonalInfo.Id, extraStream.Course.Provider, extraStream);
+        {
+            throw StudentDecoratorException.SameCourseMegaFaculty(
+                PersonalInfo.Id,
+                extraStream.Course.Provider,
+                extraStream);
+        }
 
         if (Schedule.HasIntersections(extraStream.Schedule))
             throw StudentDecoratorException.ScheduleIntersectsWithExtraStream(PersonalInfo.Id, extraStream);

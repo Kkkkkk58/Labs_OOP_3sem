@@ -17,7 +17,8 @@ public class IsuExtraServiceException : IsuExtraException
 
     public static IsuExtraServiceException MegaFacultyContainsAlienFaculty(MegaFaculty megaFaculty)
     {
-        throw new IsuExtraServiceException($"MegaFaculty {megaFaculty} contains a faculty that belongs to other megaFaculty");
+        throw new IsuExtraServiceException(
+            $"MegaFaculty {megaFaculty} contains a faculty that belongs to other megaFaculty");
     }
 
     public static IsuExtraServiceException ExtraCourseAlreadyExists(ExtraCourse extraCourse)
@@ -25,9 +26,12 @@ public class IsuExtraServiceException : IsuExtraException
         throw new IsuExtraServiceException($"Extra course {extraCourse} already exists");
     }
 
-    public static IsuExtraServiceException ExtraCourseProviderNotFound(ExtraCourse extraCourse, MegaFaculty extraCourseProvider)
+    public static IsuExtraServiceException ExtraCourseProviderNotFound(
+        ExtraCourse extraCourse,
+        MegaFaculty extraCourseProvider)
     {
-        throw new IsuExtraServiceException($"Extra course {extraCourse.Id} provider megaFaculty {extraCourseProvider.Id} was not found");
+        throw new IsuExtraServiceException(
+            $"Extra course {extraCourse.Id} provider megaFaculty {extraCourseProvider.Id} was not found");
     }
 
     public static IsuExtraServiceException GroupAlreadyHasSchedule(Group group)

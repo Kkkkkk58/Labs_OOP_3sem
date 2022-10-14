@@ -7,7 +7,9 @@ public class LessonSchedulingOptionsException : IsuExtraException
     {
     }
 
-    public static LessonSchedulingOptionsException InvalidScheduleTimeRange(DateOnly scheduleStart, DateOnly scheduleEnd)
+    public static LessonSchedulingOptionsException InvalidScheduleTimeRange(
+        DateOnly scheduleStart,
+        DateOnly scheduleEnd)
     {
         throw new LessonSchedulingOptionsException($"Invalid time range: {scheduleStart} - {scheduleEnd}");
     }

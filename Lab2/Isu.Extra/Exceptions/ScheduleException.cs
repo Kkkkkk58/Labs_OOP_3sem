@@ -2,7 +2,7 @@
 
 public class ScheduleException : IsuExtraException
 {
-    public ScheduleException(string message)
+    private ScheduleException(string message)
         : base(message)
     {
     }

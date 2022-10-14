@@ -4,7 +4,7 @@ namespace Isu.Extra.Exceptions;
 
 public class MegaFacultyException : IsuExtraException
 {
-    public MegaFacultyException(string message)
+    private MegaFacultyException(string message)
         : base(message)
     {
     }
