@@ -112,11 +112,7 @@ public class StudentDecorator : IEquatable<StudentDecorator>
     {
         Schedule extraSchedule = Schedule.Builder.Build();
 
-        foreach (ExtraStream extraStream in ExtraStreams)
-        {
-            extraSchedule.Combine(extraStream.Schedule);
-        }
-
-        return extraSchedule;
+        return ExtraStreams
+            .Aggregate(extraSchedule, (current, extraStream) => current.Combine(extraStream.Schedule));
     }
 }
