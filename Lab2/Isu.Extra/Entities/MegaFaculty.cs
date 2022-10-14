@@ -18,7 +18,7 @@ public class MegaFaculty : IEquatable<MegaFaculty>
 
     public Guid Id { get; }
     public string Name { get; }
-    public IReadOnlyList<Faculty> Faculties => _faculties;
+    public IReadOnlyList<Faculty> Faculties => _faculties.AsReadOnly();
 
     public Faculty AddFaculty(Faculty faculty)
     {

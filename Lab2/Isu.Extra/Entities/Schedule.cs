@@ -6,24 +6,23 @@ namespace Isu.Extra.Entities;
 
 public class Schedule
 {
-    private readonly IReadOnlyList<Lesson> _lessons;
-
     private Schedule(IEnumerable<Lesson> lessons)
     {
-        _lessons = lessons
+        Lessons = lessons
             .OrderBy(lesson => lesson.Time.Begin)
             .ToList()
             .AsReadOnly();
     }
 
     public static ScheduleBuilder Builder => new ScheduleBuilder();
+    public IReadOnlyList<Lesson> Lessons { get; }
 
     public bool HasIntersections(Schedule other)
     {
         ArgumentNullException.ThrowIfNull(other);
 
-        return _lessons
-            .Any(curLesson => other._lessons.Any(otherLesson => otherLesson.Time.Intersects(curLesson.Time)));
+        return Lessons
+            .Any(curLesson => other.Lessons.Any(otherLesson => otherLesson.Time.Intersects(curLesson.Time)));
     }
 
     public Schedule Combine(Schedule other)
@@ -33,8 +32,8 @@ public class Schedule
         if (HasIntersections(other))
             throw ScheduleException.ScheduleCombinationIntersects();
 
-        var newLessons = new List<Lesson>(_lessons);
-        newLessons.AddRange(other._lessons);
+        var newLessons = new List<Lesson>(Lessons);
+        newLessons.AddRange(other.Lessons);
 
         return new Schedule(newLessons);
     }
