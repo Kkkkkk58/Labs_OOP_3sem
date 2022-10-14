@@ -4,22 +4,22 @@ namespace Isu.Extra.Models;
 
 public readonly record struct LessonTime
 {
-    public LessonTime(DateTime begin, TimeSpan duration)
+    public LessonTime(DateTime start, TimeSpan duration)
     {
-        Begin = begin;
+        Start = start;
         Duration = duration;
-        End = begin + Duration;
+        End = start + Duration;
 
-        if (End.Date != Begin.Date)
-            throw LessonTimeException.InvalidLessonDates(Begin, End);
+        if (End.Date != Start.Date)
+            throw LessonTimeException.InvalidLessonDates(Start, End);
     }
 
-    public DateTime Begin { get; }
+    public DateTime Start { get; }
     public DateTime End { get; }
     public TimeSpan Duration { get; }
 
     public bool Intersects(LessonTime other)
     {
-        return End >= other.Begin && Begin <= other.End;
+        return End >= other.Start && Start <= other.End;
     }
 }

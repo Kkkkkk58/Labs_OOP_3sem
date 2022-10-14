@@ -9,7 +9,7 @@ public class Schedule
     private Schedule(IEnumerable<Lesson> lessons)
     {
         Lessons = lessons
-            .OrderBy(lesson => lesson.Time.Begin)
+            .OrderBy(lesson => lesson.Time.Start)
             .ToList()
             .AsReadOnly();
     }

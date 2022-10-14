@@ -15,7 +15,7 @@ public class LessonSchedulerException : IsuExtraException
         DateOnly scheduleEnd)
     {
         throw new LessonSchedulerException(
-            $"Lesson time: {lessonTime.Begin}-{lessonTime.End} was out of range: {scheduleStart}-{scheduleEnd}");
+            $"Lesson time: {lessonTime.Start}-{lessonTime.End} was out of range: {scheduleStart}-{scheduleEnd}");
     }
 
     public static LessonSchedulerException InvalidSingleTimeRepeatNumber(int lessonRepeatNumber)

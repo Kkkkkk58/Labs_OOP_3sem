@@ -26,7 +26,7 @@ public abstract class LessonScheduler : ILessonScheduler
         DateOnly scheduleStart,
         DateOnly scheduleEnd)
     {
-        return lessonTime.Begin < scheduleStart.ToDateTimeWithSameTime(lessonTime.Begin)
+        return lessonTime.Start < scheduleStart.ToDateTimeWithSameTime(lessonTime.Start)
                || lessonTime.End > scheduleEnd.ToDateTimeWithSameTime(lessonTime.End);
     }
 }

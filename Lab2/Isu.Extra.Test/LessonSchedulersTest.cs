@@ -74,7 +74,7 @@ public class LessonSchedulersTest
     {
         for (int i = 0; i < lessons.Count - 1; ++i)
         {
-            if (lessons[i + 1].Time.Begin - lessons[i].Time.Begin != TimeSpan.FromDays(DaysInWeek * n))
+            if (lessons[i + 1].Time.Start - lessons[i].Time.Start != TimeSpan.FromDays(DaysInWeek * n))
                 return false;
         }
 

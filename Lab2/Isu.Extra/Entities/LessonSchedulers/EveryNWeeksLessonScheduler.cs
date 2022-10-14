@@ -31,7 +31,7 @@ public class EveryNWeeksLessonScheduler : LessonScheduler
 
     private Lesson GetLessonForNextNthWeek(Lesson curLesson)
     {
-        DateTime shiftedDate = curLesson.Time.Begin + TimeSpan.FromDays(DaysInWeek * _weeksNumber);
+        DateTime shiftedDate = curLesson.Time.Start + TimeSpan.FromDays(DaysInWeek * _weeksNumber);
         return curLesson with
         {
             Time = new LessonTime(shiftedDate, curLesson.Time.Duration),
