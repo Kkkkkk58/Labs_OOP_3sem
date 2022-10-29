@@ -4,7 +4,7 @@ namespace Backups.Models;
 
 public class Storage
 {
-    public Storage(IRepository repository, RepositoryAccessKey accessKey, IReadOnlyList<RepositoryAccessKey> backupObjectKeys, Stream backupObjectData)
+    public Storage(IRepository repository, IRepositoryAccessKey accessKey, IReadOnlyList<IRepositoryAccessKey> backupObjectKeys, Stream backupObjectData)
     {
         ArgumentNullException.ThrowIfNull(accessKey);
         ArgumentNullException.ThrowIfNull(backupObjectKeys);
@@ -14,11 +14,9 @@ public class Storage
         AccessKey = accessKey;
         Repository = repository;
         BackupObjectKeys = backupObjectKeys;
-
-        Repository.SaveData(AccessKey, backupObjectData);
     }
 
-    public RepositoryAccessKey AccessKey { get; }
+    public IRepositoryAccessKey AccessKey { get; }
     public IRepository Repository { get; }
-    public IReadOnlyList<RepositoryAccessKey> BackupObjectKeys { get; }
+    public IReadOnlyList<IRepositoryAccessKey> BackupObjectKeys { get; }
 }

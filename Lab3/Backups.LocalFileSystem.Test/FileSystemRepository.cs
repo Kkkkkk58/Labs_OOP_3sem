@@ -5,38 +5,77 @@ namespace Backups.LocalFileSystem.Test;
 
 public class FileSystemRepository : IRepository
 {
-    private readonly DirectoryInfo _baseDirectoryInfo;
-
-    public FileSystemRepository(DirectoryInfo baseDirectoryInfo)
+    public FileSystemRepository(string baseDirectoryPath)
     {
-        if (baseDirectoryInfo is null || !baseDirectoryInfo.Exists)
-            throw new ArgumentNullException(nameof(baseDirectoryInfo));
-
-        _baseDirectoryInfo = baseDirectoryInfo;
+        if (!Directory.Exists(baseDirectoryPath))
+            throw new NotImplementedException();
+        BaseKey = new FileSystemRepositoryAccessKey(baseDirectoryPath);
     }
 
-    public bool Contains(RepositoryAccessKey accessKey)
+    public IRepositoryAccessKey BaseKey { get; }
+
+    public bool Contains(IRepositoryAccessKey accessKey)
     {
         string path = GetPath(accessKey);
-        return File.Exists(path) || Directory.Exists(path);
+        return ContainsFile(path) || ContainsDirectory(path);
     }
 
-    public Stream GetData(RepositoryAccessKey accessKey)
+    public IReadOnlyList<RepositoryObject> GetData(IRepositoryAccessKey accessKey)
     {
         string path = GetPath(accessKey);
-        return File.OpenRead(path);
+        if (ContainsFile(path))
+            return GetDataFromFile(accessKey, path);
+        if (ContainsDirectory(path))
+            return GetDataFromDirectory(accessKey, path);
+        throw new NotImplementedException();
     }
 
-    public void SaveData(RepositoryAccessKey accessKey, Stream content)
+    public Stream OpenStream(IRepositoryAccessKey accessKey)
     {
         string path = GetPath(accessKey);
-        using FileStream fs = File.Create(path);
-        content.Seek(0, SeekOrigin.Begin);
-        content.CopyTo(fs);
+        string? dirname = Path.GetDirectoryName(path);
+        if (dirname is not null)
+        {
+            Directory.CreateDirectory(dirname);
+        }
+
+        return File.OpenWrite(path);
     }
 
-    private string GetPath(RepositoryAccessKey accessKey)
+    private static bool ContainsFile(string path)
     {
-        return Path.Combine(_baseDirectoryInfo.FullName, accessKey.Value);
+        return File.Exists(path);
+    }
+
+    private static bool ContainsDirectory(string path)
+    {
+        return Directory.Exists(path);
+    }
+
+    private IReadOnlyList<RepositoryObject> GetDataFromDirectory(IRepositoryAccessKey accessKey, string path)
+    {
+        var data = new List<RepositoryObject>();
+        var directoryInfo = new DirectoryInfo(path);
+        string parentDir = directoryInfo.Parent?.FullName ?? string.Empty;
+        foreach (FileInfo fileInfo in directoryInfo.EnumerateFiles())
+        {
+            string name = Path.GetRelativePath(parentDir, fileInfo.FullName);
+            IRepositoryAccessKey fileAccessKey = accessKey.CombineWithSeparator(new FileSystemRepositoryAccessKey(name));
+            var content = new RepositoryObject(fileAccessKey, File.OpenRead(fileInfo.FullName));
+            data.Add(content);
+        }
+
+        return data;
+    }
+
+    private IReadOnlyList<RepositoryObject> GetDataFromFile(IRepositoryAccessKey accessKey, string path)
+    {
+        var fileRepositoryObject = new RepositoryObject(accessKey, File.OpenRead(path));
+        return new List<RepositoryObject> { fileRepositoryObject };
+    }
+
+    private string GetPath(IRepositoryAccessKey accessKey)
+    {
+        return BaseKey.CombineWithSeparator(accessKey).Value;
     }
 }

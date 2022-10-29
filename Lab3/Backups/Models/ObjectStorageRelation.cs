@@ -4,7 +4,7 @@ namespace Backups.Models;
 
 public record ObjectStorageRelation
 {
-    public ObjectStorageRelation(Abstractions.IBackupObject backupObject, Storage storage)
+    public ObjectStorageRelation(IBackupObject backupObject, Storage storage)
     {
         ArgumentNullException.ThrowIfNull(backupObject);
         ArgumentNullException.ThrowIfNull(storage);
@@ -15,6 +15,6 @@ public record ObjectStorageRelation
         Storage = storage;
     }
 
-    public Abstractions.IBackupObject BackupObject { get; }
+    public IBackupObject BackupObject { get; }
     public Storage Storage { get; }
 }

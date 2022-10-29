@@ -2,7 +2,8 @@
 
 public interface IRepository
 {
-    bool Contains(RepositoryAccessKey accessKey);
-    Stream GetData(RepositoryAccessKey accessKey);
-    void SaveData(RepositoryAccessKey accessKey, Stream content);
+    IRepositoryAccessKey BaseKey { get; }
+    bool Contains(IRepositoryAccessKey accessKey);
+    IReadOnlyList<RepositoryObject> GetData(IRepositoryAccessKey accessKey);
+    Stream OpenStream(IRepositoryAccessKey accessKey);
 }

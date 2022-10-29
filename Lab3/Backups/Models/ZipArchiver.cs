@@ -13,18 +13,18 @@ public class ZipArchiver : IArchiver
 
         foreach (IBackupObject backupObject in backupObjects)
         {
-            IReadOnlyList<BackupObjectContent> objectContents = backupObject.GetContents();
-            foreach (BackupObjectContent objectContent in objectContents)
+            IReadOnlyList<RepositoryObject> objectContents = backupObject.GetContents();
+            foreach (RepositoryObject objectContent in objectContents)
             {
                 WriteToArchive(storageArchive, objectContent);
             }
         }
     }
 
-    private static void WriteToArchive(ZipArchive storageArchive, BackupObjectContent objectContent)
+    private static void WriteToArchive(ZipArchive storageArchive, RepositoryObject repositoryObject)
     {
-        using Stream backupObjectContent = objectContent.Stream;
-        ZipArchiveEntry zipArchiveEntry = storageArchive.CreateEntry(objectContent.AccessKey.Value);
+        using Stream backupObjectContent = repositoryObject.Stream;
+        ZipArchiveEntry zipArchiveEntry = storageArchive.CreateEntry(repositoryObject.AccessKey.Value);
         using Stream arcStream = zipArchiveEntry.Open();
         backupObjectContent.CopyTo(arcStream);
     }

@@ -4,18 +4,19 @@ namespace Backups.Models.Algorithms;
 
 public class SingleStorageAlgorithm : IStorageAlgorithm
 {
-    public IEnumerable<ObjectStorageRelation> CreateStorage(IEnumerable<Abstractions.IBackupObject> backupObjects, IRepository targetRepository, IArchiver archiver)
+    public IEnumerable<ObjectStorageRelation> CreateStorage(IEnumerable<IBackupObject> backupObjects, IRepository targetRepository, IArchiver archiver, IRepositoryAccessKey baseAccessKey)
     {
-        using var ms = new MemoryStream();
+        IRepositoryAccessKey key = baseAccessKey.CombineWithSeparator(Guid.NewGuid().ToString()).CombineWithExtension(archiver.Extension);
+        using Stream writingStream = targetRepository.OpenStream(key);
         var copy = backupObjects.ToList();
         var keys = copy.Select(bo => bo.AccessKey).ToList();
-        archiver.Archive(copy, ms);
+        archiver.Archive(copy, writingStream);
 
         var storage = new Storage(
             targetRepository,
-            new RepositoryAccessKey("test.zip"),
+            key,
             keys,
-            ms);
+            writingStream);
         return copy.Select(backupObject => new ObjectStorageRelation(backupObject, storage)).ToList().AsReadOnly();
     }
 }

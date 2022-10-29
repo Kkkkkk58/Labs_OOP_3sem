@@ -5,17 +5,16 @@ namespace Backups.Entities;
 
 public class BackupTask
 {
-    private readonly List<Models.Abstractions.IBackupObject> _trackedObjects;
+    private readonly List<IBackupObject> _trackedObjects;
     private readonly BackupConfiguration _backupConfiguration;
-    private readonly Backup _backup;
     private int _currentVersion;
 
     public BackupTask(BackupConfiguration backupConfiguration, string backupName)
-        : this(new List<Models.Abstractions.IBackupObject>(), backupConfiguration, default, new Backup(backupName))
+        : this(new List<IBackupObject>(), backupConfiguration, default, new Backup(backupName))
     {
     }
 
-    public BackupTask(List<Models.Abstractions.IBackupObject> trackedObjects, BackupConfiguration backupConfiguration, int currentVersion, Backup backup)
+    public BackupTask(List<IBackupObject> trackedObjects, BackupConfiguration backupConfiguration, int currentVersion, Backup backup)
     {
         ArgumentNullException.ThrowIfNull(trackedObjects);
         ArgumentNullException.ThrowIfNull(backup);
@@ -25,24 +24,29 @@ public class BackupTask
         _trackedObjects = trackedObjects;
         _backupConfiguration = backupConfiguration;
         _currentVersion = currentVersion;
-        _backup = backup;
+        Backup = backup;
     }
+
+    public Backup Backup { get; }
 
     public RestorePoint CreateRestorePoint(DateTime restorePointDate)
     {
-        if (_backup.RestorePoints.Any(rp => rp.CreationDate >= restorePointDate))
+        if (Backup.RestorePoints.Any(rp => rp.CreationDate >= restorePointDate))
             throw new NotImplementedException();
+
+        IRepositoryAccessKey key = _backupConfiguration.TargetRepository.BaseKey
+            .CombineWithSeparator(Backup.Id.ToString()).CombineWithSeparator(_currentVersion.ToString());
 
         IReadOnlyList<ObjectStorageRelation> relations =
             _backupConfiguration.StorageAlgorithm
-                .CreateStorage(_trackedObjects, _backupConfiguration.TargetRepository, _backupConfiguration.Archiver)
+                .CreateStorage(_trackedObjects, _backupConfiguration.TargetRepository, _backupConfiguration.Archiver, key)
                 .ToList();
 
         var restorePoint = new RestorePoint(restorePointDate, ++_currentVersion, relations);
-        return _backup.AddRestorePoint(restorePoint);
+        return Backup.AddRestorePoint(restorePoint);
     }
 
-    public IBackupObject TrackBackupObject(Models.Abstractions.IBackupObject backupObject)
+    public IBackupObject TrackBackupObject(IBackupObject backupObject)
     {
         if (_trackedObjects.Contains(backupObject))
             throw new NotImplementedException();
@@ -51,7 +55,7 @@ public class BackupTask
         return backupObject;
     }
 
-    public void UntrackBackupObject(Models.Abstractions.IBackupObject backupObject)
+    public void UntrackBackupObject(IBackupObject backupObject)
     {
         if (!_trackedObjects.Remove(backupObject))
             throw new NotImplementedException();
