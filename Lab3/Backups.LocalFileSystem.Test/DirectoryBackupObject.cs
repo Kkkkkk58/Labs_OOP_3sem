@@ -18,7 +18,7 @@ public class DirectoryBackupObject : IFileSystemBackupObject
     {
         var contents = new List<BackupObjectContent>();
         var directoryInfo = new DirectoryInfo(AccessKey.Value);
-        string parentDir = directoryInfo.Parent?.FullName ?? "";
+        string parentDir = directoryInfo.Parent?.FullName ?? string.Empty;
         foreach (FileInfo file in directoryInfo.EnumerateFiles())
         {
             string name = Path.GetRelativePath(parentDir, file.FullName);

@@ -43,7 +43,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backups.Extra", "Lab5\Backu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backups.Extra.Test", "Lab5\Backups.Extra.Test\Backups.Extra.Test.csproj", "{CDC9197E-D627-4705-8056-E67C46B786C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backups.LocalFileSystem.Test", "Backups.LocalFileSystem.Test\Backups.LocalFileSystem.Test.csproj", "{AF28EDBC-52EF-4B71-9D73-9505ADBA6864}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backups.LocalFileSystem.Test", "Lab3\Backups.LocalFileSystem.Test\Backups.LocalFileSystem.Test.csproj", "{AF28EDBC-52EF-4B71-9D73-9505ADBA6864}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -13,7 +13,7 @@ var backupTask = new BackupTask(new BackupConfiguration(new SingleStorageAlgorit
 backupTask.TrackBackupObject(bo);
 backupTask.TrackBackupObject(bo2);
 
-RestorePoint _ = backupTask.CreateRestorePoint(DateTime.Now);
+RestorePoint restorePoint = backupTask.CreateRestorePoint(DateTime.Now);
 
 backupTask.UntrackBackupObject(bo);
 backupTask.UntrackBackupObject(bo2);
@@ -24,10 +24,10 @@ bo3.AddBackupObject(bo4);
 
 backupTask.TrackBackupObject(bo3);
 
-_ = backupTask.CreateRestorePoint(DateTime.Now);
+restorePoint = backupTask.CreateRestorePoint(DateTime.Now);
 backupTask.UntrackBackupObject(bo3);
 
 var bo5 = new DirectoryBackupObject(repository, new RepositoryAccessKey("D:/test/aa"));
 backupTask.TrackBackupObject(bo5);
 
-_ = backupTask.CreateRestorePoint(DateTime.Now);
+restorePoint = backupTask.CreateRestorePoint(DateTime.Now);
