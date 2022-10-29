@@ -17,6 +17,8 @@ public class SingleStorageAlgorithm : IStorageAlgorithm
             key,
             keys,
             writingStream);
+
+        writingStream.Dispose();
         return copy.Select(backupObject => new ObjectStorageRelation(backupObject, storage)).ToList().AsReadOnly();
     }
 }

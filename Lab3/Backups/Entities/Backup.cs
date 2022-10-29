@@ -42,6 +42,6 @@ public class Backup
         ArgumentNullException.ThrowIfNull(restorePoint);
 
         if (!_restorePoints.Remove(restorePoint))
-            throw new NotImplementedException();
+            throw BackupException.RestorePointNotFound(restorePoint, this);
     }
 }

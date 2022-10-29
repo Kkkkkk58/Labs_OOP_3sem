@@ -14,4 +14,9 @@ public class BackupException : BackupsException
     {
         throw new BackupException($"{restorePoint} already exists in backup {backup.Id}");
     }
+
+    public static BackupException RestorePointNotFound(RestorePoint restorePoint, Backup backup)
+    {
+        throw new BackupException($"{restorePoint} wasn't found in backup {backup.Id}");
+    }
 }

@@ -35,14 +35,14 @@ public class BackupsTest
 
         var bo = new BackupObject(repository, new InMemoryRepositoryAccessKey("input/test.txt"));
         var bo2 = new BackupObject(repository, new InMemoryRepositoryAccessKey("/input/dir"));
-        var backupTask = new BackupTask(new BackupConfiguration(new SplitStorageAlgorithm(), repository, new ZipArchiver()), "Sample backup");
+        var backupTask = new BackupTask(new BackupConfiguration(new SplitStorageAlgorithm(), repository, new ZipArchiver(), new SimpleClock()), "Sample backup");
         backupTask.TrackBackupObject(bo);
         backupTask.TrackBackupObject(bo2);
 
-        backupTask.CreateRestorePoint(DateTime.Now);
+        backupTask.CreateRestorePoint();
 
         backupTask.UntrackBackupObject(bo2);
-        backupTask.CreateRestorePoint(DateTime.Now);
+        backupTask.CreateRestorePoint();
 
         Assert.Equal(2, backupTask.Backup.RestorePoints.Count);
         Assert.Equal(3, backupTask.Backup.RestorePoints.Select(bt => bt.ObjectStorageRelations.Count).Sum());

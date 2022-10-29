@@ -29,8 +29,9 @@ public class BackupTask
 
     public Backup Backup { get; }
 
-    public RestorePoint CreateRestorePoint(DateTime restorePointDate)
+    public RestorePoint CreateRestorePoint()
     {
+        DateTime restorePointDate = _backupConfiguration.Clock.Now;
         if (Backup.RestorePoints.Any(rp => rp.CreationDate >= restorePointDate))
             throw new NotImplementedException();
 
