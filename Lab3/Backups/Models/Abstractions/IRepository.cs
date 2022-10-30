@@ -4,6 +4,6 @@ public interface IRepository
 {
     IRepositoryAccessKey BaseKey { get; }
     bool Contains(IRepositoryAccessKey accessKey);
-    IReadOnlyList<RepositoryObject> GetData(IRepositoryAccessKey accessKey);
+    IReadOnlyList<IRepositoryObject> GetData(IRepositoryAccessKey accessKey);
     Stream OpenStream(IRepositoryAccessKey accessKey);
 }

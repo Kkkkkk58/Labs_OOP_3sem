@@ -1,4 +1,4 @@
-﻿using Backups.Models;
+﻿using Backups.Models.Abstractions;
 
 namespace Backups.Test;
 
@@ -13,17 +13,17 @@ public class InMemoryRepositoryAccessKey : IRepositoryAccessKey
 
     public string Value { get; }
 
-    public IRepositoryAccessKey CombineWithSeparator(IRepositoryAccessKey other)
+    public IRepositoryAccessKey Combine(IRepositoryAccessKey other)
     {
-        return CombineWithSeparator(other.Value);
+        return Combine(other.Value);
     }
 
-    public IRepositoryAccessKey CombineWithSeparator(string value)
+    public IRepositoryAccessKey Combine(string value)
     {
         return new InMemoryRepositoryAccessKey(Value + InMemorySeparator + value);
     }
 
-    public IRepositoryAccessKey CombineWithExtension(string extension)
+    public IRepositoryAccessKey ApplyExtension(string extension)
     {
         return new InMemoryRepositoryAccessKey(Path.ChangeExtension(Value, extension));
     }

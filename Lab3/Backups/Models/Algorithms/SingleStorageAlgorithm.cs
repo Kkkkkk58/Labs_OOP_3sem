@@ -4,26 +4,45 @@ namespace Backups.Models.Algorithms;
 
 public class SingleStorageAlgorithm : IStorageAlgorithm
 {
-    public IEnumerable<ObjectStorageRelation> CreateStorage(
-        IEnumerable<IBackupObject> backupObjects,
+    public IEnumerable<IObjectStorageRelation> CreateStorage(
+        IReadOnlyCollection<IBackupObject> backupObjects,
         IRepository targetRepository,
         IArchiver archiver,
         IRepositoryAccessKey baseAccessKey)
     {
-        IRepositoryAccessKey key = baseAccessKey.CombineWithSeparator(Guid.NewGuid().ToString())
-            .CombineWithExtension(archiver.Extension);
-        using Stream writingStream = targetRepository.OpenStream(key);
-        var copy = backupObjects.ToList();
-        var keys = copy.Select(bo => bo.AccessKey).ToList();
-        archiver.Archive(copy, writingStream);
+        ValidateArguments(backupObjects, targetRepository, archiver, baseAccessKey);
 
-        var storage = new Storage(
-            targetRepository,
-            key,
-            keys,
-            writingStream);
+        IRepositoryAccessKey storageKey = GetStorageKey(baseAccessKey, archiver.Extension);
+
+        using Stream writingStream = targetRepository.OpenStream(storageKey);
+        archiver.Archive(backupObjects, writingStream);
+
+        var backupObjectKeys = backupObjects.Select(bo => bo.AccessKey).ToList();
+        var storage = new Storage(targetRepository, storageKey, backupObjectKeys);
 
         writingStream.Dispose();
-        return copy.Select(backupObject => new ObjectStorageRelation(backupObject, storage)).ToList().AsReadOnly();
+        return backupObjects
+            .Select(backupObject => new ObjectStorageRelation(backupObject, storage));
+    }
+
+    private static IRepositoryAccessKey GetStorageKey(IRepositoryAccessKey baseAccessKey, string archiverExtension)
+    {
+        string storageName = Guid.NewGuid().ToString();
+
+        return baseAccessKey
+            .Combine(storageName)
+            .ApplyExtension(archiverExtension);
+    }
+
+    private static void ValidateArguments(
+        IReadOnlyCollection<IBackupObject> backupObjects,
+        IRepository targetRepository,
+        IArchiver archiver,
+        IRepositoryAccessKey baseAccessKey)
+    {
+        ArgumentNullException.ThrowIfNull(backupObjects);
+        ArgumentNullException.ThrowIfNull(targetRepository);
+        ArgumentNullException.ThrowIfNull(archiver);
+        ArgumentNullException.ThrowIfNull(baseAccessKey);
     }
 }

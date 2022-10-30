@@ -1,18 +1,19 @@
-﻿using Backups.Exceptions;
-using Backups.Models;
+﻿using Backups.Entities.Abstractions;
+using Backups.Exceptions;
+using Backups.Models.Abstractions;
 
 namespace Backups.Entities;
 
-public class Backup
+public class Backup : IBackup
 {
-    private readonly List<RestorePoint> _restorePoints;
+    private readonly List<IRestorePoint> _restorePoints;
 
     public Backup(string name)
-        : this(Guid.NewGuid(), name, new List<RestorePoint>())
+        : this(Guid.NewGuid(), name, new List<IRestorePoint>())
     {
     }
 
-    public Backup(Guid id, string name, IEnumerable<RestorePoint> restorePoints)
+    public Backup(Guid id, string name, IEnumerable<IRestorePoint> restorePoints)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentNullException(nameof(name));
@@ -20,14 +21,16 @@ public class Backup
 
         Id = id;
         Name = name;
-        _restorePoints = restorePoints.ToList();
+        _restorePoints = restorePoints
+            .OrderBy(restorePoint => restorePoint.CreationDate)
+            .ToList();
     }
 
     public Guid Id { get; }
     public string Name { get; }
-    public IReadOnlyList<RestorePoint> RestorePoints => _restorePoints.AsReadOnly();
+    public IReadOnlyList<IRestorePoint> RestorePoints => _restorePoints.AsReadOnly();
 
-    public RestorePoint AddRestorePoint(RestorePoint restorePoint)
+    public IRestorePoint AddRestorePoint(IRestorePoint restorePoint)
     {
         ArgumentNullException.ThrowIfNull(restorePoint);
         if (_restorePoints.Contains(restorePoint))
@@ -37,7 +40,7 @@ public class Backup
         return restorePoint;
     }
 
-    public void RemoveRestorePoint(RestorePoint restorePoint)
+    public void RemoveRestorePoint(IRestorePoint restorePoint)
     {
         ArgumentNullException.ThrowIfNull(restorePoint);
 

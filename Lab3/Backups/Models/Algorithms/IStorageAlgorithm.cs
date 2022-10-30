@@ -4,8 +4,8 @@ namespace Backups.Models.Algorithms;
 
 public interface IStorageAlgorithm
 {
-    IEnumerable<ObjectStorageRelation> CreateStorage(
-        IEnumerable<IBackupObject> backupObjects,
+    IEnumerable<IObjectStorageRelation> CreateStorage(
+        IReadOnlyCollection<IBackupObject> backupObjects,
         IRepository targetRepository,
         IArchiver archiver,
         IRepositoryAccessKey baseAccessKey);

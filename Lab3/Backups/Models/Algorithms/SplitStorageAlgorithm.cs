@@ -4,31 +4,51 @@ namespace Backups.Models.Algorithms;
 
 public class SplitStorageAlgorithm : IStorageAlgorithm
 {
-    public IEnumerable<ObjectStorageRelation> CreateStorage(
-        IEnumerable<IBackupObject> backupObjects,
+    public IEnumerable<IObjectStorageRelation> CreateStorage(
+        IReadOnlyCollection<IBackupObject> backupObjects,
         IRepository targetRepository,
         IArchiver archiver,
         IRepositoryAccessKey baseAccessKey)
     {
-        var relations = new List<ObjectStorageRelation>();
+        ValidateArguments(backupObjects, targetRepository, archiver, baseAccessKey);
+
+        var relations = new List<IObjectStorageRelation>();
 
         foreach (IBackupObject backupObject in backupObjects)
         {
-            IRepositoryAccessKey key = baseAccessKey.CombineWithSeparator(backupObject.AccessKey)
-                .CombineWithExtension(archiver.Extension);
-            using Stream stream = targetRepository.OpenStream(key);
+            IRepositoryAccessKey storageKey = GetStorageKey(baseAccessKey, backupObject.AccessKey, archiver.Extension);
+            using Stream stream = targetRepository.OpenStream(storageKey);
             archiver.Archive(new List<IBackupObject> { backupObject }, stream);
+            var backupObjectKeys = new List<IRepositoryAccessKey> { backupObject.AccessKey };
 
-            var storage = new Storage(
-                targetRepository,
-                key,
-                new List<IRepositoryAccessKey> { backupObject.AccessKey },
-                stream);
+            var storage = new Storage(targetRepository, storageKey, backupObjectKeys);
             relations.Add(new ObjectStorageRelation(backupObject, storage));
 
             stream.Dispose();
         }
 
         return relations.AsReadOnly();
+    }
+
+    private static IRepositoryAccessKey GetStorageKey(
+        IRepositoryAccessKey baseAccessKey,
+        IRepositoryAccessKey backupObjectKey,
+        string extension)
+    {
+        return baseAccessKey
+            .Combine(backupObjectKey)
+            .ApplyExtension(extension);
+    }
+
+    private static void ValidateArguments(
+        IReadOnlyCollection<IBackupObject> backupObjects,
+        IRepository targetRepository,
+        IArchiver archiver,
+        IRepositoryAccessKey baseAccessKey)
+    {
+        ArgumentNullException.ThrowIfNull(backupObjects);
+        ArgumentNullException.ThrowIfNull(targetRepository);
+        ArgumentNullException.ThrowIfNull(archiver);
+        ArgumentNullException.ThrowIfNull(baseAccessKey);
     }
 }

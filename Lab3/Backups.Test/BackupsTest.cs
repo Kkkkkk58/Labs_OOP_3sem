@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Backups.Entities;
 using Backups.Models;
 using Backups.Models.Abstractions;
 using Backups.Models.Algorithms;
@@ -37,7 +36,7 @@ public class BackupsTest
         var bo2 = new BackupObject(repository, new InMemoryRepositoryAccessKey("/input/dir"));
         var backupTask =
             new BackupTask(
-                new BackupConfiguration(new SplitStorageAlgorithm(), repository, new ZipArchiver(), new SimpleClock()),
+                new BackupTaskConfiguration(new SplitStorageAlgorithm(), repository, new ZipArchiver(), new SimpleClock()),
                 "Sample backup");
         backupTask.TrackBackupObject(bo);
         backupTask.TrackBackupObject(bo2);

@@ -2,18 +2,16 @@
 
 namespace Backups.Models;
 
-public class Storage
+public class Storage : IStorage
 {
     public Storage(
         IRepository repository,
         IRepositoryAccessKey accessKey,
-        IReadOnlyList<IRepositoryAccessKey> backupObjectKeys,
-        Stream backupObjectData)
+        IReadOnlyList<IRepositoryAccessKey> backupObjectKeys)
     {
         ArgumentNullException.ThrowIfNull(accessKey);
         ArgumentNullException.ThrowIfNull(backupObjectKeys);
         ArgumentNullException.ThrowIfNull(repository);
-        ArgumentNullException.ThrowIfNull(backupObjectData);
 
         AccessKey = accessKey;
         Repository = repository;

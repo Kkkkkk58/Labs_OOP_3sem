@@ -1,4 +1,6 @@
 ﻿using Backups.Entities;
+using Backups.Entities.Abstractions;
+using Backups.Exceptions;
 using Backups.Models.Abstractions;
 
 namespace Backups.Models;
@@ -6,55 +8,56 @@ namespace Backups.Models;
 public class BackupTask
 {
     private readonly List<IBackupObject> _trackedObjects;
-    private readonly BackupConfiguration _backupConfiguration;
-    private int _currentVersion;
+    private readonly IBackupTaskConfiguration _config;
+    private IRestorePointVersion _currentVersion;
 
-    public BackupTask(BackupConfiguration backupConfiguration, string backupName)
-        : this(new List<IBackupObject>(), backupConfiguration, default, new Backup(backupName))
+    // TODO BackupTaskBuilderImpl -> default values
+    public BackupTask(IBackupTaskConfiguration config, string backupName)
+        : this(new List<IBackupObject>(), config, new RestorePointVersion(), new Backup(backupName))
     {
     }
 
     public BackupTask(
         List<IBackupObject> trackedObjects,
-        BackupConfiguration backupConfiguration,
-        int currentVersion,
-        Backup backup)
+        IBackupTaskConfiguration config,
+        IRestorePointVersion currentVersion,
+        IBackup backup)
     {
         ArgumentNullException.ThrowIfNull(trackedObjects);
+        ArgumentNullException.ThrowIfNull(config);
+        ArgumentNullException.ThrowIfNull(currentVersion);
         ArgumentNullException.ThrowIfNull(backup);
-        if (currentVersion < 0)
-            throw new ArgumentOutOfRangeException(nameof(currentVersion));
 
         _trackedObjects = trackedObjects;
-        _backupConfiguration = backupConfiguration;
+        _config = config;
         _currentVersion = currentVersion;
         Backup = backup;
     }
 
-    public Backup Backup { get; }
+    public IBackup Backup { get; }
 
-    public RestorePoint CreateRestorePoint()
+    public IRestorePoint CreateRestorePoint()
     {
-        DateTime restorePointDate = _backupConfiguration.Clock.Now;
+        DateTime restorePointDate = _config.Clock.Now;
         if (Backup.RestorePoints.Any(rp => rp.CreationDate >= restorePointDate))
-            throw new NotImplementedException();
+            throw BackupTaskException.InvalidRestorePointCreationDate(restorePointDate);
 
-        IRepositoryAccessKey key = _backupConfiguration.TargetRepository.BaseKey
-            .CombineWithSeparator(Backup.Id.ToString()).CombineWithSeparator(_currentVersion.ToString());
+        _currentVersion = _currentVersion.GetNext();
+        IRepositoryAccessKey restorePointKey = GetRestorePointKey();
 
-        IReadOnlyList<ObjectStorageRelation> relations =
-            _backupConfiguration.StorageAlgorithm
-                .CreateStorage(_trackedObjects, _backupConfiguration.TargetRepository, _backupConfiguration.Archiver, key)
+        IReadOnlyList<IObjectStorageRelation> relations = _config
+                .StorageAlgorithm
+                .CreateStorage(_trackedObjects, _config.TargetRepository, _config.Archiver, restorePointKey)
                 .ToList();
 
-        var restorePoint = new RestorePoint(restorePointDate, ++_currentVersion, relations);
+        var restorePoint = new RestorePoint(restorePointDate, _currentVersion, relations);
         return Backup.AddRestorePoint(restorePoint);
     }
 
     public IBackupObject TrackBackupObject(IBackupObject backupObject)
     {
         if (_trackedObjects.Contains(backupObject))
-            throw new NotImplementedException();
+            throw BackupTaskException.ObjectIsAlreadyTracked(backupObject);
         _trackedObjects.Add(backupObject);
 
         return backupObject;
@@ -63,6 +66,15 @@ public class BackupTask
     public void UntrackBackupObject(IBackupObject backupObject)
     {
         if (!_trackedObjects.Remove(backupObject))
-            throw new NotImplementedException();
+            throw BackupTaskException.ObjectNotFound(backupObject);
+    }
+
+    private IRepositoryAccessKey GetRestorePointKey()
+    {
+        return _config
+            .TargetRepository
+            .BaseKey
+            .Combine(Backup.Id.ToString())
+            .Combine(_currentVersion.ToString());
     }
 }

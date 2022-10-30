@@ -2,7 +2,8 @@
 
 public interface IBackupObject
 {
+    Guid Id { get; }
     IRepositoryAccessKey AccessKey { get; }
     IRepository SourceRepository { get; }
-    IReadOnlyList<RepositoryObject> GetContents();
+    IReadOnlyList<IRepositoryObject> GetContents();
 }

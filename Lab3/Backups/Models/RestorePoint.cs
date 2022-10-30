@@ -1,30 +1,29 @@
-﻿namespace Backups.Models;
+﻿using Backups.Models.Abstractions;
 
-public class RestorePoint
+namespace Backups.Models;
+
+public class RestorePoint : IRestorePoint
 {
     public RestorePoint(
         DateTime creationDate,
-        int versionNumber,
-        IReadOnlyCollection<ObjectStorageRelation> objectStorageRelations)
+        IRestorePointVersion version,
+        IReadOnlyCollection<IObjectStorageRelation> objectStorageRelations)
     {
         ArgumentNullException.ThrowIfNull(objectStorageRelations);
-        if (versionNumber <= 0)
-            throw new ArgumentOutOfRangeException(nameof(versionNumber));
         if (ContainsRepeatingBackupObjects(objectStorageRelations))
             throw new NotImplementedException();
 
         CreationDate = creationDate;
-        VersionNumber = versionNumber;
+        Version = version;
         ObjectStorageRelations = objectStorageRelations.ToList();
     }
 
-    // TODO GLOBAL add init to props
     public DateTime CreationDate { get; }
-    public int VersionNumber { get; }
-    public IReadOnlyList<ObjectStorageRelation> ObjectStorageRelations { get; }
+    public IRestorePointVersion Version { get; }
+    public IReadOnlyList<IObjectStorageRelation> ObjectStorageRelations { get; }
 
     private static bool ContainsRepeatingBackupObjects(
-        IReadOnlyCollection<ObjectStorageRelation> objectStorageRelations)
+        IReadOnlyCollection<IObjectStorageRelation> objectStorageRelations)
     {
         return objectStorageRelations.DistinctBy(o => o.BackupObject).Count() != objectStorageRelations.Count;
     }

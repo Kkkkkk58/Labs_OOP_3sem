@@ -1,4 +1,4 @@
-﻿using Backups.Models;
+﻿using Backups.Models.Abstractions;
 
 namespace Backups.LocalFileSystem.Test;
 
@@ -13,17 +13,17 @@ public class FileSystemRepositoryAccessKey : IRepositoryAccessKey
 
     public string Value { get; }
 
-    public IRepositoryAccessKey CombineWithSeparator(IRepositoryAccessKey other)
+    public IRepositoryAccessKey Combine(IRepositoryAccessKey other)
     {
-        return CombineWithSeparator(other.Value);
+        return Combine(other.Value);
     }
 
-    public IRepositoryAccessKey CombineWithSeparator(string value)
+    public IRepositoryAccessKey Combine(string value)
     {
         return new FileSystemRepositoryAccessKey(Path.Combine(Value, value));
     }
 
-    public IRepositoryAccessKey CombineWithExtension(string extension)
+    public IRepositoryAccessKey ApplyExtension(string extension)
     {
         return new FileSystemRepositoryAccessKey(Path.ChangeExtension(Value, extension));
     }

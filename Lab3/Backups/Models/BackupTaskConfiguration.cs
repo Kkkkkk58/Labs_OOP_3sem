@@ -3,9 +3,10 @@ using Backups.Models.Algorithms;
 
 namespace Backups.Models;
 
-public record BackupConfiguration : IBackupConfiguration
+public record BackupTaskConfiguration : IBackupTaskConfiguration
 {
-    public BackupConfiguration(
+    // TODO Builder with interfaces
+    public BackupTaskConfiguration(
         IStorageAlgorithm storageAlgorithm,
         IRepository targetRepository,
         IArchiver archiver,

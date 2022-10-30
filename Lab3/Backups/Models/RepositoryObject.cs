@@ -1,6 +1,8 @@
-﻿namespace Backups.Models;
+﻿using Backups.Models.Abstractions;
 
-public record RepositoryObject
+namespace Backups.Models;
+
+public record RepositoryObject : IRepositoryObject
 {
     public RepositoryObject(IRepositoryAccessKey accessKey, Stream stream)
     {

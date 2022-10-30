@@ -20,7 +20,7 @@ public class FileSystemRepository : IRepository
         return ContainsFile(path) || ContainsDirectory(path);
     }
 
-    public IReadOnlyList<RepositoryObject> GetData(IRepositoryAccessKey accessKey)
+    public IReadOnlyList<IRepositoryObject> GetData(IRepositoryAccessKey accessKey)
     {
         string path = GetPath(accessKey);
         if (ContainsFile(path))
@@ -52,16 +52,16 @@ public class FileSystemRepository : IRepository
         return Directory.Exists(path);
     }
 
-    private IReadOnlyList<RepositoryObject> GetDataFromDirectory(IRepositoryAccessKey accessKey, string path)
+    private static IReadOnlyList<IRepositoryObject> GetDataFromDirectory(IRepositoryAccessKey accessKey, string path)
     {
-        var data = new List<RepositoryObject>();
+        var data = new List<IRepositoryObject>();
         var directoryInfo = new DirectoryInfo(path);
         string parentDir = directoryInfo.Parent?.FullName ?? string.Empty;
         foreach (FileInfo fileInfo in directoryInfo.EnumerateFiles())
         {
             string name = Path.GetRelativePath(parentDir, fileInfo.FullName);
             IRepositoryAccessKey fileAccessKey =
-                accessKey.CombineWithSeparator(new FileSystemRepositoryAccessKey(name));
+                accessKey.Combine(new FileSystemRepositoryAccessKey(name));
             var content = new RepositoryObject(fileAccessKey, File.OpenRead(fileInfo.FullName));
             data.Add(content);
         }
@@ -69,14 +69,14 @@ public class FileSystemRepository : IRepository
         return data;
     }
 
-    private IReadOnlyList<RepositoryObject> GetDataFromFile(IRepositoryAccessKey accessKey, string path)
+    private static IReadOnlyList<IRepositoryObject> GetDataFromFile(IRepositoryAccessKey accessKey, string path)
     {
         var fileRepositoryObject = new RepositoryObject(accessKey, File.OpenRead(path));
-        return new List<RepositoryObject> { fileRepositoryObject };
+        return new List<IRepositoryObject> { fileRepositoryObject };
     }
 
     private string GetPath(IRepositoryAccessKey accessKey)
     {
-        return BaseKey.CombineWithSeparator(accessKey).Value;
+        return BaseKey.Combine(accessKey).Value;
     }
 }
