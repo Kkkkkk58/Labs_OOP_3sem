@@ -1,7 +1,7 @@
-﻿using Backups.Models;
+﻿using Backups.Entities;
 using Backups.Models.Abstractions;
 
-namespace Backups.Entities;
+namespace Backups.Models;
 
 public class BackupTask
 {
@@ -14,7 +14,11 @@ public class BackupTask
     {
     }
 
-    public BackupTask(List<IBackupObject> trackedObjects, BackupConfiguration backupConfiguration, int currentVersion, Backup backup)
+    public BackupTask(
+        List<IBackupObject> trackedObjects,
+        BackupConfiguration backupConfiguration,
+        int currentVersion,
+        Backup backup)
     {
         ArgumentNullException.ThrowIfNull(trackedObjects);
         ArgumentNullException.ThrowIfNull(backup);

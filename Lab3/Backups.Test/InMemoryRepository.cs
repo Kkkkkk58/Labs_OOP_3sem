@@ -46,7 +46,8 @@ public class InMemoryRepository : IRepository
 
     private IReadOnlyList<RepositoryObject> GetDataFromFile(string path, IRepositoryAccessKey accessKey)
     {
-        var fileRepositoryObject = new RepositoryObject(accessKey, _fileSystem.OpenFile(path, FileMode.Open, FileAccess.Read));
+        var fileRepositoryObject =
+            new RepositoryObject(accessKey, _fileSystem.OpenFile(path, FileMode.Open, FileAccess.Read));
         return new List<RepositoryObject> { fileRepositoryObject };
     }
 
@@ -58,7 +59,8 @@ public class InMemoryRepository : IRepository
         {
             string name = Path.GetRelativePath(path, fileInfo.FullName);
             IRepositoryAccessKey fileAccessKey = accessKey.CombineWithSeparator(name);
-            var content = new RepositoryObject(fileAccessKey, _fileSystem.OpenFile(fileInfo.FullName, FileMode.Open, FileAccess.Read));
+            Stream stream = _fileSystem.OpenFile(fileInfo.FullName, FileMode.Open, FileAccess.Read);
+            var content = new RepositoryObject(fileAccessKey, stream);
             data.Add(content);
         }
 

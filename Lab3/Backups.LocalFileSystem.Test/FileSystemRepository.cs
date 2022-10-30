@@ -60,7 +60,8 @@ public class FileSystemRepository : IRepository
         foreach (FileInfo fileInfo in directoryInfo.EnumerateFiles())
         {
             string name = Path.GetRelativePath(parentDir, fileInfo.FullName);
-            IRepositoryAccessKey fileAccessKey = accessKey.CombineWithSeparator(new FileSystemRepositoryAccessKey(name));
+            IRepositoryAccessKey fileAccessKey =
+                accessKey.CombineWithSeparator(new FileSystemRepositoryAccessKey(name));
             var content = new RepositoryObject(fileAccessKey, File.OpenRead(fileInfo.FullName));
             data.Add(content);
         }

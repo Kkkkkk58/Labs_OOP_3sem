@@ -5,12 +5,14 @@ namespace Backups.Test;
 public class InMemoryRepositoryAccessKey : IRepositoryAccessKey
 {
     private const string InMemorySeparator = "/";
+
     public InMemoryRepositoryAccessKey(string value)
     {
         Value = value;
     }
 
     public string Value { get; }
+
     public IRepositoryAccessKey CombineWithSeparator(IRepositoryAccessKey other)
     {
         return CombineWithSeparator(other.Value);

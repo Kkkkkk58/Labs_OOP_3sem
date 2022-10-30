@@ -35,7 +35,10 @@ public class BackupsTest
 
         var bo = new BackupObject(repository, new InMemoryRepositoryAccessKey("input/test.txt"));
         var bo2 = new BackupObject(repository, new InMemoryRepositoryAccessKey("/input/dir"));
-        var backupTask = new BackupTask(new BackupConfiguration(new SplitStorageAlgorithm(), repository, new ZipArchiver(), new SimpleClock()), "Sample backup");
+        var backupTask =
+            new BackupTask(
+                new BackupConfiguration(new SplitStorageAlgorithm(), repository, new ZipArchiver(), new SimpleClock()),
+                "Sample backup");
         backupTask.TrackBackupObject(bo);
         backupTask.TrackBackupObject(bo2);
 

@@ -12,6 +12,7 @@ public class BackupObject : IBackupObject
 
     public IRepositoryAccessKey AccessKey { get; }
     public IRepository SourceRepository { get; }
+
     public IReadOnlyList<RepositoryObject> GetContents()
     {
         return SourceRepository.GetData(AccessKey);

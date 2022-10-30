@@ -2,7 +2,10 @@
 
 public class RestorePoint
 {
-    public RestorePoint(DateTime creationDate, int versionNumber, IReadOnlyCollection<ObjectStorageRelation> objectStorageRelations)
+    public RestorePoint(
+        DateTime creationDate,
+        int versionNumber,
+        IReadOnlyCollection<ObjectStorageRelation> objectStorageRelations)
     {
         ArgumentNullException.ThrowIfNull(objectStorageRelations);
         if (versionNumber <= 0)
@@ -20,7 +23,8 @@ public class RestorePoint
     public int VersionNumber { get; }
     public IReadOnlyList<ObjectStorageRelation> ObjectStorageRelations { get; }
 
-    private static bool ContainsRepeatingBackupObjects(IReadOnlyCollection<ObjectStorageRelation> objectStorageRelations)
+    private static bool ContainsRepeatingBackupObjects(
+        IReadOnlyCollection<ObjectStorageRelation> objectStorageRelations)
     {
         return objectStorageRelations.DistinctBy(o => o.BackupObject).Count() != objectStorageRelations.Count;
     }

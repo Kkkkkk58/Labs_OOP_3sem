@@ -4,9 +4,14 @@ namespace Backups.Models.Algorithms;
 
 public class SingleStorageAlgorithm : IStorageAlgorithm
 {
-    public IEnumerable<ObjectStorageRelation> CreateStorage(IEnumerable<IBackupObject> backupObjects, IRepository targetRepository, IArchiver archiver, IRepositoryAccessKey baseAccessKey)
+    public IEnumerable<ObjectStorageRelation> CreateStorage(
+        IEnumerable<IBackupObject> backupObjects,
+        IRepository targetRepository,
+        IArchiver archiver,
+        IRepositoryAccessKey baseAccessKey)
     {
-        IRepositoryAccessKey key = baseAccessKey.CombineWithSeparator(Guid.NewGuid().ToString()).CombineWithExtension(archiver.Extension);
+        IRepositoryAccessKey key = baseAccessKey.CombineWithSeparator(Guid.NewGuid().ToString())
+            .CombineWithExtension(archiver.Extension);
         using Stream writingStream = targetRepository.OpenStream(key);
         var copy = backupObjects.ToList();
         var keys = copy.Select(bo => bo.AccessKey).ToList();
