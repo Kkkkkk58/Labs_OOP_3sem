@@ -56,10 +56,9 @@ public class FileSystemRepository : IRepository
     {
         var data = new List<IRepositoryObject>();
         var directoryInfo = new DirectoryInfo(path);
-        string parentDir = directoryInfo.Parent?.FullName ?? string.Empty;
         foreach (FileInfo fileInfo in directoryInfo.EnumerateFiles())
         {
-            string name = Path.GetRelativePath(parentDir, fileInfo.FullName);
+            string name = Path.GetRelativePath(directoryInfo.FullName, fileInfo.FullName);
             IRepositoryAccessKey fileAccessKey =
                 accessKey.Combine(new FileSystemRepositoryAccessKey(name));
             var content = new RepositoryObject(fileAccessKey, File.OpenRead(fileInfo.FullName));
