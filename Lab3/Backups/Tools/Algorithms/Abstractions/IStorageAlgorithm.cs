@@ -1,6 +1,7 @@
-﻿using Backups.Models.Abstractions;
+﻿using Backups.Archivers.Abstractions;
+using Backups.Models.Abstractions;
 
-namespace Backups.Models.Algorithms;
+namespace Backups.Algorithms.Abstractions;
 
 public interface IStorageAlgorithm
 {

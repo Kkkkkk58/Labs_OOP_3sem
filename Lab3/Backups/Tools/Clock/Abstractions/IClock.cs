@@ -1,4 +1,4 @@
-﻿namespace Backups.Models.Abstractions;
+﻿namespace Backups.Tools.Clock.Abstractions;
 
 public interface IClock
 {

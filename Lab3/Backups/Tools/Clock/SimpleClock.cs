@@ -1,6 +1,6 @@
-﻿using Backups.Models.Abstractions;
+﻿using Backups.Tools.Clock.Abstractions;
 
-namespace Backups.LocalFileSystem.Test;
+namespace Backups.Tools.Clock;
 
 public class SimpleClock : IClock
 {

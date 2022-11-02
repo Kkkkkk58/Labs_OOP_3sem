@@ -1,13 +1,15 @@
-﻿using Backups.Models.Abstractions;
+﻿using Backups.Algorithms.Abstractions;
+using Backups.Archivers.Abstractions;
+using Backups.Models.Abstractions;
 
 namespace Backups.Models.Algorithms;
 
-public class SingleStorageAlgorithm : IStorageAlgorithm
+public class SplitStorageAlgorithm : IStorageAlgorithm
 {
     private readonly IStorageBuilder _storageBuilder;
     private readonly IObjectStorageRelationBuilder _objectStorageRelationBuilder;
 
-    public SingleStorageAlgorithm(
+    public SplitStorageAlgorithm(
         IStorageBuilder storageBuilder,
         IObjectStorageRelationBuilder objectStorageRelationBuilder)
     {
@@ -26,25 +28,31 @@ public class SingleStorageAlgorithm : IStorageAlgorithm
     {
         ValidateArguments(backupObjects, targetRepository, archiver, baseAccessKey);
 
-        IRepositoryAccessKey storageKey = GetStorageKey(baseAccessKey, archiver.Extension);
+        var relations = new List<IObjectStorageRelation>();
 
-        using Stream writingStream = targetRepository.OpenStream(storageKey);
-        archiver.Archive(backupObjects, writingStream);
+        foreach (IBackupObject backupObject in backupObjects)
+        {
+            IRepositoryAccessKey storageKey = GetStorageKey(baseAccessKey, backupObject.AccessKey, archiver.Extension);
+            using Stream stream = targetRepository.OpenStream(storageKey);
+            archiver.Archive(new List<IBackupObject> { backupObject }, stream);
+            var backupObjectKeys = new List<IRepositoryAccessKey> { backupObject.AccessKey };
 
-        var backupObjectKeys = backupObjects.Select(bo => bo.AccessKey).ToList();
-        IStorage storage = GetStorage(targetRepository, storageKey, backupObjectKeys);
+            IStorage storage = GetStorage(targetRepository, storageKey, backupObjectKeys);
+            IObjectStorageRelation relation = GetObjectStorageRelation(backupObject, storage);
+            relations.Add(relation);
+        }
 
-        return backupObjects
-            .Select(backupObject => GetObjectStorageRelation(backupObject, storage));
+        return relations.AsReadOnly();
     }
 
-    private static IRepositoryAccessKey GetStorageKey(IRepositoryAccessKey baseAccessKey, string archiverExtension)
+    private static IRepositoryAccessKey GetStorageKey(
+        IRepositoryAccessKey baseAccessKey,
+        IRepositoryAccessKey backupObjectKey,
+        string extension)
     {
-        string storageName = Guid.NewGuid().ToString();
-
         return baseAccessKey
-            .Combine(storageName)
-            .ApplyExtension(archiverExtension);
+            .Combine(backupObjectKey)
+            .ApplyExtension(extension);
     }
 
     private static void ValidateArguments(
