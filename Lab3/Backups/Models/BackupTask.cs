@@ -32,7 +32,7 @@ public class BackupTask : IBackupTask
     public IRestorePoint CreateRestorePoint()
     {
         DateTime restorePointDate = _config.Clock.Now;
-        if (Backup.RestorePoints.Any(rp => rp.CreationDate >= restorePointDate))
+        if (DatePrecedesOtherRestorePointDate(restorePointDate))
             throw BackupTaskException.InvalidRestorePointCreationDate(restorePointDate);
 
         _currentVersion = _currentVersion.GetNext();
@@ -60,6 +60,11 @@ public class BackupTask : IBackupTask
     {
         if (!_trackedObjects.Remove(backupObject))
             throw BackupTaskException.ObjectNotFound(backupObject);
+    }
+
+    private bool DatePrecedesOtherRestorePointDate(DateTime restorePointDate)
+    {
+        return Backup.RestorePoints.Any(rp => rp.CreationDate >= restorePointDate);
     }
 
     private IRepositoryAccessKey GetRestorePointKey()

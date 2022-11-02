@@ -1,6 +1,6 @@
 ﻿using Backups.Models.Abstractions;
 
-namespace Backups.Archivers.Abstractions;
+namespace Backups.Tools.Archivers.Abstractions;
 
 public interface IArchiver
 {

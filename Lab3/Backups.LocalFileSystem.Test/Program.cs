@@ -1,7 +1,7 @@
 ﻿using Backups.LocalFileSystem.Test.Repository;
 using Backups.Models;
 using Backups.Models.Abstractions;
-using Backups.Models.Algorithms;
+using Backups.Tools.Algorithms;
 
 IRepository repository = new FileSystemRepository("D:/test");
 Console.WriteLine("Hello, World!");

@@ -1,8 +1,8 @@
 ﻿using System.IO.Compression;
-using Backups.Archivers.Abstractions;
 using Backups.Models.Abstractions;
+using Backups.Tools.Archivers.Abstractions;
 
-namespace Backups.Models.Archivers;
+namespace Backups.Tools.Archivers;
 
 public class ZipArchiver : IArchiver
 {

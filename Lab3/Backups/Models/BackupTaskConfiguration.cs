@@ -1,6 +1,6 @@
-﻿using Backups.Algorithms.Abstractions;
-using Backups.Archivers.Abstractions;
-using Backups.Models.Abstractions;
+﻿using Backups.Models.Abstractions;
+using Backups.Tools.Algorithms.Abstractions;
+using Backups.Tools.Archivers.Abstractions;
 using Backups.Tools.Clock.Abstractions;
 
 namespace Backups.Models;

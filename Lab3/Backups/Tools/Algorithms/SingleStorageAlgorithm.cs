@@ -1,8 +1,8 @@
-﻿using Backups.Algorithms.Abstractions;
-using Backups.Archivers.Abstractions;
-using Backups.Models.Abstractions;
+﻿using Backups.Models.Abstractions;
+using Backups.Tools.Algorithms.Abstractions;
+using Backups.Tools.Archivers.Abstractions;
 
-namespace Backups.Models.Algorithms;
+namespace Backups.Tools.Algorithms;
 
 public class SingleStorageAlgorithm : IStorageAlgorithm
 {
