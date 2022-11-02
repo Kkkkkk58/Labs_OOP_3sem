@@ -3,5 +3,4 @@
 public interface IRestorePointVersion
 {
     IRestorePointVersion GetNext();
-    string ToString();
 }

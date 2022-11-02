@@ -47,4 +47,9 @@ public class Backup : IBackup
         if (!_restorePoints.Remove(restorePoint))
             throw BackupException.RestorePointNotFound(restorePoint, this);
     }
+
+    public override string ToString()
+    {
+        return $"Backup {Id}: {Name}";
+    }
 }

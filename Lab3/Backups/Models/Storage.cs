@@ -21,4 +21,9 @@ public class Storage : IStorage
     public IRepositoryAccessKey AccessKey { get; }
     public IRepository Repository { get; }
     public IReadOnlyList<IRepositoryAccessKey> BackupObjectKeys { get; }
+
+    public override string ToString()
+    {
+        return $"Storage: {Repository} - {AccessKey}";
+    }
 }

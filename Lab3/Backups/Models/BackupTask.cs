@@ -64,11 +64,13 @@ public class BackupTask : IBackupTask
 
     private IRepositoryAccessKey GetRestorePointKey()
     {
+        string versionString = _currentVersion.ToString() ?? throw BackupTaskException.NullVersionString();
+
         return _config
             .TargetRepository
             .BaseKey
             .Combine(Backup.Id.ToString())
-            .Combine(_currentVersion.ToString());
+            .Combine(versionString);
     }
 
     private IRestorePoint GetRestorePoint(

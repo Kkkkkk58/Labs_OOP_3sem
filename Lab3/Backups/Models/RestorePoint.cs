@@ -24,6 +24,11 @@ public class RestorePoint : IRestorePoint
     public IRestorePointVersion Version { get; }
     public IReadOnlyList<IObjectStorageRelation> ObjectStorageRelations { get; }
 
+    public override string ToString()
+    {
+        return $"Restore point {Version} from {CreationDate}";
+    }
+
     private static bool ContainsRepeatingBackupObjects(
         IReadOnlyCollection<IObjectStorageRelation> objectStorageRelations)
     {
