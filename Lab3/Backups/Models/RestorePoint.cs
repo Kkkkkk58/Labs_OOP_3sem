@@ -5,21 +5,17 @@ namespace Backups.Models;
 
 public class RestorePoint : IRestorePoint
 {
-    public RestorePoint(
+    private RestorePoint(
         DateTime creationDate,
         IRestorePointVersion version,
-        IReadOnlyCollection<IObjectStorageRelation> objectStorageRelations)
+        IReadOnlyList<IObjectStorageRelation> objectStorageRelations)
     {
-        ArgumentNullException.ThrowIfNull(version);
-        ArgumentNullException.ThrowIfNull(objectStorageRelations);
-        if (ContainsRepeatingBackupObjects(objectStorageRelations))
-            throw RestorePointException.ContainsRepeatingBackupObjects();
-
         CreationDate = creationDate;
         Version = version;
-        ObjectStorageRelations = objectStorageRelations.ToList();
+        ObjectStorageRelations = objectStorageRelations;
     }
 
+    public static IRestorePointBuilder Builder => new RestorePointBuilder();
     public DateTime CreationDate { get; }
     public IRestorePointVersion Version { get; }
     public IReadOnlyList<IObjectStorageRelation> ObjectStorageRelations { get; }
@@ -29,9 +25,56 @@ public class RestorePoint : IRestorePoint
         return $"Restore point {Version} from {CreationDate}";
     }
 
-    private static bool ContainsRepeatingBackupObjects(
-        IReadOnlyCollection<IObjectStorageRelation> objectStorageRelations)
+    public class RestorePointBuilder : IRestorePointBuilder, IRestorePointVersionBuilder, IRestorePointRelationsBuilder
     {
-        return objectStorageRelations.DistinctBy(o => o.BackupObject).Count() != objectStorageRelations.Count;
+        private DateTime? _restorePointDate;
+        private IRestorePointVersion? _restorePointVersion;
+        private IReadOnlyList<IObjectStorageRelation>? _objectStorageRelations;
+
+        public IRestorePointVersionBuilder SetDate(DateTime restorePointDate)
+        {
+            _restorePointDate = restorePointDate;
+            return this;
+        }
+
+        public IRestorePointRelationsBuilder SetVersion(IRestorePointVersion restorePointVersion)
+        {
+            _restorePointVersion = restorePointVersion;
+            return this;
+        }
+
+        public IRestorePointBuilder SetRelations(IReadOnlyList<IObjectStorageRelation> objectStorageRelations)
+        {
+            if (objectStorageRelations is not null && ContainsRepeatingBackupObjects(objectStorageRelations))
+                throw RestorePointException.ContainsRepeatingBackupObjects();
+
+            _objectStorageRelations = objectStorageRelations;
+            return this;
+        }
+
+        public IRestorePoint Build()
+        {
+            ArgumentNullException.ThrowIfNull(_restorePointDate);
+            ArgumentNullException.ThrowIfNull(_restorePointVersion);
+            ArgumentNullException.ThrowIfNull(_objectStorageRelations);
+
+            var restorePoint = new RestorePoint(_restorePointDate.Value, _restorePointVersion, _objectStorageRelations);
+            Reset();
+
+            return restorePoint;
+        }
+
+        private static bool ContainsRepeatingBackupObjects(
+            IReadOnlyCollection<IObjectStorageRelation> objectStorageRelations)
+        {
+            return objectStorageRelations.DistinctBy(o => o.BackupObject).Count() != objectStorageRelations.Count;
+        }
+
+        private void Reset()
+        {
+            _objectStorageRelations = null;
+            _restorePointDate = null;
+            _restorePointVersion = null;
+        }
     }
 }

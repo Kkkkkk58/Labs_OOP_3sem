@@ -7,7 +7,7 @@ using Backups.Tools.Clock.Abstractions;
 
 namespace Backups.Models;
 
-public class BackupTaskConfigurationBuilder : IBackupTaskConfigurationBuilder
+public class BackupTaskConfigurationBuilder : IBackupTaskConfigurationBuilder, IBackupTaskAlgorithmBuilder
 {
     private IRepository? _targetRepository;
     private IStorageAlgorithm? _storageAlgorithm;
@@ -15,7 +15,7 @@ public class BackupTaskConfigurationBuilder : IBackupTaskConfigurationBuilder
     private IClock? _clock;
     private IRestorePointBuilder? _restorePointBuilder;
 
-    public IBackupTaskConfigurationBuilder SetTargetRepository(IRepository repository)
+    public IBackupTaskAlgorithmBuilder SetTargetRepository(IRepository repository)
     {
         _targetRepository = repository;
         return this;
@@ -51,7 +51,7 @@ public class BackupTaskConfigurationBuilder : IBackupTaskConfigurationBuilder
         ArgumentNullException.ThrowIfNull(_storageAlgorithm);
 
         _archiver ??= new ZipArchiver();
-        _restorePointBuilder ??= new RestorePointBuilder();
+        _restorePointBuilder ??= RestorePoint.Builder;
         _clock ??= new SimpleClock();
 
         return new BackupTaskConfiguration(

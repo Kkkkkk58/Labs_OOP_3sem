@@ -6,11 +6,15 @@ namespace Backups.Models.Abstractions;
 
 public interface IBackupTaskConfigurationBuilder
 {
-    IBackupTaskConfigurationBuilder SetTargetRepository(IRepository repository);
-    IBackupTaskConfigurationBuilder SetStorageAlgorithm(IStorageAlgorithm storageAlgorithm);
+    IBackupTaskAlgorithmBuilder SetTargetRepository(IRepository repository);
     IBackupTaskConfigurationBuilder SetArchiver(IArchiver archiver);
     IBackupTaskConfigurationBuilder SetClock(IClock clock);
     IBackupTaskConfigurationBuilder SetRestorePointBuilder(IRestorePointBuilder restorePointBuilder);
 
     IBackupTaskConfiguration Build();
+}
+
+public interface IBackupTaskAlgorithmBuilder
+{
+    IBackupTaskConfigurationBuilder SetStorageAlgorithm(IStorageAlgorithm storageAlgorithm);
 }

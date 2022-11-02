@@ -75,7 +75,7 @@ public class BackupTask : IBackupTask
 
     private IRestorePoint GetRestorePoint(
         DateTime restorePointDate,
-        IReadOnlyCollection<IObjectStorageRelation> relations)
+        IReadOnlyList<IObjectStorageRelation> relations)
     {
         return _config
             .RestorePointBuilder

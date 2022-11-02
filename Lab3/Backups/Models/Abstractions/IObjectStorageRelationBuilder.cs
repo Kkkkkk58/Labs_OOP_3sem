@@ -2,8 +2,12 @@
 
 public interface IObjectStorageRelationBuilder
 {
-    IObjectStorageRelationBuilder SetBackupObject(IBackupObject backupObject);
-    IObjectStorageRelationBuilder SetStorage(IStorage storage);
+    IRelationStorageBuilder SetBackupObject(IBackupObject backupObject);
 
     IObjectStorageRelation Build();
+}
+
+public interface IRelationStorageBuilder
+{
+    IObjectStorageRelationBuilder SetStorage(IStorage storage);
 }

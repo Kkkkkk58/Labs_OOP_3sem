@@ -54,7 +54,7 @@ public class BackupTaskBuilder : IBackupTaskBuilder
 
     private IBackup GetNewBackup()
     {
-        return (_backupName is null)
+        return _backupName is null
             ? throw new ArgumentNullException(nameof(_backupName))
             : new Backup(_backupName);
     }

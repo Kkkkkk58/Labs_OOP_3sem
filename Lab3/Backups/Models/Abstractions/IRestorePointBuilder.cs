@@ -2,9 +2,16 @@
 
 public interface IRestorePointBuilder
 {
-    IRestorePointBuilder SetDate(DateTime restorePointDate);
-    IRestorePointBuilder SetVersion(IRestorePointVersion restorePointVersion);
-    IRestorePointBuilder SetRelations(IReadOnlyCollection<IObjectStorageRelation> objectStorageRelations);
-
+    IRestorePointVersionBuilder SetDate(DateTime restorePointDate);
     IRestorePoint Build();
+}
+
+public interface IRestorePointVersionBuilder
+{
+    IRestorePointRelationsBuilder SetVersion(IRestorePointVersion restorePointVersion);
+}
+
+public interface IRestorePointRelationsBuilder
+{
+    IRestorePointBuilder SetRelations(IReadOnlyList<IObjectStorageRelation> objectStorageRelations);
 }

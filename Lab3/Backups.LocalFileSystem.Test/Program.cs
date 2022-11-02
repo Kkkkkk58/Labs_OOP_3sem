@@ -39,10 +39,10 @@ static IBackupTask GetBackupTask(IRepository repository)
 
 static IBackupTaskConfiguration GetBackupTaskConfig(IRepository repository)
 {
-    var algorithm = new SplitStorageAlgorithm(new StorageBuilder(), new ObjectStorageRelationBuilder());
+    var algorithm = new SplitStorageAlgorithm(Storage.Builder, ObjectStorageRelation.Builder);
 
     return new BackupTaskConfigurationBuilder()
-        .SetStorageAlgorithm(algorithm)
         .SetTargetRepository(repository)
+        .SetStorageAlgorithm(algorithm)
         .Build();
 }
