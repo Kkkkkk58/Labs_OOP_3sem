@@ -16,12 +16,12 @@ public class BackupTaskException : BackupsException
 
     public static BackupTaskException ObjectIsAlreadyTracked(IBackupObject backupObject)
     {
-        throw new BackupTaskException($"Backup object {backupObject.Id} is already being tracked");
+        throw new BackupTaskException($"Backup object {backupObject} is already being tracked");
     }
 
     public static BackupTaskException ObjectNotFound(IBackupObject backupObject)
     {
-        throw new BackupTaskException($"Backup object {backupObject.Id} was not found");
+        throw new BackupTaskException($"Backup object {backupObject} was not found");
     }
 
     public static BackupTaskException NullVersionString()
