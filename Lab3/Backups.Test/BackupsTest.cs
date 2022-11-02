@@ -14,30 +14,13 @@ public class BackupsTest
     public void BasicTest()
     {
         var fs = new MemoryFileSystem();
-        {
-            fs.CreateDirectory("/test/input");
-            using Stream stream = fs.CreateFile("/test/input/test.txt");
-            {
-                using Stream another = File.OpenRead("D:/test/1.txt");
-                another.CopyTo(stream);
-            }
-
-            fs.CreateDirectory("/test/input/dir");
-            using Stream anotherStream = fs.CreateFile("/test/input/dir/suren.txt");
-            {
-                using var ms = new MemoryStream(Encoding.UTF8.GetBytes("TEST MESSAGE"));
-                ms.CopyTo(anotherStream);
-            }
-        }
+        SeedFileSystem(fs);
 
         IRepository repository = new InMemoryRepository(fs, "/test");
 
         var bo = new BackupObject(repository, new InMemoryRepositoryAccessKey("input/test.txt"));
         var bo2 = new BackupObject(repository, new InMemoryRepositoryAccessKey("/input/dir"));
-        var backupTask =
-            new BackupTask(
-                new BackupTaskConfiguration(new SplitStorageAlgorithm(), repository, new ZipArchiver(), new SimpleClock()),
-                "Sample backup");
+        IBackupTask backupTask = GetBackupTask(repository);
         backupTask.TrackBackupObject(bo);
         backupTask.TrackBackupObject(bo2);
 
@@ -46,7 +29,61 @@ public class BackupsTest
         backupTask.UntrackBackupObject(bo2);
         backupTask.CreateRestorePoint();
 
-        Assert.Equal(2, backupTask.Backup.RestorePoints.Count);
-        Assert.Equal(3, backupTask.Backup.RestorePoints.Select(bt => bt.ObjectStorageRelations.Count).Sum());
+        Assert.Equal(2, GetRestorePointsNumber(backupTask));
+        Assert.Equal(3, GetStorageNumber(backupTask));
+    }
+
+    private static int GetRestorePointsNumber(IBackupTask backupTask)
+    {
+        return backupTask
+            .Backup
+            .RestorePoints
+            .Count;
+    }
+
+    private static int GetStorageNumber(IBackupTask backupTask)
+    {
+        return backupTask
+            .Backup
+            .RestorePoints
+            .Select(bt => bt.ObjectStorageRelations.Count)
+            .Sum();
+    }
+
+    private static IBackupTask GetBackupTask(IRepository repository)
+    {
+        IBackupTaskConfiguration config = GetBackupTaskConfig(repository);
+
+        return new BackupTaskBuilder()
+            .SetConfiguration(config)
+            .SetBackupName("Test Backup")
+            .Build();
+    }
+
+    private static IBackupTaskConfiguration GetBackupTaskConfig(IRepository repository)
+    {
+        var algorithm = new SplitStorageAlgorithm(new StorageBuilder(), new ObjectStorageRelationBuilder());
+
+        return new BackupTaskConfigurationBuilder()
+            .SetStorageAlgorithm(algorithm)
+            .SetTargetRepository(repository)
+            .Build();
+    }
+
+    private static void SeedFileSystem(IFileSystem fs)
+    {
+        fs.CreateDirectory("/test/input");
+        using Stream stream = fs.CreateFile("/test/input/test.txt");
+        {
+            using Stream another = File.OpenRead("D:/test/1.txt");
+            another.CopyTo(stream);
+        }
+
+        fs.CreateDirectory("/test/input/dir");
+        using Stream anotherStream = fs.CreateFile("/test/input/dir/suren.txt");
+        {
+            using var ms = new MemoryStream(Encoding.UTF8.GetBytes("TEST MESSAGE"));
+            ms.CopyTo(anotherStream);
+        }
     }
 }

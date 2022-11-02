@@ -8,4 +8,6 @@ public interface IBackupTaskConfiguration
     IStorageAlgorithm StorageAlgorithm { get; }
     IArchiver Archiver { get; }
     IClock Clock { get; }
+
+    IRestorePointBuilder RestorePointBuilder { get; }
 }

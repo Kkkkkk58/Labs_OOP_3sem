@@ -22,6 +22,8 @@ public class FileSystemRepository : IRepository
 
     public IReadOnlyList<IRepositoryObject> GetData(IRepositoryAccessKey accessKey)
     {
+        ArgumentNullException.ThrowIfNull(accessKey);
+
         string path = GetPath(accessKey);
         if (ContainsFile(path))
             return GetDataFromFile(accessKey, path);
@@ -32,6 +34,8 @@ public class FileSystemRepository : IRepository
 
     public Stream OpenStream(IRepositoryAccessKey accessKey)
     {
+        ArgumentNullException.ThrowIfNull(accessKey);
+
         string path = GetPath(accessKey);
         string? dirname = Path.GetDirectoryName(path);
         if (dirname is not null)
@@ -54,18 +58,24 @@ public class FileSystemRepository : IRepository
 
     private static IReadOnlyList<IRepositoryObject> GetDataFromDirectory(IRepositoryAccessKey accessKey, string path)
     {
-        var data = new List<IRepositoryObject>();
-        var directoryInfo = new DirectoryInfo(path);
-        foreach (FileInfo fileInfo in directoryInfo.EnumerateFiles())
-        {
-            string name = Path.GetRelativePath(directoryInfo.FullName, fileInfo.FullName);
-            IRepositoryAccessKey fileAccessKey =
-                accessKey.Combine(new FileSystemRepositoryAccessKey(name));
-            var content = new RepositoryObject(fileAccessKey, File.OpenRead(fileInfo.FullName));
-            data.Add(content);
-        }
+        ArgumentNullException.ThrowIfNull(accessKey);
 
-        return data;
+        var directoryInfo = new DirectoryInfo(path);
+        return directoryInfo
+            .EnumerateFiles()
+            .Select(file => (GetFileAccessKey(accessKey, directoryInfo, file), file))
+            .Select(fk => new RepositoryObject(fk.Item1, File.OpenRead(fk.file.FullName)))
+            .ToList()
+            .AsReadOnly();
+    }
+
+    private static IRepositoryAccessKey GetFileAccessKey(
+        IRepositoryAccessKey accessKey,
+        FileSystemInfo directoryInfo,
+        FileSystemInfo fileInfo)
+    {
+        string name = Path.GetRelativePath(directoryInfo.FullName, fileInfo.FullName);
+        return accessKey.Combine(new FileSystemRepositoryAccessKey(name));
     }
 
     private static IReadOnlyList<IRepositoryObject> GetDataFromFile(IRepositoryAccessKey accessKey, string path)

@@ -9,6 +9,7 @@ public class RestorePoint : IRestorePoint
         IRestorePointVersion version,
         IReadOnlyCollection<IObjectStorageRelation> objectStorageRelations)
     {
+        ArgumentNullException.ThrowIfNull(version);
         ArgumentNullException.ThrowIfNull(objectStorageRelations);
         if (ContainsRepeatingBackupObjects(objectStorageRelations))
             throw new NotImplementedException();

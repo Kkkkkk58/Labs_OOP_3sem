@@ -4,6 +4,18 @@ namespace Backups.Models.Algorithms;
 
 public class SingleStorageAlgorithm : IStorageAlgorithm
 {
+    private readonly IStorageBuilder _storageBuilder;
+    private readonly IObjectStorageRelationBuilder _objectStorageRelationBuilder;
+
+    public SingleStorageAlgorithm(IStorageBuilder storageBuilder, IObjectStorageRelationBuilder objectStorageRelationBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(storageBuilder);
+        ArgumentNullException.ThrowIfNull(objectStorageRelationBuilder);
+
+        _storageBuilder = storageBuilder;
+        _objectStorageRelationBuilder = objectStorageRelationBuilder;
+    }
+
     public IEnumerable<IObjectStorageRelation> CreateStorage(
         IReadOnlyCollection<IBackupObject> backupObjects,
         IRepository targetRepository,
@@ -18,11 +30,12 @@ public class SingleStorageAlgorithm : IStorageAlgorithm
         archiver.Archive(backupObjects, writingStream);
 
         var backupObjectKeys = backupObjects.Select(bo => bo.AccessKey).ToList();
-        var storage = new Storage(targetRepository, storageKey, backupObjectKeys);
+        IStorage storage = GetStorage(targetRepository, storageKey, backupObjectKeys);
 
+        // TODO Separate saving
         writingStream.Dispose();
         return backupObjects
-            .Select(backupObject => new ObjectStorageRelation(backupObject, storage));
+            .Select(backupObject => GetObjectStorageRelation(backupObject, storage));
     }
 
     private static IRepositoryAccessKey GetStorageKey(IRepositoryAccessKey baseAccessKey, string archiverExtension)
@@ -44,5 +57,22 @@ public class SingleStorageAlgorithm : IStorageAlgorithm
         ArgumentNullException.ThrowIfNull(targetRepository);
         ArgumentNullException.ThrowIfNull(archiver);
         ArgumentNullException.ThrowIfNull(baseAccessKey);
+    }
+
+    private IStorage GetStorage(IRepository targetRepository, IRepositoryAccessKey storageKey, IReadOnlyList<IRepositoryAccessKey> backupObjectKeys)
+    {
+        return _storageBuilder
+            .SetRepository(targetRepository)
+            .SetAccessKey(storageKey)
+            .SetBackupObjectAccessKeys(backupObjectKeys)
+            .Build();
+    }
+
+    private IObjectStorageRelation GetObjectStorageRelation(IBackupObject backupObject, IStorage storage)
+    {
+        return _objectStorageRelationBuilder
+            .SetBackupObject(backupObject)
+            .SetStorage(storage)
+            .Build();
     }
 }

@@ -5,30 +5,24 @@ using Backups.Models.Abstractions;
 
 namespace Backups.Models;
 
-public class BackupTask
+public class BackupTask : IBackupTask
 {
     private readonly List<IBackupObject> _trackedObjects;
     private readonly IBackupTaskConfiguration _config;
     private IRestorePointVersion _currentVersion;
 
-    // TODO BackupTaskBuilderImpl -> default values
-    public BackupTask(IBackupTaskConfiguration config, string backupName)
-        : this(new List<IBackupObject>(), config, new RestorePointVersion(), new Backup(backupName))
-    {
-    }
-
     public BackupTask(
-        List<IBackupObject> trackedObjects,
         IBackupTaskConfiguration config,
         IRestorePointVersion currentVersion,
-        IBackup backup)
+        IBackup backup,
+        IEnumerable<IBackupObject> trackedObjects)
     {
         ArgumentNullException.ThrowIfNull(trackedObjects);
         ArgumentNullException.ThrowIfNull(config);
         ArgumentNullException.ThrowIfNull(currentVersion);
         ArgumentNullException.ThrowIfNull(backup);
 
-        _trackedObjects = trackedObjects;
+        _trackedObjects = trackedObjects.ToList();
         _config = config;
         _currentVersion = currentVersion;
         Backup = backup;
@@ -50,7 +44,7 @@ public class BackupTask
                 .CreateStorage(_trackedObjects, _config.TargetRepository, _config.Archiver, restorePointKey)
                 .ToList();
 
-        var restorePoint = new RestorePoint(restorePointDate, _currentVersion, relations);
+        IRestorePoint restorePoint = GetRestorePoint(restorePointDate, relations);
         return Backup.AddRestorePoint(restorePoint);
     }
 
@@ -76,5 +70,15 @@ public class BackupTask
             .BaseKey
             .Combine(Backup.Id.ToString())
             .Combine(_currentVersion.ToString());
+    }
+
+    private IRestorePoint GetRestorePoint(DateTime restorePointDate, IReadOnlyCollection<IObjectStorageRelation> relations)
+    {
+        return _config
+            .RestorePointBuilder
+            .SetDate(restorePointDate)
+            .SetVersion(_currentVersion)
+            .SetRelations(relations)
+            .Build();
     }
 }
