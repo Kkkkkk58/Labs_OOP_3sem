@@ -103,8 +103,6 @@ public class BackupsTest
 
         fs.CreateDirectory("/test/input/dir");
         WriteData(data, fs.CreateFile("/test/input/dir/suren.txt"));
-
-        WriteData(data, File.OpenWrite("out.txt"));
     }
 
     private static Stream GetData()
