@@ -4,7 +4,7 @@ namespace Backups.Test.Repository;
 
 public class InMemoryRepositoryAccessKey : IRepositoryAccessKey
 {
-    private const char InMemorySeparator = '/';
+    private const char InMemoryPathSeparator = '/';
 
     public InMemoryRepositoryAccessKey(string value)
     {
@@ -20,7 +20,7 @@ public class InMemoryRepositoryAccessKey : IRepositoryAccessKey
 
     public IRepositoryAccessKey Combine(string value)
     {
-        string newKey = string.Join(InMemorySeparator, Value, value);
+        string newKey = string.Join(InMemoryPathSeparator, Value, value);
         return new InMemoryRepositoryAccessKey(newKey);
     }
 
