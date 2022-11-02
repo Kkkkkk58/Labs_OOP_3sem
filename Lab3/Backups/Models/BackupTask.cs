@@ -39,9 +39,9 @@ public class BackupTask : IBackupTask
         IRepositoryAccessKey restorePointKey = GetRestorePointKey();
 
         IReadOnlyList<IObjectStorageRelation> relations = _config
-                .StorageAlgorithm
-                .CreateStorage(_trackedObjects, _config.TargetRepository, _config.Archiver, restorePointKey)
-                .ToList();
+            .StorageAlgorithm
+            .CreateStorage(_trackedObjects, _config.TargetRepository, _config.Archiver, restorePointKey)
+            .ToList();
 
         IRestorePoint restorePoint = GetRestorePoint(restorePointDate, relations);
         return Backup.AddRestorePoint(restorePoint);
@@ -71,7 +71,9 @@ public class BackupTask : IBackupTask
             .Combine(_currentVersion.ToString());
     }
 
-    private IRestorePoint GetRestorePoint(DateTime restorePointDate, IReadOnlyCollection<IObjectStorageRelation> relations)
+    private IRestorePoint GetRestorePoint(
+        DateTime restorePointDate,
+        IReadOnlyCollection<IObjectStorageRelation> relations)
     {
         return _config
             .RestorePointBuilder

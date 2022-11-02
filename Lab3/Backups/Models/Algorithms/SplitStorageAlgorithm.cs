@@ -7,7 +7,9 @@ public class SplitStorageAlgorithm : IStorageAlgorithm
     private readonly IStorageBuilder _storageBuilder;
     private readonly IObjectStorageRelationBuilder _objectStorageRelationBuilder;
 
-    public SplitStorageAlgorithm(IStorageBuilder storageBuilder, IObjectStorageRelationBuilder objectStorageRelationBuilder)
+    public SplitStorageAlgorithm(
+        IStorageBuilder storageBuilder,
+        IObjectStorageRelationBuilder objectStorageRelationBuilder)
     {
         ArgumentNullException.ThrowIfNull(storageBuilder);
         ArgumentNullException.ThrowIfNull(objectStorageRelationBuilder);
@@ -63,7 +65,10 @@ public class SplitStorageAlgorithm : IStorageAlgorithm
         ArgumentNullException.ThrowIfNull(baseAccessKey);
     }
 
-    private IStorage GetStorage(IRepository targetRepository, IRepositoryAccessKey storageKey, IReadOnlyList<IRepositoryAccessKey> backupObjectKeys)
+    private IStorage GetStorage(
+        IRepository targetRepository,
+        IRepositoryAccessKey storageKey,
+        IReadOnlyList<IRepositoryAccessKey> backupObjectKeys)
     {
         return _storageBuilder
             .SetRepository(targetRepository)
