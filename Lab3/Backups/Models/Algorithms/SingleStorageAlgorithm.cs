@@ -32,8 +32,6 @@ public class SingleStorageAlgorithm : IStorageAlgorithm
         var backupObjectKeys = backupObjects.Select(bo => bo.AccessKey).ToList();
         IStorage storage = GetStorage(targetRepository, storageKey, backupObjectKeys);
 
-        // TODO Separate saving
-        writingStream.Dispose();
         return backupObjects
             .Select(backupObject => GetObjectStorageRelation(backupObject, storage));
     }

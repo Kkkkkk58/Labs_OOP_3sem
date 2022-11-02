@@ -1,4 +1,5 @@
-﻿using Backups.Models.Abstractions;
+﻿using Backups.Exceptions;
+using Backups.Models.Abstractions;
 
 namespace Backups.Models;
 
@@ -9,7 +10,7 @@ public record ObjectStorageRelation : IObjectStorageRelation
         ArgumentNullException.ThrowIfNull(backupObject);
         ArgumentNullException.ThrowIfNull(storage);
         if (!storage.BackupObjectKeys.Contains(backupObject.AccessKey))
-            throw new NotImplementedException();
+            throw ObjectStorageRelationException.InvalidRelation();
 
         BackupObject = backupObject;
         Storage = storage;

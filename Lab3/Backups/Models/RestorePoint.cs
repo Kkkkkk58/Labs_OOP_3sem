@@ -1,4 +1,5 @@
-﻿using Backups.Models.Abstractions;
+﻿using Backups.Exceptions;
+using Backups.Models.Abstractions;
 
 namespace Backups.Models;
 
@@ -12,7 +13,7 @@ public class RestorePoint : IRestorePoint
         ArgumentNullException.ThrowIfNull(version);
         ArgumentNullException.ThrowIfNull(objectStorageRelations);
         if (ContainsRepeatingBackupObjects(objectStorageRelations))
-            throw new NotImplementedException();
+            throw RestorePointException.ContainsRepeatingBackupObjects();
 
         CreationDate = creationDate;
         Version = version;

@@ -36,8 +36,6 @@ public class SplitStorageAlgorithm : IStorageAlgorithm
             IStorage storage = GetStorage(targetRepository, storageKey, backupObjectKeys);
             IObjectStorageRelation relation = GetObjectStorageRelation(backupObject, storage);
             relations.Add(relation);
-
-            stream.Dispose();
         }
 
         return relations.AsReadOnly();
