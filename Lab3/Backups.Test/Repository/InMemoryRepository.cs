@@ -3,7 +3,7 @@ using Backups.Models.Abstractions;
 using Zio;
 using Zio.FileSystems;
 
-namespace Backups.Test;
+namespace Backups.Test.Repository;
 
 public class InMemoryRepository : IRepository
 {
@@ -11,8 +11,9 @@ public class InMemoryRepository : IRepository
 
     public InMemoryRepository(MemoryFileSystem fileSystem, string baseDirectory)
     {
+        ArgumentNullException.ThrowIfNull(fileSystem);
         if (!fileSystem.DirectoryExists(baseDirectory))
-            throw new NotImplementedException();
+            throw new ArgumentException($"Invalid base directory: {baseDirectory}");
 
         _fileSystem = fileSystem;
         BaseKey = new InMemoryRepositoryAccessKey(baseDirectory);
@@ -33,7 +34,7 @@ public class InMemoryRepository : IRepository
             return GetDataFromFile(path, accessKey);
         if (ContainsDirectory(path))
             return GetDataFromDirectory(path, accessKey);
-        throw new NotImplementedException();
+        throw new ArgumentException($"Invalid path: {accessKey}");
     }
 
     public Stream OpenStream(IRepositoryAccessKey accessKey)

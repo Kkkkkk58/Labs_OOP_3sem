@@ -1,6 +1,6 @@
 ﻿using Backups.Models.Abstractions;
 
-namespace Backups.Test;
+namespace Backups.Test.Repository;
 
 public class InMemoryRepositoryAccessKey : IRepositoryAccessKey
 {

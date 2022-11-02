@@ -1,14 +1,15 @@
 ﻿using Backups.Models;
 using Backups.Models.Abstractions;
 
-namespace Backups.LocalFileSystem.Test;
+namespace Backups.LocalFileSystem.Test.Repository;
 
 public class FileSystemRepository : IRepository
 {
     public FileSystemRepository(string baseDirectoryPath)
     {
         if (!Directory.Exists(baseDirectoryPath))
-            throw new NotImplementedException();
+            throw new ArgumentException($"Invalid base directory: {baseDirectoryPath}");
+
         BaseKey = new FileSystemRepositoryAccessKey(baseDirectoryPath);
     }
 
@@ -29,7 +30,7 @@ public class FileSystemRepository : IRepository
             return GetDataFromFile(accessKey, path);
         if (ContainsDirectory(path))
             return GetDataFromDirectory(accessKey, path);
-        throw new NotImplementedException();
+        throw new ArgumentException($"Invalid path: {accessKey}");
     }
 
     public Stream OpenStream(IRepositoryAccessKey accessKey)

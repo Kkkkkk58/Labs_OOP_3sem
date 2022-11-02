@@ -1,6 +1,6 @@
 ﻿using Backups.Models.Abstractions;
 
-namespace Backups.LocalFileSystem.Test;
+namespace Backups.LocalFileSystem.Test.Repository;
 
 public class FileSystemRepositoryAccessKey : IRepositoryAccessKey
 {
