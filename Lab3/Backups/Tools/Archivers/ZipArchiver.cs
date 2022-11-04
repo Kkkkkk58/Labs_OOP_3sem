@@ -10,7 +10,7 @@ public class ZipArchiver : IArchiver
 
     public void Archive(IEnumerable<IBackupObject> backupObjects, Stream writingStream)
     {
-        using var storageArchive = new ZipArchive(writingStream, ZipArchiveMode.Create, leaveOpen: true);
+        using var storageArchive = new ZipArchive(writingStream, ZipArchiveMode.Create);
 
         foreach (IBackupObject backupObject in backupObjects)
         {
