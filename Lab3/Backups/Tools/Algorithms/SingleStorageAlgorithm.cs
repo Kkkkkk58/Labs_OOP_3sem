@@ -1,52 +1,30 @@
 ﻿using Backups.Models.Abstractions;
+using Backups.Models.Storage.Abstractions;
 using Backups.Tools.Algorithms.Abstractions;
-using Backups.Tools.Archivers.Abstractions;
+using Backups.Tools.Archiver.Abstractions;
 
 namespace Backups.Tools.Algorithms;
 
 public class SingleStorageAlgorithm : IStorageAlgorithm
 {
-    private readonly IStorageBuilder _storageBuilder;
-    private readonly IObjectStorageRelationBuilder _objectStorageRelationBuilder;
-
-    public SingleStorageAlgorithm(
-        IStorageBuilder storageBuilder,
-        IObjectStorageRelationBuilder objectStorageRelationBuilder)
-    {
-        ArgumentNullException.ThrowIfNull(storageBuilder);
-        ArgumentNullException.ThrowIfNull(objectStorageRelationBuilder);
-
-        _storageBuilder = storageBuilder;
-        _objectStorageRelationBuilder = objectStorageRelationBuilder;
-    }
-
-    public IEnumerable<IObjectStorageRelation> CreateStorage(
+    public IStorage CreateStorage(
         IReadOnlyCollection<IBackupObject> backupObjects,
         IRepository targetRepository,
         IArchiver archiver,
         IRepositoryAccessKey baseAccessKey)
     {
         ValidateArguments(backupObjects, targetRepository, archiver, baseAccessKey);
+        IRepositoryAccessKey storageKey = GetStorageKey(baseAccessKey);
 
-        IRepositoryAccessKey storageKey = GetStorageKey(baseAccessKey, archiver.Extension);
-
-        using Stream writingStream = targetRepository.OpenStream(storageKey);
-        archiver.Archive(backupObjects, writingStream);
-
-        var backupObjectKeys = backupObjects.Select(bo => bo.AccessKey).ToList();
-        IStorage storage = GetStorage(targetRepository, storageKey, backupObjectKeys);
-
-        return backupObjects
-            .Select(backupObject => GetObjectStorageRelation(backupObject, storage));
+        return archiver.Archive(backupObjects.Select(bo => bo.GetRepositoryObject()), targetRepository, storageKey);
     }
 
-    private static IRepositoryAccessKey GetStorageKey(IRepositoryAccessKey baseAccessKey, string archiverExtension)
+    private static IRepositoryAccessKey GetStorageKey(IRepositoryAccessKey baseAccessKey)
     {
         string storageName = Guid.NewGuid().ToString();
 
         return baseAccessKey
-            .Combine(storageName)
-            .ApplyExtension(archiverExtension);
+            .Combine(storageName);
     }
 
     private static void ValidateArguments(
@@ -59,25 +37,5 @@ public class SingleStorageAlgorithm : IStorageAlgorithm
         ArgumentNullException.ThrowIfNull(targetRepository);
         ArgumentNullException.ThrowIfNull(archiver);
         ArgumentNullException.ThrowIfNull(baseAccessKey);
-    }
-
-    private IStorage GetStorage(
-        IRepository targetRepository,
-        IRepositoryAccessKey storageKey,
-        IReadOnlyList<IRepositoryAccessKey> backupObjectKeys)
-    {
-        return _storageBuilder
-            .SetRepository(targetRepository)
-            .SetAccessKey(storageKey)
-            .SetBackupObjectAccessKeys(backupObjectKeys)
-            .Build();
-    }
-
-    private IObjectStorageRelation GetObjectStorageRelation(IBackupObject backupObject, IStorage storage)
-    {
-        return _objectStorageRelationBuilder
-            .SetBackupObject(backupObject)
-            .SetStorage(storage)
-            .Build();
     }
 }

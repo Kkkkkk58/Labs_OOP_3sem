@@ -7,7 +7,6 @@ namespace Backups.Models;
 public class BackupTaskBuilder : IBackupTaskBuilder
 {
     private IBackupTaskConfiguration? _config;
-    private IRestorePointVersion? _restorePointVersion;
     private IBackup? _backup;
     private string? _backupName;
     private IEnumerable<IBackupObject>? _trackedObjects;
@@ -15,12 +14,6 @@ public class BackupTaskBuilder : IBackupTaskBuilder
     public IBackupTaskBuilder SetConfiguration(IBackupTaskConfiguration configuration)
     {
         _config = configuration;
-        return this;
-    }
-
-    public IBackupTaskBuilder SetCurrentVersion(IRestorePointVersion restorePointVersion)
-    {
-        _restorePointVersion = restorePointVersion;
         return this;
     }
 
@@ -45,11 +38,10 @@ public class BackupTaskBuilder : IBackupTaskBuilder
     public IBackupTask Build()
     {
         ArgumentNullException.ThrowIfNull(_config);
-        _restorePointVersion ??= new RestorePointVersion();
         _backup ??= GetNewBackup();
         _trackedObjects ??= new List<IBackupObject>();
 
-        return new BackupTask(_config, _restorePointVersion, _backup, _trackedObjects);
+        return new BackupTask(_config, _backup, _trackedObjects);
     }
 
     private IBackup GetNewBackup()

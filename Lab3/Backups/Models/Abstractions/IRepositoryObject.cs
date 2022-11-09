@@ -2,6 +2,6 @@
 
 public interface IRepositoryObject
 {
-    IRepositoryAccessKey AccessKey { get; }
-    Stream Stream { get; }
+    string Name { get; }
+    void Accept(IRepositoryObjectVisitor repositoryObjectVisitor);
 }

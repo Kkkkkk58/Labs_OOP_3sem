@@ -1,7 +1,7 @@
 ﻿using Backups.Models.Abstractions;
 using Backups.Tools.Algorithms.Abstractions;
-using Backups.Tools.Archivers;
-using Backups.Tools.Archivers.Abstractions;
+using Backups.Tools.Archiver;
+using Backups.Tools.Archiver.Abstractions;
 using Backups.Tools.Clock;
 using Backups.Tools.Clock.Abstractions;
 
@@ -13,6 +13,7 @@ public class BackupTaskConfigurationBuilder : IBackupTaskConfigurationBuilder, I
     private IStorageAlgorithm? _storageAlgorithm;
     private IArchiver? _archiver;
     private IClock? _clock;
+    private string? _dateTimeFormat;
     private IRestorePointBuilder? _restorePointBuilder;
 
     public IBackupTaskAlgorithmBuilder SetTargetRepository(IRepository repository)
@@ -45,12 +46,19 @@ public class BackupTaskConfigurationBuilder : IBackupTaskConfigurationBuilder, I
         return this;
     }
 
+    public IBackupTaskConfigurationBuilder SetDateTimeFormat(string dateTimeFormat)
+    {
+        _dateTimeFormat = dateTimeFormat;
+        return this;
+    }
+
     public IBackupTaskConfiguration Build()
     {
         ArgumentNullException.ThrowIfNull(_targetRepository);
         ArgumentNullException.ThrowIfNull(_storageAlgorithm);
 
         _archiver ??= new ZipArchiver();
+        _dateTimeFormat ??= "yyyy-dd-MM_HH-mm-ss-fff";
         _restorePointBuilder ??= RestorePoint.Builder;
         _clock ??= new SimpleClock();
 
@@ -59,6 +67,7 @@ public class BackupTaskConfigurationBuilder : IBackupTaskConfigurationBuilder, I
             _targetRepository,
             _archiver,
             _clock,
+            _dateTimeFormat,
             _restorePointBuilder);
     }
 }

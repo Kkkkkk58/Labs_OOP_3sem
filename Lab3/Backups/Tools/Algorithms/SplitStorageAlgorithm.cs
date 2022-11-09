@@ -1,26 +1,14 @@
 ﻿using Backups.Models.Abstractions;
+using Backups.Models.Storage;
+using Backups.Models.Storage.Abstractions;
 using Backups.Tools.Algorithms.Abstractions;
-using Backups.Tools.Archivers.Abstractions;
+using Backups.Tools.Archiver.Abstractions;
 
 namespace Backups.Tools.Algorithms;
 
 public class SplitStorageAlgorithm : IStorageAlgorithm
 {
-    private readonly IStorageBuilder _storageBuilder;
-    private readonly IObjectStorageRelationBuilder _objectStorageRelationBuilder;
-
-    public SplitStorageAlgorithm(
-        IStorageBuilder storageBuilder,
-        IObjectStorageRelationBuilder objectStorageRelationBuilder)
-    {
-        ArgumentNullException.ThrowIfNull(storageBuilder);
-        ArgumentNullException.ThrowIfNull(objectStorageRelationBuilder);
-
-        _storageBuilder = storageBuilder;
-        _objectStorageRelationBuilder = objectStorageRelationBuilder;
-    }
-
-    public IEnumerable<IObjectStorageRelation> CreateStorage(
+    public IStorage CreateStorage(
         IReadOnlyCollection<IBackupObject> backupObjects,
         IRepository targetRepository,
         IArchiver archiver,
@@ -28,31 +16,17 @@ public class SplitStorageAlgorithm : IStorageAlgorithm
     {
         ValidateArguments(backupObjects, targetRepository, archiver, baseAccessKey);
 
-        var relations = new List<IObjectStorageRelation>();
+        var innerStorage = backupObjects
+            .Select(backupObject => archiver.Archive(new List<IRepositoryObject> { backupObject.GetRepositoryObject() }, targetRepository, GetStorageKey(baseAccessKey,  backupObject.AccessKey)))
+            .ToList();
 
-        foreach (IBackupObject backupObject in backupObjects)
-        {
-            IRepositoryAccessKey storageKey = GetStorageKey(baseAccessKey, backupObject.AccessKey, archiver.Extension);
-            using Stream stream = targetRepository.OpenStream(storageKey);
-            archiver.Archive(new List<IBackupObject> { backupObject }, stream);
-            var backupObjectKeys = new List<IRepositoryAccessKey> { backupObject.AccessKey };
-
-            IStorage storage = GetStorage(targetRepository, storageKey, backupObjectKeys);
-            IObjectStorageRelation relation = GetObjectStorageRelation(backupObject, storage);
-            relations.Add(relation);
-        }
-
-        return relations.AsReadOnly();
+        return new SplitStorage(targetRepository, baseAccessKey, innerStorage);
     }
 
-    private static IRepositoryAccessKey GetStorageKey(
-        IRepositoryAccessKey baseAccessKey,
-        IRepositoryAccessKey backupObjectKey,
-        string extension)
+    private static IRepositoryAccessKey GetStorageKey(IRepositoryAccessKey baseAccessKey, IRepositoryAccessKey backupObjectKey)
     {
         return baseAccessKey
-            .Combine(backupObjectKey)
-            .ApplyExtension(extension);
+            .Combine(backupObjectKey);
     }
 
     private static void ValidateArguments(
@@ -65,25 +39,5 @@ public class SplitStorageAlgorithm : IStorageAlgorithm
         ArgumentNullException.ThrowIfNull(targetRepository);
         ArgumentNullException.ThrowIfNull(archiver);
         ArgumentNullException.ThrowIfNull(baseAccessKey);
-    }
-
-    private IStorage GetStorage(
-        IRepository targetRepository,
-        IRepositoryAccessKey storageKey,
-        IReadOnlyList<IRepositoryAccessKey> backupObjectKeys)
-    {
-        return _storageBuilder
-            .SetRepository(targetRepository)
-            .SetAccessKey(storageKey)
-            .SetBackupObjectAccessKeys(backupObjectKeys)
-            .Build();
-    }
-
-    private IObjectStorageRelation GetObjectStorageRelation(IBackupObject backupObject, IStorage storage)
-    {
-        return _objectStorageRelationBuilder
-            .SetBackupObject(backupObject)
-            .SetStorage(storage)
-            .Build();
     }
 }

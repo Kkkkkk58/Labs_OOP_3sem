@@ -1,17 +1,21 @@
-﻿namespace Backups.Models.Abstractions;
+﻿using Backups.Models.Storage.Abstractions;
+
+namespace Backups.Models.Abstractions;
 
 public interface IRestorePointBuilder
 {
-    IRestorePointVersionBuilder SetDate(DateTime restorePointDate);
+    IRestorePointBuilder SetId(Guid id);
+    IRestorePointBackupObjectsBuilder SetDate(DateTime restorePointDate);
+
     IRestorePoint Build();
 }
 
-public interface IRestorePointVersionBuilder
+public interface IRestorePointBackupObjectsBuilder
 {
-    IRestorePointRelationsBuilder SetVersion(IRestorePointVersion restorePointVersion);
+    IRestorePointStorageBuilder SetBackupObjects(IEnumerable<IBackupObject> backupObjects);
 }
 
-public interface IRestorePointRelationsBuilder
+public interface IRestorePointStorageBuilder
 {
-    IRestorePointBuilder SetRelations(IReadOnlyList<IObjectStorageRelation> objectStorageRelations);
+    IRestorePointBuilder SetStorage(IStorage storage);
 }

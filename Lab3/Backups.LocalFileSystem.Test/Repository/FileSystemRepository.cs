@@ -10,7 +10,8 @@ public class FileSystemRepository : IRepository
         if (!Directory.Exists(baseDirectoryPath))
             throw new ArgumentException($"Invalid base directory: {baseDirectoryPath}");
 
-        BaseKey = new FileSystemRepositoryAccessKey(baseDirectoryPath);
+        string separator = new string(Path.DirectorySeparatorChar, 1);
+        BaseKey = new RepositoryAccessKey(baseDirectoryPath, separator);
     }
 
     public IRepositoryAccessKey BaseKey { get; }
@@ -21,19 +22,19 @@ public class FileSystemRepository : IRepository
         return ContainsFile(path) || ContainsDirectory(path);
     }
 
-    public IReadOnlyList<IRepositoryObject> GetData(IRepositoryAccessKey accessKey)
+    public IRepositoryObject GetComponent(IRepositoryAccessKey accessKey)
     {
         ArgumentNullException.ThrowIfNull(accessKey);
 
         string path = GetPath(accessKey);
         if (ContainsFile(path))
-            return GetDataFromFile(accessKey, path);
+            return GetFileComponent(accessKey);
         if (ContainsDirectory(path))
-            return GetDataFromDirectory(accessKey, path);
+            return GetDirectoryComponent(accessKey);
         throw new ArgumentException($"Invalid path: {accessKey}");
     }
 
-    public Stream OpenStream(IRepositoryAccessKey accessKey)
+    public Stream OpenWrite(IRepositoryAccessKey accessKey)
     {
         ArgumentNullException.ThrowIfNull(accessKey);
 
@@ -57,36 +58,45 @@ public class FileSystemRepository : IRepository
         return Directory.Exists(path);
     }
 
-    private static IReadOnlyList<IRepositoryObject> GetDataFromDirectory(IRepositoryAccessKey accessKey, string path)
+    private IRepositoryObject GetFileComponent(IRepositoryAccessKey accessKey)
     {
-        ArgumentNullException.ThrowIfNull(accessKey);
-
-        var directoryInfo = new DirectoryInfo(path);
-        return directoryInfo
-            .EnumerateFiles()
-            .Select(file => (GetFileAccessKey(accessKey, directoryInfo, file), file))
-            .Select(fk => new RepositoryObject(fk.Item1, File.OpenRead(fk.file.FullName)))
-            .ToList()
-            .AsReadOnly();
+        return new FileRepositoryObject(accessKey.Name, () => GetStream(accessKey));
     }
 
-    private static IRepositoryAccessKey GetFileAccessKey(
-        IRepositoryAccessKey accessKey,
-        FileSystemInfo directoryInfo,
-        FileSystemInfo fileInfo)
+    private Stream GetStream(IRepositoryAccessKey accessKey)
     {
-        string name = Path.GetRelativePath(directoryInfo.FullName, fileInfo.FullName);
-        return accessKey.Combine(new FileSystemRepositoryAccessKey(name));
+        return File.OpenRead(GetPath(accessKey));
     }
 
-    private static IReadOnlyList<IRepositoryObject> GetDataFromFile(IRepositoryAccessKey accessKey, string path)
+    private IRepositoryObject GetDirectoryComponent(IRepositoryAccessKey accessKey)
     {
-        var fileRepositoryObject = new RepositoryObject(accessKey, File.OpenRead(path));
-        return new List<IRepositoryObject> { fileRepositoryObject };
+        return new DirectoryRepositoryObject(accessKey.Name, () => GetObjects(accessKey));
+    }
+
+    private IReadOnlyCollection<IRepositoryObject> GetObjects(IRepositoryAccessKey accessKey)
+    {
+        var directoryInfo = new DirectoryInfo(GetPath(accessKey));
+        IEnumerable<FileSystemInfo> infos = directoryInfo.EnumerateFileSystemInfos();
+
+        var objects = new List<IRepositoryObject>();
+        foreach (FileSystemInfo fileSystemInfo in infos)
+        {
+            IRepositoryAccessKey objectKey = accessKey.Combine(fileSystemInfo.Name);
+            if (ContainsDirectory(fileSystemInfo.FullName))
+            {
+                objects.Add(new DirectoryRepositoryObject(objectKey.Name, () => GetObjects(objectKey)));
+            }
+            else if (ContainsFile(fileSystemInfo.FullName))
+            {
+                objects.Add(new FileRepositoryObject(objectKey.Name, () => GetStream(objectKey)));
+            }
+        }
+
+        return objects.AsReadOnly();
     }
 
     private string GetPath(IRepositoryAccessKey accessKey)
     {
-        return BaseKey.Combine(accessKey).Value;
+        return accessKey.FullKey.StartsWith(BaseKey.FullKey) ? accessKey.FullKey : BaseKey.Combine(accessKey).FullKey;
     }
 }

@@ -2,7 +2,10 @@
 
 public interface IRepositoryAccessKey
 {
-    string Value { get; }
+    string FullKey { get; }
+    string Name { get; }
+    IEnumerable<string> KeyParts { get; }
+
     IRepositoryAccessKey Combine(IRepositoryAccessKey other);
     IRepositoryAccessKey Combine(string value);
 

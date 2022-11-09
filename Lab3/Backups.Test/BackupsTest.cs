@@ -9,18 +9,23 @@ using Zio.FileSystems;
 
 namespace Backups.Test;
 
-public class BackupsTest
+public class BackupsTest : IDisposable
 {
+    private readonly MemoryFileSystem _fs;
+
+    public BackupsTest()
+    {
+        _fs = new MemoryFileSystem();
+        SeedFileSystem();
+    }
+
     [Fact]
     public void SplitAlgorithmUntrackObject_StorageNumberNotEqualsRestorePointsNumber()
     {
-        var fs = new MemoryFileSystem();
-        SeedFileSystem(fs);
-
-        IRepository repository = new InMemoryRepository(fs, "/test");
-        var bo = new BackupObject(repository, new InMemoryRepositoryAccessKey("input/test.txt"));
-        var bo2 = new BackupObject(repository, new InMemoryRepositoryAccessKey("/input/dir"));
-        var algorithm = new SplitStorageAlgorithm(Storage.Builder, ObjectStorageRelation.Builder);
+        IRepository repository = new InMemoryRepository(_fs, "/test");
+        var bo = new BackupObject(repository, new RepositoryAccessKey("input/test.txt", "/"));
+        var bo2 = new BackupObject(repository, new RepositoryAccessKey("/input/dir", "/"));
+        var algorithm = new SplitStorageAlgorithm();
         IBackupTask backupTask = GetBackupTask(repository, algorithm);
 
         backupTask.TrackBackupObject(bo);
@@ -38,14 +43,11 @@ public class BackupsTest
     [Fact]
     public void SingleAlgorithmUntrackObject_StorageNumberNotEqualsRestorePointsNumber()
     {
-        var fs = new MemoryFileSystem();
-        SeedFileSystem(fs);
+        IRepository repository = new InMemoryRepository(_fs, "/test");
 
-        IRepository repository = new InMemoryRepository(fs, "/test");
-
-        var bo = new BackupObject(repository, new InMemoryRepositoryAccessKey("input/test.txt"));
-        var bo2 = new BackupObject(repository, new InMemoryRepositoryAccessKey("/input/dir"));
-        var algorithm = new SingleStorageAlgorithm(Storage.Builder, ObjectStorageRelation.Builder);
+        var bo = new BackupObject(repository, new RepositoryAccessKey("input/test.txt", "/"));
+        var bo2 = new BackupObject(repository, new RepositoryAccessKey("/input/dir", "/"));
+        var algorithm = new SingleStorageAlgorithm();
         IBackupTask backupTask = GetBackupTask(repository, algorithm);
         backupTask.TrackBackupObject(bo);
         backupTask.TrackBackupObject(bo2);
@@ -59,22 +61,17 @@ public class BackupsTest
         Assert.Equal(2, GetStorageNumber(backupTask));
     }
 
+    public void Dispose()
+    {
+        _fs.Dispose();
+    }
+
     private static int GetRestorePointsNumber(IBackupTask backupTask)
     {
         return backupTask
             .Backup
             .RestorePoints
             .Count;
-    }
-
-    private static int GetStorageNumber(IBackupTask backupTask)
-    {
-        return backupTask
-            .Backup
-            .RestorePoints
-            .SelectMany(bt => bt.ObjectStorageRelations.Select(r => r.Storage))
-            .Distinct()
-            .Count();
     }
 
     private static IBackupTask GetBackupTask(IRepository repository, IStorageAlgorithm algorithm)
@@ -95,16 +92,6 @@ public class BackupsTest
             .Build();
     }
 
-    private static void SeedFileSystem(IFileSystem fs)
-    {
-        using Stream data = GetData();
-        fs.CreateDirectory("/test/input");
-        WriteData(data, fs.CreateFile("/test/input/test.txt"));
-
-        fs.CreateDirectory("/test/input/dir");
-        WriteData(data, fs.CreateFile("/test/input/dir/suren.txt"));
-    }
-
     private static Stream GetData()
     {
         const int size = 2000;
@@ -123,5 +110,26 @@ public class BackupsTest
             inputStream.Seek(0, SeekOrigin.Begin);
             inputStream.CopyTo(outputStream);
         }
+    }
+
+    private int GetStorageNumber(IBackupTask backupTask)
+    {
+        return backupTask
+            .Backup
+            .RestorePoints
+            .Select(bt => bt.Storage)
+            .Select(storage => _fs.GetDirectoryEntry(new RepositoryAccessKey(storage.AccessKey.KeyParts.Take(storage.AccessKey.KeyParts.Count() - 1), "/").FullKey))
+            .Select(de => de.EnumerateFiles().Count())
+            .Sum();
+    }
+
+    private void SeedFileSystem()
+    {
+        using Stream data = GetData();
+        _fs.CreateDirectory("/test/input");
+        WriteData(data, _fs.CreateFile("/test/input/test.txt"));
+
+        _fs.CreateDirectory("/test/input/dir");
+        WriteData(data, _fs.CreateFile("/test/input/dir/suren.txt"));
     }
 }

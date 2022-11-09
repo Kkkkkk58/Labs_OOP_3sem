@@ -1,8 +1,11 @@
-﻿namespace Backups.Models.Abstractions;
+﻿using Backups.Models.Storage.Abstractions;
+
+namespace Backups.Models.Abstractions;
 
 public interface IRestorePoint
 {
+    Guid Id { get; }
     DateTime CreationDate { get; }
-    IRestorePointVersion Version { get; }
-    IReadOnlyList<IObjectStorageRelation> ObjectStorageRelations { get; }
+    IStorage Storage { get; }
+    IEnumerable<IBackupObject> BackupObjects { get; }
 }

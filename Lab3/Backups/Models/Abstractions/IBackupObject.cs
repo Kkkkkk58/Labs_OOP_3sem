@@ -4,5 +4,5 @@ public interface IBackupObject
 {
     IRepositoryAccessKey AccessKey { get; }
     IRepository SourceRepository { get; }
-    IReadOnlyList<IRepositoryObject> GetContents();
+    IRepositoryObject GetRepositoryObject();
 }

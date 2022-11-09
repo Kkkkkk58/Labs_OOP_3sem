@@ -1,6 +1,7 @@
 ﻿using Backups.Entities.Abstractions;
 using Backups.Exceptions;
 using Backups.Models.Abstractions;
+using Backups.Models.Storage.Abstractions;
 
 namespace Backups.Models;
 
@@ -8,22 +9,18 @@ public class BackupTask : IBackupTask
 {
     private readonly List<IBackupObject> _trackedObjects;
     private readonly IBackupTaskConfiguration _config;
-    private IRestorePointVersion _currentVersion;
 
     public BackupTask(
         IBackupTaskConfiguration config,
-        IRestorePointVersion currentVersion,
         IBackup backup,
         IEnumerable<IBackupObject> trackedObjects)
     {
         ArgumentNullException.ThrowIfNull(trackedObjects);
         ArgumentNullException.ThrowIfNull(config);
-        ArgumentNullException.ThrowIfNull(currentVersion);
         ArgumentNullException.ThrowIfNull(backup);
 
         _trackedObjects = trackedObjects.ToList();
         _config = config;
-        _currentVersion = currentVersion;
         Backup = backup;
     }
 
@@ -35,15 +32,13 @@ public class BackupTask : IBackupTask
         if (DatePrecedesOtherRestorePointDate(restorePointDate))
             throw BackupTaskException.InvalidRestorePointCreationDate(restorePointDate);
 
-        _currentVersion = _currentVersion.GetNext();
-        IRepositoryAccessKey restorePointKey = GetRestorePointKey();
+        IRepositoryAccessKey restorePointKey = GetRestorePointKey(restorePointDate);
 
-        IReadOnlyList<IObjectStorageRelation> relations = _config
+        IStorage storage = _config
             .StorageAlgorithm
-            .CreateStorage(_trackedObjects, _config.TargetRepository, _config.Archiver, restorePointKey)
-            .ToList();
+            .CreateStorage(_trackedObjects, _config.TargetRepository, _config.Archiver, restorePointKey);
 
-        IRestorePoint restorePoint = GetRestorePoint(restorePointDate, relations);
+        IRestorePoint restorePoint = GetRestorePoint(restorePointDate, storage);
         return Backup.AddRestorePoint(restorePoint);
     }
 
@@ -67,26 +62,24 @@ public class BackupTask : IBackupTask
         return Backup.RestorePoints.Any(rp => rp.CreationDate >= restorePointDate);
     }
 
-    private IRepositoryAccessKey GetRestorePointKey()
+    private IRepositoryAccessKey GetRestorePointKey(DateTime restorePointDate)
     {
-        string versionString = _currentVersion.ToString() ?? throw BackupTaskException.NullVersionString();
-
         return _config
             .TargetRepository
             .BaseKey
             .Combine(Backup.Id.ToString())
-            .Combine(versionString);
+            .Combine(restorePointDate.ToString(_config.DateTimeFormat));
     }
 
     private IRestorePoint GetRestorePoint(
         DateTime restorePointDate,
-        IReadOnlyList<IObjectStorageRelation> relations)
+        IStorage storage)
     {
         return _config
             .RestorePointBuilder
             .SetDate(restorePointDate)
-            .SetVersion(_currentVersion)
-            .SetRelations(relations)
+            .SetBackupObjects(_trackedObjects.AsEnumerable())
+            .SetStorage(storage)
             .Build();
     }
 }

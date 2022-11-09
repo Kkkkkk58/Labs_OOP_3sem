@@ -16,9 +16,9 @@ public class BackupObject : IBackupObject
     public IRepositoryAccessKey AccessKey { get; }
     public IRepository SourceRepository { get; }
 
-    public IReadOnlyList<IRepositoryObject> GetContents()
+    public IRepositoryObject GetRepositoryObject()
     {
-        return SourceRepository.GetData(AccessKey);
+        return SourceRepository.GetComponent(AccessKey);
     }
 
     public override string ToString()

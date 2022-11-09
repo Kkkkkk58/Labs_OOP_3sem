@@ -9,14 +9,14 @@ public class InMemoryRepository : IRepository
 {
     private readonly MemoryFileSystem _fileSystem;
 
-    public InMemoryRepository(MemoryFileSystem fileSystem, string baseDirectory)
+    public InMemoryRepository(MemoryFileSystem fileSystem, string baseDirectory, string inMemorySeparator = "/")
     {
         ArgumentNullException.ThrowIfNull(fileSystem);
         if (!fileSystem.DirectoryExists(baseDirectory))
             throw new ArgumentException($"Invalid base directory: {baseDirectory}");
 
         _fileSystem = fileSystem;
-        BaseKey = new InMemoryRepositoryAccessKey(baseDirectory);
+        BaseKey = new RepositoryAccessKey(baseDirectory, inMemorySeparator);
     }
 
     public IRepositoryAccessKey BaseKey { get; }
@@ -27,17 +27,17 @@ public class InMemoryRepository : IRepository
         return ContainsFile(path) || ContainsDirectory(path);
     }
 
-    public IReadOnlyList<IRepositoryObject> GetData(IRepositoryAccessKey accessKey)
+    public IRepositoryObject GetComponent(IRepositoryAccessKey accessKey)
     {
         string path = GetPath(accessKey);
         if (ContainsFile(path))
-            return GetDataFromFile(path, accessKey);
+            return GetDataFromFile(accessKey);
         if (ContainsDirectory(path))
-            return GetDataFromDirectory(path, accessKey);
+            return GetDataFromDirectory(accessKey);
         throw new ArgumentException($"Invalid path: {accessKey}");
     }
 
-    public Stream OpenStream(IRepositoryAccessKey accessKey)
+    public Stream OpenWrite(IRepositoryAccessKey accessKey)
     {
         UPath p = GetPath(accessKey);
         UPath dirname = p.GetDirectory();
@@ -45,32 +45,46 @@ public class InMemoryRepository : IRepository
         return _fileSystem.OpenFile(p, FileMode.Create, FileAccess.Write);
     }
 
-    private IReadOnlyList<IRepositoryObject> GetDataFromFile(string path, IRepositoryAccessKey accessKey)
+    private IRepositoryObject GetDataFromFile(IRepositoryAccessKey accessKey)
     {
-        var fileRepositoryObject =
-            new RepositoryObject(accessKey, _fileSystem.OpenFile(path, FileMode.Open, FileAccess.Read));
-        return new List<IRepositoryObject> { fileRepositoryObject };
+        return new FileRepositoryObject(accessKey.Name, () => GetStream(accessKey));
     }
 
-    private IReadOnlyList<IRepositoryObject> GetDataFromDirectory(string path, IRepositoryAccessKey accessKey)
+    private Stream GetStream(IRepositoryAccessKey accessKey)
     {
-        var data = new List<IRepositoryObject>();
-        DirectoryEntry directoryInfo = _fileSystem.GetDirectoryEntry(path);
-        foreach (FileEntry fileInfo in directoryInfo.EnumerateFiles())
+        return _fileSystem.OpenFile(GetPath(accessKey), FileMode.Open, FileAccess.Read);
+    }
+
+    private IRepositoryObject GetDataFromDirectory(IRepositoryAccessKey accessKey)
+    {
+        return new DirectoryRepositoryObject(accessKey.Name, () => GetObjects(accessKey));
+    }
+
+    private IReadOnlyCollection<IRepositoryObject> GetObjects(IRepositoryAccessKey accessKey)
+    {
+        DirectoryEntry directoryInfo = _fileSystem.GetDirectoryEntry(GetPath(accessKey));
+        IEnumerable<FileSystemEntry> infos = directoryInfo.EnumerateEntries();
+
+        var objects = new List<IRepositoryObject>();
+        foreach (FileSystemEntry fileSystemInfo in infos)
         {
-            string name = Path.GetRelativePath(path, fileInfo.FullName);
-            IRepositoryAccessKey fileAccessKey = accessKey.Combine(name);
-            Stream stream = _fileSystem.OpenFile(fileInfo.FullName, FileMode.Open, FileAccess.Read);
-            var content = new RepositoryObject(fileAccessKey, stream);
-            data.Add(content);
+            IRepositoryAccessKey objectKey = accessKey.Combine(fileSystemInfo.Name);
+            if (ContainsDirectory(fileSystemInfo.FullName))
+            {
+                objects.Add(new DirectoryRepositoryObject(objectKey.Name, () => GetObjects(objectKey)));
+            }
+            else if (ContainsFile(fileSystemInfo.FullName))
+            {
+                objects.Add(new FileRepositoryObject(objectKey.Name, () => GetStream(objectKey)));
+            }
         }
 
-        return data;
+        return objects.AsReadOnly();
     }
 
     private string GetPath(IRepositoryAccessKey accessKey)
     {
-        return BaseKey.Combine(accessKey).Value;
+        return accessKey.FullKey.StartsWith(BaseKey.FullKey) ? accessKey.FullKey : BaseKey.Combine(accessKey).FullKey;
     }
 
     private bool ContainsFile(UPath path)

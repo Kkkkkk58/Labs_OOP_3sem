@@ -1,5 +1,5 @@
 ﻿using Backups.Tools.Algorithms.Abstractions;
-using Backups.Tools.Archivers.Abstractions;
+using Backups.Tools.Archiver.Abstractions;
 using Backups.Tools.Clock.Abstractions;
 
 namespace Backups.Models.Abstractions;
@@ -10,6 +10,7 @@ public interface IBackupTaskConfigurationBuilder
     IBackupTaskConfigurationBuilder SetArchiver(IArchiver archiver);
     IBackupTaskConfigurationBuilder SetClock(IClock clock);
     IBackupTaskConfigurationBuilder SetRestorePointBuilder(IRestorePointBuilder restorePointBuilder);
+    IBackupTaskConfigurationBuilder SetDateTimeFormat(string dateTimeFormat);
 
     IBackupTaskConfiguration Build();
 }

@@ -1,80 +1,83 @@
-﻿using Backups.Exceptions;
-using Backups.Models.Abstractions;
+﻿using Backups.Models.Abstractions;
+using Backups.Models.Storage.Abstractions;
 
 namespace Backups.Models;
 
 public class RestorePoint : IRestorePoint
 {
     private RestorePoint(
+        Guid id,
         DateTime creationDate,
-        IRestorePointVersion version,
-        IReadOnlyList<IObjectStorageRelation> objectStorageRelations)
+        IEnumerable<IBackupObject> backupObjects,
+        IStorage storage)
     {
+        Id = id;
         CreationDate = creationDate;
-        Version = version;
-        ObjectStorageRelations = objectStorageRelations;
+        BackupObjects = backupObjects;
+        Storage = storage;
     }
 
     public static IRestorePointBuilder Builder => new RestorePointBuilder();
+    public Guid Id { get; }
     public DateTime CreationDate { get; }
-    public IRestorePointVersion Version { get; }
-    public IReadOnlyList<IObjectStorageRelation> ObjectStorageRelations { get; }
+    public IStorage Storage { get; }
+    public IEnumerable<IBackupObject> BackupObjects { get; }
 
     public override string ToString()
     {
-        return $"Restore point {Version} from {CreationDate}";
+        return $"Restore point {Id} from {CreationDate}";
     }
 
-    public class RestorePointBuilder : IRestorePointBuilder, IRestorePointVersionBuilder, IRestorePointRelationsBuilder
+    public class RestorePointBuilder : IRestorePointBuilder, IRestorePointBackupObjectsBuilder, IRestorePointStorageBuilder
     {
+        private Guid? _id;
         private DateTime? _restorePointDate;
-        private IRestorePointVersion? _restorePointVersion;
-        private IReadOnlyList<IObjectStorageRelation>? _objectStorageRelations;
+        private IEnumerable<IBackupObject>? _backupObjects;
+        private IStorage? _storage;
 
-        public IRestorePointVersionBuilder SetDate(DateTime restorePointDate)
+        public IRestorePointBuilder SetId(Guid id)
+        {
+            _id = id;
+            return this;
+        }
+
+        public IRestorePointBackupObjectsBuilder SetDate(DateTime restorePointDate)
         {
             _restorePointDate = restorePointDate;
             return this;
         }
 
-        public IRestorePointRelationsBuilder SetVersion(IRestorePointVersion restorePointVersion)
+        public IRestorePointStorageBuilder SetBackupObjects(IEnumerable<IBackupObject> backupObjects)
         {
-            _restorePointVersion = restorePointVersion;
+            _backupObjects = backupObjects;
             return this;
         }
 
-        public IRestorePointBuilder SetRelations(IReadOnlyList<IObjectStorageRelation> objectStorageRelations)
+        public IRestorePointBuilder SetStorage(IStorage storage)
         {
-            if (objectStorageRelations is not null && ContainsRepeatingBackupObjects(objectStorageRelations))
-                throw RestorePointException.ContainsRepeatingBackupObjects();
-
-            _objectStorageRelations = objectStorageRelations;
+            _storage = storage;
             return this;
         }
 
         public IRestorePoint Build()
         {
+            _id ??= Guid.NewGuid();
             ArgumentNullException.ThrowIfNull(_restorePointDate);
-            ArgumentNullException.ThrowIfNull(_restorePointVersion);
-            ArgumentNullException.ThrowIfNull(_objectStorageRelations);
+            ArgumentNullException.ThrowIfNull(_backupObjects);
+            ArgumentNullException.ThrowIfNull(_storage);
 
-            var restorePoint = new RestorePoint(_restorePointDate.Value, _restorePointVersion, _objectStorageRelations);
+            var restorePoint = new RestorePoint(_id.Value, _restorePointDate.Value, _backupObjects, _storage);
+
             Reset();
-
             return restorePoint;
-        }
-
-        private static bool ContainsRepeatingBackupObjects(
-            IReadOnlyCollection<IObjectStorageRelation> objectStorageRelations)
-        {
-            return objectStorageRelations.DistinctBy(o => o.BackupObject).Count() != objectStorageRelations.Count;
         }
 
         private void Reset()
         {
-            _objectStorageRelations = null;
+            _id = null;
             _restorePointDate = null;
-            _restorePointVersion = null;
+            _backupObjects = null;
+            _storage = null;
         }
     }
 }
