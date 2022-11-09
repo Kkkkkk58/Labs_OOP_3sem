@@ -23,7 +23,7 @@ public class ArchivedFolder : IArchivedFolder
     private IReadOnlyCollection<IRepositoryObject> GetObjects(ZipArchiveEntry entry)
     {
         var objects = new List<IRepositoryObject>();
-        var archive = new ZipArchive(entry.Open(), ZipArchiveMode.Read);
+        using var archive = new ZipArchive(entry.Open(), ZipArchiveMode.Read);
         foreach (IArchivedObject archivedObject in Children)
         {
             ZipArchiveEntry? childEntry = archive.GetEntry(archivedObject.Name);

@@ -20,7 +20,10 @@ public class ZipArchiveVisitor : IRepositoryObjectVisitor
     {
         ZipArchiveEntry entry = GetArchiveEntry(fileRepositoryObject);
         using Stream archiveEntryStream = entry.Open();
-        fileRepositoryObject.Stream.CopyTo(archiveEntryStream);
+        using (Stream data = fileRepositoryObject.Stream)
+        {
+            data.CopyTo(archiveEntryStream);
+        }
 
         _archivedObjects.Peek().Add(new ArchivedFile(fileRepositoryObject.Name));
     }

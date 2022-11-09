@@ -17,16 +17,16 @@ public class SplitStorageAlgorithm : IStorageAlgorithm
         ValidateArguments(backupObjects, targetRepository, archiver, baseAccessKey);
 
         var innerStorage = backupObjects
-            .Select(backupObject => archiver.Archive(new List<IRepositoryObject> { backupObject.GetRepositoryObject() }, targetRepository, GetStorageKey(baseAccessKey,  backupObject.AccessKey)))
+            .Select(backupObject => archiver.Archive(new List<IRepositoryObject> { backupObject.GetRepositoryObject() }, targetRepository, GetStorageKey(baseAccessKey,  backupObject.AccessKey.Name)))
             .ToList();
 
         return new SplitStorage(targetRepository, baseAccessKey, innerStorage);
     }
 
-    private static IRepositoryAccessKey GetStorageKey(IRepositoryAccessKey baseAccessKey, IRepositoryAccessKey backupObjectKey)
+    private static IRepositoryAccessKey GetStorageKey(IRepositoryAccessKey baseAccessKey, string backupObjectName)
     {
         return baseAccessKey
-            .Combine(backupObjectKey);
+            .Combine(backupObjectName);
     }
 
     private static void ValidateArguments(

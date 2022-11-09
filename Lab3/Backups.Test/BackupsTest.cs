@@ -23,7 +23,7 @@ public class BackupsTest : IDisposable
     public void SplitAlgorithmUntrackObject_StorageNumberNotEqualsRestorePointsNumber()
     {
         IRepository repository = new InMemoryRepository(_fs, "/test");
-        var bo = new BackupObject(repository, new RepositoryAccessKey("input/test.txt", "/"));
+        var bo = new BackupObject(repository, new RepositoryAccessKey("/input/test.txt", "/"));
         var bo2 = new BackupObject(repository, new RepositoryAccessKey("/input/dir", "/"));
         var algorithm = new SplitStorageAlgorithm();
         IBackupTask backupTask = GetBackupTask(repository, algorithm);
@@ -37,7 +37,7 @@ public class BackupsTest : IDisposable
         backupTask.CreateRestorePoint();
 
         Assert.Equal(2, GetRestorePointsNumber(backupTask));
-        Assert.Equal(3, GetStorageNumber(backupTask));
+        Assert.Equal(3, GetSplitStorageNumber(backupTask));
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class BackupsTest : IDisposable
         backupTask.CreateRestorePoint();
 
         Assert.Equal(2, GetRestorePointsNumber(backupTask));
-        Assert.Equal(2, GetStorageNumber(backupTask));
+        Assert.Equal(2, GetSingleStorageNumber(backupTask));
     }
 
     public void Dispose()
@@ -112,13 +112,24 @@ public class BackupsTest : IDisposable
         }
     }
 
-    private int GetStorageNumber(IBackupTask backupTask)
+    private int GetSingleStorageNumber(IBackupTask backupTask)
     {
         return backupTask
             .Backup
             .RestorePoints
             .Select(bt => bt.Storage)
             .Select(storage => _fs.GetDirectoryEntry(new RepositoryAccessKey(storage.AccessKey.KeyParts.Take(storage.AccessKey.KeyParts.Count() - 1), "/").FullKey))
+            .Select(de => de.EnumerateFiles().Count())
+            .Sum();
+    }
+
+    private int GetSplitStorageNumber(IBackupTask backupTask)
+    {
+        return backupTask
+            .Backup
+            .RestorePoints
+            .Select(bt => bt.Storage)
+            .Select(storage => _fs.GetDirectoryEntry(storage.AccessKey.FullKey))
             .Select(de => de.EnumerateFiles().Count())
             .Sum();
     }
