@@ -1,9 +1,10 @@
 ﻿using Backups.Models;
 using Backups.Models.Repository.Abstractions;
-using Backups.Services.Abstractions;
+using Backups.Models.Storage.Abstractions;
 using Backups.Services.BackupTaskService;
-using Backups.Services.Configuration;
-using Backups.Services.Configuration.Abstractions;
+using Backups.Services.BackupTaskService.Abstractions;
+using Backups.Services.BackupTaskService.Configuration;
+using Backups.Services.BackupTaskService.Configuration.Abstractions;
 using Backups.Test.Repository;
 using Backups.Tools.Algorithms;
 using Backups.Tools.Algorithms.Abstractions;
@@ -45,7 +46,7 @@ public class BackupsTest : IDisposable
     }
 
     [Fact]
-    public void SingleAlgorithmUntrackObject_StorageNumberNotEqualsRestorePointsNumber()
+    public void SingleAlgorithmUntrackObject_StorageNumberEqualsRestorePointsNumber()
     {
         IRepository repository = new InMemoryRepository(_fs, "/test");
 
@@ -121,10 +122,17 @@ public class BackupsTest : IDisposable
         return backupTask
             .Backup
             .RestorePoints
-            .Select(bt => bt.Storage)
-            .Select(storage => _fs.GetDirectoryEntry(new RepositoryAccessKey(storage.AccessKey.KeyParts.Take(storage.AccessKey.KeyParts.Count() - 1), "/").FullKey))
-            .Select(de => de.EnumerateFiles().Count())
+            .Select(restorePoint => restorePoint.Storage)
+            .Select(storage => _fs.GetDirectoryEntry(GetParentDirectoryPath(storage)))
+            .Select(directoryEntry => directoryEntry.EnumerateFiles().Count())
             .Sum();
+    }
+
+    private string GetParentDirectoryPath(IStorage storage)
+    {
+        IEnumerable<string> parentKeyParts = storage.AccessKey.KeyParts.SkipLast(1);
+
+        return new RepositoryAccessKey(parentKeyParts, "/").FullKey;
     }
 
     private int GetSplitStorageNumber(IBackupTask backupTask)
@@ -132,9 +140,9 @@ public class BackupsTest : IDisposable
         return backupTask
             .Backup
             .RestorePoints
-            .Select(bt => bt.Storage)
+            .Select(restorePoint => restorePoint.Storage)
             .Select(storage => _fs.GetDirectoryEntry(storage.AccessKey.FullKey))
-            .Select(de => de.EnumerateFiles().Count())
+            .Select(directoryEntry => directoryEntry.EnumerateFiles().Count())
             .Sum();
     }
 

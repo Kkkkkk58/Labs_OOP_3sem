@@ -7,7 +7,7 @@ public class RepositoryAccessKey : IRepositoryAccessKey
     private readonly string _keySeparator;
 
     public RepositoryAccessKey(string baseKey, string keySeparator)
-        : this(baseKey.Split(keySeparator, StringSplitOptions.RemoveEmptyEntries), keySeparator)
+        : this(baseKey.Split(keySeparator), keySeparator)
     {
     }
 
