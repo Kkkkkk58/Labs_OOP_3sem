@@ -47,7 +47,7 @@ public class ZipArchiveVisitor : IRepositoryObjectVisitor
 
     public IEnumerable<IArchivedObject> GetArchivedObjects()
     {
-        return _archivedObjects.Pop();
+        return _archivedObjects.Peek();
     }
 
     private ZipArchiveEntry GetArchiveEntry(IDirectoryRepositoryObject repositoryObject)
