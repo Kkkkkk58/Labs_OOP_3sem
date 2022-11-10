@@ -1,4 +1,4 @@
-﻿namespace Backups.Models.Abstractions;
+﻿namespace Backups.Models.RepositoryObjects.Abstractions;
 
 public interface IDirectoryRepositoryObject : IRepositoryObject
 {

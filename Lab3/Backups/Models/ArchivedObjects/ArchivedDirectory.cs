@@ -3,12 +3,13 @@ using Backups.Exceptions;
 using Backups.Models.Abstractions;
 using Backups.Models.ArchivedObjects.Abstractions;
 using Backups.Models.RepositoryObjects;
+using Backups.Models.RepositoryObjects.Abstractions;
 
 namespace Backups.Models.ArchivedObjects;
 
-public class ArchivedFolder : IArchivedFolder
+public class ArchivedDirectory : IArchivedDirectory
 {
-    public ArchivedFolder(string name, IEnumerable<IArchivedObject> children)
+    public ArchivedDirectory(string name, IEnumerable<IArchivedObject> children)
     {
         Name = name;
         Children = children;
@@ -32,8 +33,9 @@ public class ArchivedFolder : IArchivedFolder
     {
         ArgumentNullException.ThrowIfNull(entry);
 
-        var objects = new List<IRepositoryObject>();
         var archive = new ZipArchive(entry.Open(), ZipArchiveMode.Read);
+
+        var objects = new List<IRepositoryObject>();
         foreach (IArchivedObject archivedObject in Children)
         {
             ZipArchiveEntry? childEntry = archive.GetEntry(archivedObject.Name);

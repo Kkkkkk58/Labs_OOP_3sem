@@ -7,7 +7,7 @@ public class RepositoryAccessKey : IRepositoryAccessKey
     private readonly string _keySeparator;
 
     public RepositoryAccessKey(string baseKey, string keySeparator)
-        : this(baseKey.Split(keySeparator), keySeparator)
+        : this(baseKey.Split(keySeparator, StringSplitOptions.RemoveEmptyEntries), keySeparator)
     {
     }
 
@@ -33,7 +33,9 @@ public class RepositoryAccessKey : IRepositoryAccessKey
     public IRepositoryAccessKey Combine(string value)
     {
         ArgumentNullException.ThrowIfNull(value);
-        return Combine(new RepositoryAccessKey(new[] { value }, _keySeparator));
+
+        var additionalKey = new RepositoryAccessKey(new[] { value }, _keySeparator);
+        return Combine(additionalKey);
     }
 
     public IRepositoryAccessKey ApplyExtension(string extension)
@@ -41,7 +43,10 @@ public class RepositoryAccessKey : IRepositoryAccessKey
         ArgumentNullException.ThrowIfNull(extension);
 
         string nameWithExtension = $"{Name}.{extension}";
-        return new RepositoryAccessKey(KeyParts.Take(KeyParts.Count() - 1).Concat(new[] { nameWithExtension }), _keySeparator);
+        IEnumerable<string> partsWithoutName = KeyParts.Take(KeyParts.Count() - 1);
+
+        IEnumerable<string> newKeyParts = partsWithoutName.Concat(new[] { nameWithExtension });
+        return new RepositoryAccessKey(newKeyParts, _keySeparator);
     }
 
     public override string ToString()

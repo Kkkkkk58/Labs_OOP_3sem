@@ -1,5 +1,6 @@
 ﻿using Backups.Models.Abstractions;
 using Backups.Models.Repository.Abstractions;
+using Backups.Models.RepositoryObjects.Abstractions;
 using Backups.Models.Storage;
 using Backups.Models.Storage.Abstractions;
 using Backups.Tools.Algorithms.Abstractions;
@@ -21,15 +22,26 @@ public class SplitStorageAlgorithm : IStorageAlgorithm
         ArgumentNullException.ThrowIfNull(baseAccessKey);
 
         var innerStorage = backupObjects
-            .Select(backupObject => archiver.Archive(new List<IRepositoryObject> { backupObject.GetRepositoryObject() }, targetRepository, GetStorageKey(baseAccessKey,  backupObject.AccessKey.Name)))
+            .Select(backupObject => GetBackupObjectStorage(targetRepository, archiver, baseAccessKey, backupObject))
             .ToList();
 
         return new SplitStorage(targetRepository, baseAccessKey, innerStorage);
     }
 
+    private static IStorage GetBackupObjectStorage(
+        IRepository targetRepository,
+        IArchiver archiver,
+        IRepositoryAccessKey baseAccessKey,
+        IBackupObject backupObject)
+    {
+        IRepositoryObject[] repositoryObjects = { backupObject.GetRepositoryObject() };
+        IRepositoryAccessKey storageKey = GetStorageKey(baseAccessKey, backupObject.AccessKey.Name);
+
+        return archiver.Archive(repositoryObjects, targetRepository, storageKey);
+    }
+
     private static IRepositoryAccessKey GetStorageKey(IRepositoryAccessKey baseAccessKey, string backupObjectName)
     {
-        return baseAccessKey
-            .Combine(backupObjectName);
+        return baseAccessKey.Combine(backupObjectName);
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Backups.Entities;
 using Backups.Entities.Abstractions;
 using Backups.Models.Abstractions;
-using Backups.Services.Abstractions;
-using Backups.Services.Configuration.Abstractions;
+using Backups.Services.BackupTaskService.Abstractions;
+using Backups.Services.BackupTaskService.Configuration.Abstractions;
 
 namespace Backups.Services.BackupTaskService;
 

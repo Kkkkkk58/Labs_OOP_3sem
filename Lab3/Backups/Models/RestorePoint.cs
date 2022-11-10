@@ -31,7 +31,8 @@ public class RestorePoint : IRestorePoint
         return $"Restore point {Id} from {CreationDate}";
     }
 
-    public class RestorePointBuilder : IRestorePointBuilder, IRestorePointBackupObjectsBuilder, IRestorePointStorageBuilder
+    public class RestorePointBuilder : IRestorePointBuilder, IRestorePointBackupObjectsBuilder,
+        IRestorePointStorageBuilder
     {
         private Guid? _id;
         private DateTime? _restorePointDate;

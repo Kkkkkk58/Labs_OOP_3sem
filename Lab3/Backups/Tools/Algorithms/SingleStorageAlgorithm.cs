@@ -1,5 +1,6 @@
 ﻿using Backups.Models.Abstractions;
 using Backups.Models.Repository.Abstractions;
+using Backups.Models.RepositoryObjects.Abstractions;
 using Backups.Models.Storage.Abstractions;
 using Backups.Tools.Algorithms.Abstractions;
 using Backups.Tools.Archiver.Abstractions;
@@ -20,14 +21,16 @@ public class SingleStorageAlgorithm : IStorageAlgorithm
         ArgumentNullException.ThrowIfNull(baseAccessKey);
 
         IRepositoryAccessKey storageKey = GetStorageKey(baseAccessKey);
-        return archiver.Archive(backupObjects.Select(bo => bo.GetRepositoryObject()), targetRepository, storageKey);
+        IEnumerable<IRepositoryObject> repositoryObjects = backupObjects
+            .Select(bo => bo.GetRepositoryObject());
+
+        return archiver.Archive(repositoryObjects, targetRepository, storageKey);
     }
 
     private static IRepositoryAccessKey GetStorageKey(IRepositoryAccessKey baseAccessKey)
     {
         string storageName = Guid.NewGuid().ToString();
 
-        return baseAccessKey
-            .Combine(storageName);
+        return baseAccessKey.Combine(storageName);
     }
 }

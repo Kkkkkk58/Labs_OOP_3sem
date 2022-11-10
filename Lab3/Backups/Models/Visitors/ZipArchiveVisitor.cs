@@ -1,10 +1,10 @@
 ﻿using System.IO.Compression;
-using Backups.Models.Abstractions;
 using Backups.Models.ArchivedObjects;
 using Backups.Models.ArchivedObjects.Abstractions;
 using Backups.Models.RepositoryObjects.Abstractions;
+using Backups.Models.Visitors.Abstractions;
 
-namespace Backups.Tools.Archiver;
+namespace Backups.Models.Visitors;
 
 public class ZipArchiveVisitor : IRepositoryObjectVisitor
 {
@@ -31,7 +31,8 @@ public class ZipArchiveVisitor : IRepositoryObjectVisitor
             data.CopyTo(archiveEntryStream);
         }
 
-        _archivedObjects.Peek().Add(new ArchivedFile(fileRepositoryObject.Name));
+        var archivedFile = new ArchivedFile(fileRepositoryObject.Name);
+        _archivedObjects.Peek().Add(archivedFile);
     }
 
     public void Visit(IDirectoryRepositoryObject directoryRepositoryObject)
@@ -50,7 +51,8 @@ public class ZipArchiveVisitor : IRepositoryObjectVisitor
 
         _archives.Pop();
         List<IArchivedObject> curList = _archivedObjects.Pop();
-        _archivedObjects.Peek().Add(new ArchivedFolder($"{directoryRepositoryObject.Name}.zip", curList));
+        var archivedDirectory = new ArchivedDirectory($"{directoryRepositoryObject.Name}.zip", curList);
+        _archivedObjects.Peek().Add(archivedDirectory);
     }
 
     public IEnumerable<IArchivedObject> GetArchivedObjects()

@@ -1,14 +1,14 @@
 ﻿using Backups.Models;
 using Backups.Models.Abstractions;
 using Backups.Models.Repository.Abstractions;
-using Backups.Services.Configuration.Abstractions;
+using Backups.Services.BackupTaskService.Configuration.Abstractions;
 using Backups.Tools.Algorithms.Abstractions;
 using Backups.Tools.Archiver;
 using Backups.Tools.Archiver.Abstractions;
 using Backups.Tools.Clock;
 using Backups.Tools.Clock.Abstractions;
 
-namespace Backups.Services.Configuration;
+namespace Backups.Services.BackupTaskService.Configuration;
 
 public class BackupTaskConfigurationBuilder : IBackupTaskConfigurationBuilder, IBackupTaskAlgorithmBuilder
 {

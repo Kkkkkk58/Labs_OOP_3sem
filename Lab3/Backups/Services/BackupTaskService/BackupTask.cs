@@ -2,8 +2,8 @@
 using Backups.Exceptions;
 using Backups.Models.Abstractions;
 using Backups.Models.Storage.Abstractions;
-using Backups.Services.Abstractions;
-using Backups.Services.Configuration.Abstractions;
+using Backups.Services.BackupTaskService.Abstractions;
+using Backups.Services.BackupTaskService.Configuration.Abstractions;
 
 namespace Backups.Services.BackupTaskService;
 

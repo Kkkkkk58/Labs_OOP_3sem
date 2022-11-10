@@ -1,6 +1,6 @@
 ﻿namespace Backups.Models.ArchivedObjects.Abstractions;
 
-public interface IArchivedFolder : IArchivedObject
+public interface IArchivedDirectory : IArchivedObject
 {
     IEnumerable<IArchivedObject> Children { get; }
 }

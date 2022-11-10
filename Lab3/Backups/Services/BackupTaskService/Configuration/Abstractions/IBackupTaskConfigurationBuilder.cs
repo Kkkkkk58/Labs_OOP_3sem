@@ -4,7 +4,7 @@ using Backups.Tools.Algorithms.Abstractions;
 using Backups.Tools.Archiver.Abstractions;
 using Backups.Tools.Clock.Abstractions;
 
-namespace Backups.Services.Configuration.Abstractions;
+namespace Backups.Services.BackupTaskService.Configuration.Abstractions;
 
 public interface IBackupTaskConfigurationBuilder
 {

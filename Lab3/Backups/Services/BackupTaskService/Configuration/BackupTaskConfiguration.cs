@@ -1,11 +1,11 @@
 ﻿using Backups.Models.Abstractions;
 using Backups.Models.Repository.Abstractions;
-using Backups.Services.Configuration.Abstractions;
+using Backups.Services.BackupTaskService.Configuration.Abstractions;
 using Backups.Tools.Algorithms.Abstractions;
 using Backups.Tools.Archiver.Abstractions;
 using Backups.Tools.Clock.Abstractions;
 
-namespace Backups.Services.Configuration;
+namespace Backups.Services.BackupTaskService.Configuration;
 
 public record BackupTaskConfiguration : IBackupTaskConfiguration
 {

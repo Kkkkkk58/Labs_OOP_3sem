@@ -1,5 +1,6 @@
 ﻿using Backups.Models.Abstractions;
 using Backups.Models.Repository.Abstractions;
+using Backups.Models.RepositoryObjects.Abstractions;
 using Backups.Models.Storage.Abstractions;
 
 namespace Backups.Models.Storage;

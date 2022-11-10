@@ -1,7 +1,7 @@
 ﻿using Backups.Models.ArchivedObjects.Abstractions;
 using Backups.Models.RepositoryObjects.Abstractions;
 
-namespace Backups.Models.Abstractions;
+namespace Backups.Models.Visitors.Abstractions;
 
 public interface IRepositoryObjectVisitor
 {

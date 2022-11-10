@@ -25,23 +25,30 @@ public class ZipStorage : IStorage
 
     public IRepositoryAccessKey AccessKey { get; }
     public IRepository Repository { get; }
-    public IEnumerable<IRepositoryObject> Objects => GetObjects();
+    public IEnumerable<IRepositoryObject> Objects => GetRepositoryObjects();
 
     public override string ToString()
     {
         return $"ZipStorage {AccessKey} saved into {Repository}";
     }
 
-    private IEnumerable<IRepositoryObject> GetObjects()
+    private IEnumerable<IRepositoryObject> GetRepositoryObjects()
+    {
+        IRepositoryObject archiveRepoObject = Repository.GetComponent(AccessKey);
+        if (archiveRepoObject is not IFileRepositoryObject archiveFile)
+            throw new NotImplementedException();
+
+        var zipArchive = new ZipArchive(archiveFile.Stream, ZipArchiveMode.Read);
+
+        return GetObjectsFromArchive(zipArchive);
+    }
+
+    private IEnumerable<IRepositoryObject> GetObjectsFromArchive(ZipArchive zipArchive)
     {
         var objects = new List<IRepositoryObject>();
-        var zipArch = new ZipArchive(
-            ((IFileRepositoryObject)Repository.GetComponent(AccessKey)).Stream,
-            ZipArchiveMode.Read);
-
         foreach (IArchivedObject archivedObject in _archivedObjects)
         {
-            ZipArchiveEntry? entry = zipArch.GetEntry(archivedObject.Name);
+            ZipArchiveEntry? entry = zipArchive.GetEntry(archivedObject.Name);
             if (entry is null)
                 throw ZipStorageException.ZipEntryNotFound(archivedObject.Name);
 
