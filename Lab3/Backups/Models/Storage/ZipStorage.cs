@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using Backups.Exceptions;
 using Backups.Models.Abstractions;
 using Backups.Models.ArchivedObjects.Abstractions;
 using Backups.Models.Repository.Abstractions;
@@ -42,7 +43,7 @@ public class ZipStorage : IStorage
         {
             ZipArchiveEntry? entry = zipArch.GetEntry(archivedObject.Name);
             if (entry is null)
-                continue;
+                throw ZipStorageException.ZipEntryNotFound(archivedObject.Name);
 
             objects.Add(archivedObject.GetRepositoryObject(entry));
         }

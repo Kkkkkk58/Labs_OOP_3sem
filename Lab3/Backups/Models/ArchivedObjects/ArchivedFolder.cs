@@ -33,7 +33,7 @@ public class ArchivedFolder : IArchivedFolder
         ArgumentNullException.ThrowIfNull(entry);
 
         var objects = new List<IRepositoryObject>();
-        using var archive = new ZipArchive(entry.Open(), ZipArchiveMode.Read);
+        var archive = new ZipArchive(entry.Open(), ZipArchiveMode.Read);
         foreach (IArchivedObject archivedObject in Children)
         {
             ZipArchiveEntry? childEntry = archive.GetEntry(archivedObject.Name);

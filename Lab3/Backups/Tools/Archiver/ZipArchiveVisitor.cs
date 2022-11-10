@@ -50,7 +50,7 @@ public class ZipArchiveVisitor : IRepositoryObjectVisitor
 
         _archives.Pop();
         List<IArchivedObject> curList = _archivedObjects.Pop();
-        _archivedObjects.Peek().Add(new ArchivedFolder(directoryRepositoryObject.Name, curList));
+        _archivedObjects.Peek().Add(new ArchivedFolder($"{directoryRepositoryObject.Name}.zip", curList));
     }
 
     public IEnumerable<IArchivedObject> GetArchivedObjects()
