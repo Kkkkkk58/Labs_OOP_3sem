@@ -1,10 +1,10 @@
 ﻿using Backups.LocalFileSystem.Test.Repository;
 using Backups.Models;
 using Backups.Models.Repository.Abstractions;
-using Backups.Services.Abstractions;
 using Backups.Services.BackupTaskService;
-using Backups.Services.Configuration;
-using Backups.Services.Configuration.Abstractions;
+using Backups.Services.BackupTaskService.Abstractions;
+using Backups.Services.BackupTaskService.Configuration;
+using Backups.Services.BackupTaskService.Configuration.Abstractions;
 using Backups.Tools.Algorithms;
 
 string separator = Path.DirectorySeparatorChar.ToString();

@@ -2,6 +2,7 @@
 using Backups.Models.Abstractions;
 using Backups.Models.Repository.Abstractions;
 using Backups.Models.RepositoryObjects;
+using Backups.Models.RepositoryObjects.Abstractions;
 
 namespace Backups.LocalFileSystem.Test.Repository;
 
@@ -32,9 +33,10 @@ public class FileSystemRepository : IRepository
 
         string path = GetPath(accessKey);
         if (ContainsFile(path))
-            return GetFileComponent(accessKey);
+            return new FileRepositoryObject(accessKey.Name, () => GetStream(accessKey));
         if (ContainsDirectory(path))
-            return GetDirectoryComponent(accessKey);
+            return new DirectoryRepositoryObject(accessKey.Name, () => GetObjects(accessKey));
+
         throw new ArgumentException($"Invalid path: {accessKey}");
     }
 
@@ -62,41 +64,35 @@ public class FileSystemRepository : IRepository
         return Directory.Exists(path);
     }
 
-    private IRepositoryObject GetFileComponent(IRepositoryAccessKey accessKey)
-    {
-        return new FileRepositoryObject(accessKey.Name, () => GetStream(accessKey));
-    }
-
     private Stream GetStream(IRepositoryAccessKey accessKey)
     {
         return File.OpenRead(GetPath(accessKey));
     }
 
-    private IRepositoryObject GetDirectoryComponent(IRepositoryAccessKey accessKey)
-    {
-        return new DirectoryRepositoryObject(accessKey.Name, () => GetObjects(accessKey));
-    }
-
     private IReadOnlyCollection<IRepositoryObject> GetObjects(IRepositoryAccessKey accessKey)
     {
         var directoryInfo = new DirectoryInfo(GetPath(accessKey));
-        IEnumerable<FileSystemInfo> infos = directoryInfo.EnumerateFileSystemInfos();
+        IEnumerable<FileSystemInfo> fsObjects = directoryInfo.EnumerateFileSystemInfos();
 
-        var objects = new List<IRepositoryObject>();
-        foreach (FileSystemInfo fileSystemInfo in infos)
+        var repositoryObjects = new List<IRepositoryObject>();
+        foreach (FileSystemInfo fsObject in fsObjects)
         {
-            IRepositoryAccessKey objectKey = accessKey.Combine(fileSystemInfo.Name);
-            if (ContainsDirectory(fileSystemInfo.FullName))
+            IRepositoryAccessKey objectKey = accessKey.Combine(fsObject.Name);
+            if (ContainsDirectory(fsObject.FullName))
             {
-                objects.Add(new DirectoryRepositoryObject(objectKey.Name, () => GetObjects(objectKey)));
+                repositoryObjects.Add(new DirectoryRepositoryObject(objectKey.Name, () => GetObjects(objectKey)));
             }
-            else if (ContainsFile(fileSystemInfo.FullName))
+            else if (ContainsFile(fsObject.FullName))
             {
-                objects.Add(new FileRepositoryObject(objectKey.Name, () => GetStream(objectKey)));
+                repositoryObjects.Add(new FileRepositoryObject(objectKey.Name, () => GetStream(objectKey)));
+            }
+            else
+            {
+                throw new ArgumentException($"Repository doesn't contain object {objectKey}");
             }
         }
 
-        return objects.AsReadOnly();
+        return repositoryObjects.AsReadOnly();
     }
 
     private string GetPath(IRepositoryAccessKey accessKey)
