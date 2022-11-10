@@ -2,6 +2,7 @@
 using Backups.Models.Abstractions;
 using Backups.Models.Repository.Abstractions;
 using Backups.Models.RepositoryObjects;
+using Backups.Models.RepositoryObjects.Abstractions;
 using Zio;
 using Zio.FileSystems;
 
@@ -27,7 +28,7 @@ public class InMemoryRepository : IRepository
     {
         ArgumentNullException.ThrowIfNull(accessKey);
 
-        string path = GetPath(accessKey);
+        UPath path = GetPath(accessKey);
         return ContainsFile(path) || ContainsDirectory(path);
     }
 
@@ -35,11 +36,12 @@ public class InMemoryRepository : IRepository
     {
         ArgumentNullException.ThrowIfNull(accessKey);
 
-        string path = GetPath(accessKey);
+        UPath path = GetPath(accessKey);
         if (ContainsFile(path))
             return GetDataFromFile(accessKey);
         if (ContainsDirectory(path))
             return GetDataFromDirectory(accessKey);
+
         throw new ArgumentException($"Invalid path: {accessKey}");
     }
 
@@ -70,29 +72,26 @@ public class InMemoryRepository : IRepository
 
     private IReadOnlyCollection<IRepositoryObject> GetObjects(IRepositoryAccessKey accessKey)
     {
-        DirectoryEntry directoryInfo = _fileSystem.GetDirectoryEntry(GetPath(accessKey));
-        IEnumerable<FileSystemEntry> infos = directoryInfo.EnumerateEntries();
+        DirectoryEntry directoryEntry = _fileSystem.GetDirectoryEntry(GetPath(accessKey));
+        IEnumerable<FileSystemEntry> fsObjects = directoryEntry.EnumerateEntries();
 
-        var objects = new List<IRepositoryObject>();
-        foreach (FileSystemEntry fileSystemInfo in infos)
-        {
-            IRepositoryAccessKey objectKey = accessKey.Combine(fileSystemInfo.Name);
-            if (ContainsDirectory(fileSystemInfo.FullName))
-            {
-                objects.Add(new DirectoryRepositoryObject(objectKey.Name, () => GetObjects(objectKey)));
-            }
-            else if (ContainsFile(fileSystemInfo.FullName))
-            {
-                objects.Add(new FileRepositoryObject(objectKey.Name, () => GetStream(objectKey)));
-            }
-        }
-
-        return objects.AsReadOnly();
+        return fsObjects
+            .Select(fsObject => GetInnerObject(accessKey, fsObject))
+            .ToList()
+            .AsReadOnly();
     }
 
-    private string GetPath(IRepositoryAccessKey accessKey)
+    private IRepositoryObject GetInnerObject(IRepositoryAccessKey accessKey, FileSystemEntry fsObject)
     {
-        return accessKey.FullKey.StartsWith(BaseKey.FullKey) ? accessKey.FullKey : BaseKey.Combine(accessKey).FullKey;
+        IRepositoryAccessKey objectKey = accessKey.Combine(fsObject.Name);
+
+        if (ContainsDirectory(fsObject.FullName))
+            return new DirectoryRepositoryObject(objectKey.Name, () => GetObjects(objectKey));
+
+        if (ContainsFile(fsObject.FullName))
+            return new FileRepositoryObject(objectKey.Name, () => GetStream(objectKey));
+
+        throw new ArgumentException($"An object {objectKey} doesn't exist");
     }
 
     private bool ContainsFile(UPath path)
@@ -103,5 +102,10 @@ public class InMemoryRepository : IRepository
     private bool ContainsDirectory(UPath path)
     {
         return _fileSystem.DirectoryExists(path);
+    }
+
+    private UPath GetPath(IRepositoryAccessKey accessKey)
+    {
+        return accessKey.FullKey.StartsWith(BaseKey.FullKey) ? accessKey.FullKey : BaseKey.Combine(accessKey).FullKey;
     }
 }

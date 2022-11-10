@@ -33,9 +33,9 @@ public class FileSystemRepository : IRepository
 
         string path = GetPath(accessKey);
         if (ContainsFile(path))
-            return new FileRepositoryObject(accessKey.Name, () => GetStream(accessKey));
+            return GetFileObject(accessKey);
         if (ContainsDirectory(path))
-            return new DirectoryRepositoryObject(accessKey.Name, () => GetObjects(accessKey));
+            return GetDirectoryObject(accessKey);
 
         throw new ArgumentException($"Invalid path: {accessKey}");
     }
@@ -64,6 +64,16 @@ public class FileSystemRepository : IRepository
         return Directory.Exists(path);
     }
 
+    private FileRepositoryObject GetFileObject(IRepositoryAccessKey accessKey)
+    {
+        return new FileRepositoryObject(accessKey.Name, () => GetStream(accessKey));
+    }
+
+    private DirectoryRepositoryObject GetDirectoryObject(IRepositoryAccessKey accessKey)
+    {
+        return new DirectoryRepositoryObject(accessKey.Name, () => GetObjects(accessKey));
+    }
+
     private Stream GetStream(IRepositoryAccessKey accessKey)
     {
         return File.OpenRead(GetPath(accessKey));
@@ -74,25 +84,23 @@ public class FileSystemRepository : IRepository
         var directoryInfo = new DirectoryInfo(GetPath(accessKey));
         IEnumerable<FileSystemInfo> fsObjects = directoryInfo.EnumerateFileSystemInfos();
 
-        var repositoryObjects = new List<IRepositoryObject>();
-        foreach (FileSystemInfo fsObject in fsObjects)
-        {
-            IRepositoryAccessKey objectKey = accessKey.Combine(fsObject.Name);
-            if (ContainsDirectory(fsObject.FullName))
-            {
-                repositoryObjects.Add(new DirectoryRepositoryObject(objectKey.Name, () => GetObjects(objectKey)));
-            }
-            else if (ContainsFile(fsObject.FullName))
-            {
-                repositoryObjects.Add(new FileRepositoryObject(objectKey.Name, () => GetStream(objectKey)));
-            }
-            else
-            {
-                throw new ArgumentException($"Repository doesn't contain object {objectKey}");
-            }
-        }
+        return fsObjects
+            .Select(fsObject => GetInnerObject(accessKey, fsObject))
+            .ToList()
+            .AsReadOnly();
+    }
 
-        return repositoryObjects.AsReadOnly();
+    private IRepositoryObject GetInnerObject(IRepositoryAccessKey accessKey, FileSystemInfo fsObject)
+    {
+        IRepositoryAccessKey objectKey = accessKey.Combine(fsObject.Name);
+
+        if (ContainsDirectory(fsObject.FullName))
+            return new DirectoryRepositoryObject(objectKey.Name, () => GetObjects(objectKey));
+
+        if (ContainsFile(fsObject.FullName))
+            return new FileRepositoryObject(objectKey.Name, () => GetStream(objectKey));
+
+        throw new ArgumentException($"Repository doesn't contain object {objectKey}");
     }
 
     private string GetPath(IRepositoryAccessKey accessKey)
