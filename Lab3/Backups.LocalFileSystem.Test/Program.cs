@@ -1,6 +1,10 @@
 ﻿using Backups.LocalFileSystem.Test.Repository;
 using Backups.Models;
-using Backups.Models.Abstractions;
+using Backups.Models.Repository.Abstractions;
+using Backups.Services.Abstractions;
+using Backups.Services.BackupTaskService;
+using Backups.Services.Configuration;
+using Backups.Services.Configuration.Abstractions;
 using Backups.Tools.Algorithms;
 
 string separator = Path.DirectorySeparatorChar.ToString();
@@ -16,6 +20,14 @@ backupTask.TrackBackupObject(bo2);
 
 backupTask.CreateRestorePoint();
 
+// IEnumerable<IRepositoryObject> repositoryObjects = backupTask.Backup.RestorePoints[0].Storage.Objects;
+// foreach (IRepositoryObject repositoryObject in repositoryObjects)
+// {
+//    Console.WriteLine(repositoryObject.Name);
+//    using var sr = new StreamReader(((IFileRepositoryObject)repositoryObject).Stream);
+//    string s = sr.ReadToEnd();
+//    Console.WriteLine(s);
+// }
 backupTask.UntrackBackupObject(bo);
 
 var bo3 = new BackupObject(repository, new RepositoryAccessKey("aa", separator));
@@ -39,7 +51,7 @@ static IBackupTask GetBackupTask(IRepository repository)
 
 static IBackupTaskConfiguration GetBackupTaskConfig(IRepository repository)
 {
-    var algorithm = new SplitStorageAlgorithm();
+    var algorithm = new SingleStorageAlgorithm();
 
     return new BackupTaskConfigurationBuilder()
         .SetTargetRepository(repository)

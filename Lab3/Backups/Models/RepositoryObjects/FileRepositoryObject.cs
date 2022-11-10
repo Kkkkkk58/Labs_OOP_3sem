@@ -1,6 +1,7 @@
 ﻿using Backups.Models.Abstractions;
+using Backups.Models.RepositoryObjects.Abstractions;
 
-namespace Backups.Models;
+namespace Backups.Models.RepositoryObjects;
 
 public class FileRepositoryObject : IFileRepositoryObject
 {
@@ -8,6 +9,10 @@ public class FileRepositoryObject : IFileRepositoryObject
 
     public FileRepositoryObject(string name, Func<Stream> func)
     {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(func);
+
         Name = name;
         _func = func;
     }
@@ -19,5 +24,10 @@ public class FileRepositoryObject : IFileRepositoryObject
     public void Accept(IRepositoryObjectVisitor repositoryObjectVisitor)
     {
         repositoryObjectVisitor.Visit(this);
+    }
+
+    public override string ToString()
+    {
+        return $"Repository file {Name}";
     }
 }

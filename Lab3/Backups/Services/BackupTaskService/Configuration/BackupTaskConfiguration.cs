@@ -1,9 +1,11 @@
 ﻿using Backups.Models.Abstractions;
+using Backups.Models.Repository.Abstractions;
+using Backups.Services.Configuration.Abstractions;
 using Backups.Tools.Algorithms.Abstractions;
 using Backups.Tools.Archiver.Abstractions;
 using Backups.Tools.Clock.Abstractions;
 
-namespace Backups.Models;
+namespace Backups.Services.Configuration;
 
 public record BackupTaskConfiguration : IBackupTaskConfiguration
 {
@@ -15,7 +17,12 @@ public record BackupTaskConfiguration : IBackupTaskConfiguration
         string dateTimeFormat,
         IRestorePointBuilder restorePointBuilder)
     {
-        ValidateArguments(storageAlgorithm, targetRepository, archiver, clock, dateTimeFormat, restorePointBuilder);
+        ArgumentNullException.ThrowIfNull(storageAlgorithm);
+        ArgumentNullException.ThrowIfNull(targetRepository);
+        ArgumentNullException.ThrowIfNull(archiver);
+        ArgumentNullException.ThrowIfNull(clock);
+        ArgumentNullException.ThrowIfNull(dateTimeFormat);
+        ArgumentNullException.ThrowIfNull(restorePointBuilder);
 
         StorageAlgorithm = storageAlgorithm;
         TargetRepository = targetRepository;
@@ -32,20 +39,4 @@ public record BackupTaskConfiguration : IBackupTaskConfiguration
     public string DateTimeFormat { get; }
 
     public IRestorePointBuilder RestorePointBuilder { get; }
-
-    private static void ValidateArguments(
-        IStorageAlgorithm storageAlgorithm,
-        IRepository targetRepository,
-        IArchiver archiver,
-        IClock clock,
-        string dateTimeFormat,
-        IRestorePointBuilder restorePointBuilder)
-    {
-        ArgumentNullException.ThrowIfNull(storageAlgorithm);
-        ArgumentNullException.ThrowIfNull(targetRepository);
-        ArgumentNullException.ThrowIfNull(archiver);
-        ArgumentNullException.ThrowIfNull(clock);
-        ArgumentNullException.ThrowIfNull(dateTimeFormat);
-        ArgumentNullException.ThrowIfNull(restorePointBuilder);
-    }
 }

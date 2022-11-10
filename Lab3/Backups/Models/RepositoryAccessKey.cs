@@ -13,6 +13,9 @@ public class RepositoryAccessKey : IRepositoryAccessKey
 
     public RepositoryAccessKey(IEnumerable<string> keyParts, string keySeparator)
     {
+        ArgumentNullException.ThrowIfNull(keyParts);
+        ArgumentNullException.ThrowIfNull(keySeparator);
+
         KeyParts = keyParts;
         _keySeparator = keySeparator;
     }
@@ -23,17 +26,26 @@ public class RepositoryAccessKey : IRepositoryAccessKey
 
     public IRepositoryAccessKey Combine(IRepositoryAccessKey other)
     {
+        ArgumentNullException.ThrowIfNull(other);
         return new RepositoryAccessKey(KeyParts.Concat(other.KeyParts), _keySeparator);
     }
 
     public IRepositoryAccessKey Combine(string value)
     {
+        ArgumentNullException.ThrowIfNull(value);
         return Combine(new RepositoryAccessKey(new[] { value }, _keySeparator));
     }
 
     public IRepositoryAccessKey ApplyExtension(string extension)
     {
+        ArgumentNullException.ThrowIfNull(extension);
+
         string nameWithExtension = $"{Name}.{extension}";
         return new RepositoryAccessKey(KeyParts.Take(KeyParts.Count() - 1).Concat(new[] { nameWithExtension }), _keySeparator);
+    }
+
+    public override string ToString()
+    {
+        return FullKey;
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Backups.Models;
 using Backups.Models.Abstractions;
+using Backups.Models.Repository.Abstractions;
+using Backups.Models.RepositoryObjects;
 
 namespace Backups.LocalFileSystem.Test.Repository;
 
@@ -18,6 +20,8 @@ public class FileSystemRepository : IRepository
 
     public bool Contains(IRepositoryAccessKey accessKey)
     {
+        ArgumentNullException.ThrowIfNull(accessKey);
+
         string path = GetPath(accessKey);
         return ContainsFile(path) || ContainsDirectory(path);
     }

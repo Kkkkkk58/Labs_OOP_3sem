@@ -28,7 +28,7 @@ public class Backup : IBackup
 
     public Guid Id { get; }
     public string Name { get; }
-    public IReadOnlyList<IRestorePoint> RestorePoints => _restorePoints.AsReadOnly();
+    public IReadOnlyCollection<IRestorePoint> RestorePoints => _restorePoints.AsReadOnly();
 
     public IRestorePoint AddRestorePoint(IRestorePoint restorePoint)
     {

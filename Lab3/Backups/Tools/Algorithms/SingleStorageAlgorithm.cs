@@ -1,4 +1,5 @@
 ﻿using Backups.Models.Abstractions;
+using Backups.Models.Repository.Abstractions;
 using Backups.Models.Storage.Abstractions;
 using Backups.Tools.Algorithms.Abstractions;
 using Backups.Tools.Archiver.Abstractions;
@@ -13,9 +14,12 @@ public class SingleStorageAlgorithm : IStorageAlgorithm
         IArchiver archiver,
         IRepositoryAccessKey baseAccessKey)
     {
-        ValidateArguments(backupObjects, targetRepository, archiver, baseAccessKey);
-        IRepositoryAccessKey storageKey = GetStorageKey(baseAccessKey);
+        ArgumentNullException.ThrowIfNull(backupObjects);
+        ArgumentNullException.ThrowIfNull(targetRepository);
+        ArgumentNullException.ThrowIfNull(archiver);
+        ArgumentNullException.ThrowIfNull(baseAccessKey);
 
+        IRepositoryAccessKey storageKey = GetStorageKey(baseAccessKey);
         return archiver.Archive(backupObjects.Select(bo => bo.GetRepositoryObject()), targetRepository, storageKey);
     }
 
@@ -25,17 +29,5 @@ public class SingleStorageAlgorithm : IStorageAlgorithm
 
         return baseAccessKey
             .Combine(storageName);
-    }
-
-    private static void ValidateArguments(
-        IReadOnlyCollection<IBackupObject> backupObjects,
-        IRepository targetRepository,
-        IArchiver archiver,
-        IRepositoryAccessKey baseAccessKey)
-    {
-        ArgumentNullException.ThrowIfNull(backupObjects);
-        ArgumentNullException.ThrowIfNull(targetRepository);
-        ArgumentNullException.ThrowIfNull(archiver);
-        ArgumentNullException.ThrowIfNull(baseAccessKey);
     }
 }

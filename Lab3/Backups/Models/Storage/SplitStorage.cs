@@ -1,4 +1,5 @@
 ﻿using Backups.Models.Abstractions;
+using Backups.Models.Repository.Abstractions;
 using Backups.Models.Storage.Abstractions;
 
 namespace Backups.Models.Storage;
@@ -12,6 +13,10 @@ public class SplitStorage : IStorage
         IRepositoryAccessKey accessKey,
         IReadOnlyCollection<IStorage> innerStorage)
     {
+        ArgumentNullException.ThrowIfNull(repository);
+        ArgumentNullException.ThrowIfNull(accessKey);
+        ArgumentNullException.ThrowIfNull(innerStorage);
+
         _innerStorage = innerStorage;
         AccessKey = accessKey;
         Repository = repository;
@@ -20,4 +25,9 @@ public class SplitStorage : IStorage
     public IRepositoryAccessKey AccessKey { get; }
     public IRepository Repository { get; }
     public IEnumerable<IRepositoryObject> Objects => _innerStorage.SelectMany(storage => storage.Objects);
+
+    public override string ToString()
+    {
+        return $"SplitStorage {AccessKey} saved into {Repository}";
+    }
 }

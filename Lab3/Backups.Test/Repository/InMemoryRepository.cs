@@ -1,5 +1,7 @@
 ﻿using Backups.Models;
 using Backups.Models.Abstractions;
+using Backups.Models.Repository.Abstractions;
+using Backups.Models.RepositoryObjects;
 using Zio;
 using Zio.FileSystems;
 
@@ -23,12 +25,16 @@ public class InMemoryRepository : IRepository
 
     public bool Contains(IRepositoryAccessKey accessKey)
     {
+        ArgumentNullException.ThrowIfNull(accessKey);
+
         string path = GetPath(accessKey);
         return ContainsFile(path) || ContainsDirectory(path);
     }
 
     public IRepositoryObject GetComponent(IRepositoryAccessKey accessKey)
     {
+        ArgumentNullException.ThrowIfNull(accessKey);
+
         string path = GetPath(accessKey);
         if (ContainsFile(path))
             return GetDataFromFile(accessKey);
@@ -39,6 +45,8 @@ public class InMemoryRepository : IRepository
 
     public Stream OpenWrite(IRepositoryAccessKey accessKey)
     {
+        ArgumentNullException.ThrowIfNull(accessKey);
+
         UPath p = GetPath(accessKey);
         UPath dirname = p.GetDirectory();
         _fileSystem.CreateDirectory(dirname);

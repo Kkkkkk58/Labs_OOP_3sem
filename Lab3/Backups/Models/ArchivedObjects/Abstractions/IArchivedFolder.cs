@@ -1,4 +1,4 @@
-﻿namespace Backups.Models.Abstractions;
+﻿namespace Backups.Models.ArchivedObjects.Abstractions;
 
 public interface IArchivedFolder : IArchivedObject
 {

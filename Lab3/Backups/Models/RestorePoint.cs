@@ -11,6 +11,9 @@ public class RestorePoint : IRestorePoint
         IEnumerable<IBackupObject> backupObjects,
         IStorage storage)
     {
+        ArgumentNullException.ThrowIfNull(backupObjects);
+        ArgumentNullException.ThrowIfNull(storage);
+
         Id = id;
         CreationDate = creationDate;
         BackupObjects = backupObjects;

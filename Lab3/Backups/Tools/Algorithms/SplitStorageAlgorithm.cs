@@ -1,4 +1,5 @@
 ﻿using Backups.Models.Abstractions;
+using Backups.Models.Repository.Abstractions;
 using Backups.Models.Storage;
 using Backups.Models.Storage.Abstractions;
 using Backups.Tools.Algorithms.Abstractions;
@@ -14,7 +15,10 @@ public class SplitStorageAlgorithm : IStorageAlgorithm
         IArchiver archiver,
         IRepositoryAccessKey baseAccessKey)
     {
-        ValidateArguments(backupObjects, targetRepository, archiver, baseAccessKey);
+        ArgumentNullException.ThrowIfNull(backupObjects);
+        ArgumentNullException.ThrowIfNull(targetRepository);
+        ArgumentNullException.ThrowIfNull(archiver);
+        ArgumentNullException.ThrowIfNull(baseAccessKey);
 
         var innerStorage = backupObjects
             .Select(backupObject => archiver.Archive(new List<IRepositoryObject> { backupObject.GetRepositoryObject() }, targetRepository, GetStorageKey(baseAccessKey,  backupObject.AccessKey.Name)))
@@ -27,17 +31,5 @@ public class SplitStorageAlgorithm : IStorageAlgorithm
     {
         return baseAccessKey
             .Combine(backupObjectName);
-    }
-
-    private static void ValidateArguments(
-        IReadOnlyCollection<IBackupObject> backupObjects,
-        IRepository targetRepository,
-        IArchiver archiver,
-        IRepositoryAccessKey baseAccessKey)
-    {
-        ArgumentNullException.ThrowIfNull(backupObjects);
-        ArgumentNullException.ThrowIfNull(targetRepository);
-        ArgumentNullException.ThrowIfNull(archiver);
-        ArgumentNullException.ThrowIfNull(baseAccessKey);
     }
 }

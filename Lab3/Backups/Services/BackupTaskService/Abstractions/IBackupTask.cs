@@ -1,6 +1,7 @@
 ﻿using Backups.Entities.Abstractions;
+using Backups.Models.Abstractions;
 
-namespace Backups.Models.Abstractions;
+namespace Backups.Services.Abstractions;
 
 public interface IBackupTask
 {

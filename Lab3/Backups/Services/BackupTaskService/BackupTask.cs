@@ -2,8 +2,10 @@
 using Backups.Exceptions;
 using Backups.Models.Abstractions;
 using Backups.Models.Storage.Abstractions;
+using Backups.Services.Abstractions;
+using Backups.Services.Configuration.Abstractions;
 
-namespace Backups.Models;
+namespace Backups.Services.BackupTaskService;
 
 public class BackupTask : IBackupTask
 {
@@ -44,15 +46,18 @@ public class BackupTask : IBackupTask
 
     public IBackupObject TrackBackupObject(IBackupObject backupObject)
     {
+        ArgumentNullException.ThrowIfNull(backupObject);
         if (_trackedObjects.Contains(backupObject))
             throw BackupTaskException.ObjectIsAlreadyTracked(backupObject);
-        _trackedObjects.Add(backupObject);
 
+        _trackedObjects.Add(backupObject);
         return backupObject;
     }
 
     public void UntrackBackupObject(IBackupObject backupObject)
     {
+        ArgumentNullException.ThrowIfNull(backupObject);
+
         if (!_trackedObjects.Remove(backupObject))
             throw BackupTaskException.ObjectNotFound(backupObject);
     }

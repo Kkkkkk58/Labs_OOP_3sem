@@ -23,9 +23,4 @@ public class BackupTaskException : BackupsException
     {
         throw new BackupTaskException($"Backup object {backupObject} was not found");
     }
-
-    public static BackupTaskException NullVersionString()
-    {
-        throw new BackupTaskException("Backup task version string must be non-null");
-    }
 }

@@ -1,4 +1,7 @@
-﻿namespace Backups.Models.Abstractions;
+﻿using Backups.Models.ArchivedObjects.Abstractions;
+using Backups.Models.RepositoryObjects.Abstractions;
+
+namespace Backups.Models.Abstractions;
 
 public interface IRepositoryObjectVisitor
 {

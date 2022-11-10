@@ -1,6 +1,8 @@
 ﻿using System.IO.Compression;
-using Backups.Models;
 using Backups.Models.Abstractions;
+using Backups.Models.ArchivedObjects;
+using Backups.Models.ArchivedObjects.Abstractions;
+using Backups.Models.RepositoryObjects.Abstractions;
 
 namespace Backups.Tools.Archiver;
 
@@ -11,6 +13,8 @@ public class ZipArchiveVisitor : IRepositoryObjectVisitor
 
     public ZipArchiveVisitor(ZipArchive zipArchive)
     {
+        ArgumentNullException.ThrowIfNull(zipArchive);
+
         _archives = new Stack<ZipArchive>(new[] { zipArchive });
         _archivedObjects = new Stack<List<IArchivedObject>>(1);
         _archivedObjects.Push(new List<IArchivedObject>());
@@ -18,6 +22,8 @@ public class ZipArchiveVisitor : IRepositoryObjectVisitor
 
     public void Visit(IFileRepositoryObject fileRepositoryObject)
     {
+        ArgumentNullException.ThrowIfNull(fileRepositoryObject);
+
         ZipArchiveEntry entry = GetArchiveEntry(fileRepositoryObject);
         using Stream archiveEntryStream = entry.Open();
         using (Stream data = fileRepositoryObject.Stream)
@@ -30,6 +36,8 @@ public class ZipArchiveVisitor : IRepositoryObjectVisitor
 
     public void Visit(IDirectoryRepositoryObject directoryRepositoryObject)
     {
+        ArgumentNullException.ThrowIfNull(directoryRepositoryObject);
+
         using Stream archiveEntryStream = GetArchiveEntry(directoryRepositoryObject).Open();
         using var directoryArchive = new ZipArchive(archiveEntryStream, ZipArchiveMode.Create);
 

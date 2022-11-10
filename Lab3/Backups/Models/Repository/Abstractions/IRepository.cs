@@ -1,4 +1,6 @@
-﻿namespace Backups.Models.Abstractions;
+﻿using Backups.Models.Abstractions;
+
+namespace Backups.Models.Repository.Abstractions;
 
 public interface IRepository
 {

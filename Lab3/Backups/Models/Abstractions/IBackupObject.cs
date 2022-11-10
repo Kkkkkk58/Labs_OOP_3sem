@@ -1,4 +1,6 @@
-﻿namespace Backups.Models.Abstractions;
+﻿using Backups.Models.Repository.Abstractions;
+
+namespace Backups.Models.Abstractions;
 
 public interface IBackupObject
 {

@@ -6,7 +6,7 @@ public interface IBackup
 {
     Guid Id { get; }
     string Name { get; }
-    IReadOnlyList<IRestorePoint> RestorePoints { get; }
+    IReadOnlyCollection<IRestorePoint> RestorePoints { get; }
 
     IRestorePoint AddRestorePoint(IRestorePoint restorePoint);
     void RemoveRestorePoint(IRestorePoint restorePoint);

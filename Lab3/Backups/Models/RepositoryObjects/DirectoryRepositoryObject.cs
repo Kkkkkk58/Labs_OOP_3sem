@@ -1,6 +1,6 @@
 ﻿using Backups.Models.Abstractions;
 
-namespace Backups.Models;
+namespace Backups.Models.RepositoryObjects;
 
 public class DirectoryRepositoryObject : IDirectoryRepositoryObject
 {
@@ -8,6 +8,10 @@ public class DirectoryRepositoryObject : IDirectoryRepositoryObject
 
     public DirectoryRepositoryObject(string name, Func<IReadOnlyCollection<IRepositoryObject>> func)
     {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(func);
+
         Name = name;
         _func = func;
     }
@@ -19,5 +23,10 @@ public class DirectoryRepositoryObject : IDirectoryRepositoryObject
     public void Accept(IRepositoryObjectVisitor repositoryObjectVisitor)
     {
         repositoryObjectVisitor.Visit(this);
+    }
+
+    public override string ToString()
+    {
+        return $"Repository directory {Name}";
     }
 }

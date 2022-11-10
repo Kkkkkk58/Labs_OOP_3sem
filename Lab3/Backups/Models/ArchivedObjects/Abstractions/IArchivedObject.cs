@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
+using Backups.Models.Abstractions;
 
-namespace Backups.Models.Abstractions;
+namespace Backups.Models.ArchivedObjects.Abstractions;
 
 public interface IArchivedObject
 {

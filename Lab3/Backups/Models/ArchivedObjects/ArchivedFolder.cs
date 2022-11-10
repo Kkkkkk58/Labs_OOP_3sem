@@ -1,7 +1,10 @@
 ﻿using System.IO.Compression;
+using Backups.Exceptions;
 using Backups.Models.Abstractions;
+using Backups.Models.ArchivedObjects.Abstractions;
+using Backups.Models.RepositoryObjects;
 
-namespace Backups.Models;
+namespace Backups.Models.ArchivedObjects;
 
 public class ArchivedFolder : IArchivedFolder
 {
@@ -20,15 +23,22 @@ public class ArchivedFolder : IArchivedFolder
         return new DirectoryRepositoryObject(Name, () => GetObjects(entry));
     }
 
+    public override string ToString()
+    {
+        return $"Archived directory {Name}";
+    }
+
     private IReadOnlyCollection<IRepositoryObject> GetObjects(ZipArchiveEntry entry)
     {
+        ArgumentNullException.ThrowIfNull(entry);
+
         var objects = new List<IRepositoryObject>();
         using var archive = new ZipArchive(entry.Open(), ZipArchiveMode.Read);
         foreach (IArchivedObject archivedObject in Children)
         {
             ZipArchiveEntry? childEntry = archive.GetEntry(archivedObject.Name);
             if (childEntry is null)
-                throw new NotImplementedException();
+                throw ArchivedFolderException.ChildEntryNotFound(archivedObject.Name);
 
             objects.Add(archivedObject.GetRepositoryObject(childEntry));
         }

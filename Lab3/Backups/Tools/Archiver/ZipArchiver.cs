@@ -1,5 +1,7 @@
 ﻿using System.IO.Compression;
 using Backups.Models.Abstractions;
+using Backups.Models.ArchivedObjects.Abstractions;
+using Backups.Models.Repository.Abstractions;
 using Backups.Models.Storage;
 using Backups.Models.Storage.Abstractions;
 using Backups.Tools.Archiver.Abstractions;
@@ -12,6 +14,10 @@ public class ZipArchiver : IArchiver
 
     public IStorage Archive(IEnumerable<IRepositoryObject> repositoryObjects, IRepository repository, IRepositoryAccessKey partialArchiveKey)
     {
+        ArgumentNullException.ThrowIfNull(repositoryObjects);
+        ArgumentNullException.ThrowIfNull(repository);
+        ArgumentNullException.ThrowIfNull(partialArchiveKey);
+
         IRepositoryAccessKey archiveKey = partialArchiveKey.ApplyExtension(Extension);
 
         using Stream stream = repository.OpenWrite(archiveKey);
@@ -25,6 +31,6 @@ public class ZipArchiver : IArchiver
 
         IEnumerable<IArchivedObject> archivedObjects = visitor.GetArchivedObjects();
 
-        return new ZipStorage(archiveKey, repository, archivedObjects);
+        return new ZipStorage(repository, archiveKey, archivedObjects);
     }
 }

@@ -1,8 +1,10 @@
 ﻿using Backups.Entities;
 using Backups.Entities.Abstractions;
 using Backups.Models.Abstractions;
+using Backups.Services.Abstractions;
+using Backups.Services.Configuration.Abstractions;
 
-namespace Backups.Models;
+namespace Backups.Services.BackupTaskService;
 
 public class BackupTaskBuilder : IBackupTaskBuilder
 {
