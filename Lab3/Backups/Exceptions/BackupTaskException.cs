@@ -11,16 +11,16 @@ public class BackupTaskException : BackupsException
 
     public static BackupTaskException InvalidRestorePointCreationDate(DateTime restorePointDate)
     {
-        throw new BackupTaskException($"Creation date {restorePointDate} is invalid");
+        return new BackupTaskException($"Creation date {restorePointDate} is invalid");
     }
 
     public static BackupTaskException ObjectIsAlreadyTracked(IBackupObject backupObject)
     {
-        throw new BackupTaskException($"Backup object {backupObject} is already being tracked");
+        return new BackupTaskException($"Backup object {backupObject} is already being tracked");
     }
 
     public static BackupTaskException ObjectNotFound(IBackupObject backupObject)
     {
-        throw new BackupTaskException($"Backup object {backupObject} was not found");
+        return new BackupTaskException($"Backup object {backupObject} was not found");
     }
 }

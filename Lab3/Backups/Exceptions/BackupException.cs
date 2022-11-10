@@ -12,11 +12,11 @@ public class BackupException : BackupsException
 
     public static BackupException RestorePointAlreadyExists(IRestorePoint restorePoint, IBackup backup)
     {
-        throw new BackupException($"{restorePoint} already exists in backup {backup.Id}");
+        return new BackupException($"{restorePoint} already exists in backup {backup.Id}");
     }
 
     public static BackupException RestorePointNotFound(IRestorePoint restorePoint, IBackup backup)
     {
-        throw new BackupException($"{restorePoint} wasn't found in backup {backup.Id}");
+        return new BackupException($"{restorePoint} wasn't found in backup {backup.Id}");
     }
 }
