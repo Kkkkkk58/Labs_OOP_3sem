@@ -3,7 +3,7 @@ using Backups.Models.Storage.Abstractions;
 
 namespace Backups.Models;
 
-public class RestorePoint : IRestorePoint
+public class RestorePoint : IRestorePoint, IEquatable<RestorePoint>
 {
     private RestorePoint(
         Guid id,
@@ -31,8 +31,22 @@ public class RestorePoint : IRestorePoint
         return $"Restore point {Id} from {CreationDate}";
     }
 
-    public class RestorePointBuilder : IRestorePointBuilder, IRestorePointBackupObjectsBuilder,
-        IRestorePointStorageBuilder
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as RestorePoint);
+    }
+
+    public bool Equals(RestorePoint? other)
+    {
+        return other is not null && Id.Equals(other.Id);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
+
+    public class RestorePointBuilder : IRestorePointBuilder, IRestorePointBackupObjectsBuilder, IRestorePointStorageBuilder
     {
         private Guid? _id;
         private DateTime? _restorePointDate;

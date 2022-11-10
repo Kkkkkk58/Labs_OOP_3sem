@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using Backups.Models.Abstractions;
 using Backups.Models.RepositoryObjects.Abstractions;
 
 namespace Backups.Models.ArchivedObjects.Abstractions;

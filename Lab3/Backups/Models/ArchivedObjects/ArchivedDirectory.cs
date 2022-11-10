@@ -1,6 +1,5 @@
 ﻿using System.IO.Compression;
 using Backups.Exceptions;
-using Backups.Models.Abstractions;
 using Backups.Models.ArchivedObjects.Abstractions;
 using Backups.Models.RepositoryObjects;
 using Backups.Models.RepositoryObjects.Abstractions;

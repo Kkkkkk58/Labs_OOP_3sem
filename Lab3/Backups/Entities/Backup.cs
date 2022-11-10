@@ -4,7 +4,7 @@ using Backups.Models.Abstractions;
 
 namespace Backups.Entities;
 
-public class Backup : IBackup
+public class Backup : IBackup, IEquatable<Backup>
 {
     private readonly List<IRestorePoint> _restorePoints;
 
@@ -51,5 +51,20 @@ public class Backup : IBackup
     public override string ToString()
     {
         return $"Backup {Id}: {Name}";
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as Backup);
+    }
+
+    public bool Equals(Backup? other)
+    {
+        return other is not null && Id.Equals(other.Id);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }

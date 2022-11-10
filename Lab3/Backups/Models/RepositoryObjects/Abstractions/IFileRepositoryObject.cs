@@ -1,6 +1,4 @@
-﻿using Backups.Models.Abstractions;
-
-namespace Backups.Models.RepositoryObjects.Abstractions;
+﻿namespace Backups.Models.RepositoryObjects.Abstractions;
 
 public interface IFileRepositoryObject : IRepositoryObject
 {
