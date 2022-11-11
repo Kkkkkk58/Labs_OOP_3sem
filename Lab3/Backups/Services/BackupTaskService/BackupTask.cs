@@ -9,6 +9,7 @@ namespace Backups.Services.BackupTaskService;
 
 public class BackupTask : IBackupTask
 {
+    private readonly IBackup _backup;
     private readonly List<IBackupObject> _trackedObjects;
     private readonly IBackupTaskConfiguration _config;
 
@@ -23,10 +24,10 @@ public class BackupTask : IBackupTask
 
         _trackedObjects = trackedObjects.ToList();
         _config = config;
-        Backup = backup;
+        _backup = backup;
     }
 
-    public IBackup Backup { get; }
+    public IReadOnlyCollection<IRestorePoint> RestorePoints => _backup.RestorePoints;
 
     public IRestorePoint CreateRestorePoint()
     {
@@ -41,7 +42,7 @@ public class BackupTask : IBackupTask
             .CreateStorage(_trackedObjects, _config.TargetRepository, _config.Archiver, restorePointKey);
 
         IRestorePoint restorePoint = GetRestorePoint(restorePointDate, storage);
-        return Backup.AddRestorePoint(restorePoint);
+        return _backup.AddRestorePoint(restorePoint);
     }
 
     public IBackupObject TrackBackupObject(IBackupObject backupObject)
@@ -64,7 +65,7 @@ public class BackupTask : IBackupTask
 
     private bool DatePrecedesOtherRestorePointDate(DateTime restorePointDate)
     {
-        return Backup.RestorePoints.Any(rp => rp.CreationDate >= restorePointDate);
+        return _backup.RestorePoints.Any(rp => rp.CreationDate >= restorePointDate);
     }
 
     private IRepositoryAccessKey GetRestorePointKey(DateTime restorePointDate)
@@ -72,7 +73,7 @@ public class BackupTask : IBackupTask
         return _config
             .TargetRepository
             .BaseKey
-            .Combine(Backup.Id.ToString())
+            .Combine(_backup.Id.ToString())
             .Combine(restorePointDate.ToString(_config.DateTimeFormat));
     }
 

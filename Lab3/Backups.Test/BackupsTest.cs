@@ -74,7 +74,6 @@ public class BackupsTest : IDisposable
     private static int GetRestorePointsNumber(IBackupTask backupTask)
     {
         return backupTask
-            .Backup
             .RestorePoints
             .Count;
     }
@@ -120,7 +119,6 @@ public class BackupsTest : IDisposable
     private int GetSingleStorageNumber(IBackupTask backupTask)
     {
         return backupTask
-            .Backup
             .RestorePoints
             .Select(restorePoint => restorePoint.Storage)
             .Select(storage => _fs.GetDirectoryEntry(GetParentDirectoryPath(storage)))
@@ -138,7 +136,6 @@ public class BackupsTest : IDisposable
     private int GetSplitStorageNumber(IBackupTask backupTask)
     {
         return backupTask
-            .Backup
             .RestorePoints
             .Select(restorePoint => restorePoint.Storage)
             .Select(storage => _fs.GetDirectoryEntry(storage.AccessKey.FullKey))
