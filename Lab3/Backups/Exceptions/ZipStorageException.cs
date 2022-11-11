@@ -11,4 +11,9 @@ public class ZipStorageException : BackupsException
     {
         return new ZipStorageException($"An entry for object {objectName} was not found");
     }
+
+    public static ZipStorageException InvalidRepositoryObject()
+    {
+        throw new ZipStorageException("Zip storage received an invalid object from repository");
+    }
 }

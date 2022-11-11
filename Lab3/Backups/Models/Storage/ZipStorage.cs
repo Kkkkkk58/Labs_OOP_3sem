@@ -36,7 +36,7 @@ public class ZipStorage : IStorage
     {
         IRepositoryObject archiveRepoObject = Repository.GetComponent(AccessKey);
         if (archiveRepoObject is not IFileRepositoryObject archiveFile)
-            throw new NotImplementedException();
+            throw ZipStorageException.InvalidRepositoryObject();
 
         var zipArchive = new ZipArchive(archiveFile.Stream, ZipArchiveMode.Read);
 
