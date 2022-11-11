@@ -8,5 +8,5 @@ public interface IStorage
 {
     IRepositoryAccessKey AccessKey { get; }
     IRepository Repository { get; }
-    IEnumerable<IRepositoryObject> Objects { get; }
+    IReadOnlyCollection<IRepositoryObject> Objects { get; }
 }

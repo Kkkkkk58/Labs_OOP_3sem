@@ -7,5 +7,5 @@ public interface IRestorePoint
     Guid Id { get; }
     DateTime CreationDate { get; }
     IStorage Storage { get; }
-    IEnumerable<IBackupObject> BackupObjects { get; }
+    IReadOnlyCollection<IBackupObject> BackupObjects { get; }
 }

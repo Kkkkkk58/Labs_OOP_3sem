@@ -21,8 +21,9 @@ public class SingleStorageAlgorithm : IStorageAlgorithm
         ArgumentNullException.ThrowIfNull(baseAccessKey);
 
         IRepositoryAccessKey storageKey = GetStorageKey(baseAccessKey);
-        IEnumerable<IRepositoryObject> repositoryObjects = backupObjects
-            .Select(bo => bo.GetRepositoryObject());
+        IReadOnlyCollection<IRepositoryObject> repositoryObjects = backupObjects
+            .Select(bo => bo.GetRepositoryObject())
+            .ToList();
 
         return archiver.Archive(repositoryObjects, targetRepository, storageKey);
     }

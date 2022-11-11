@@ -25,7 +25,7 @@ public class SplitStorage : IStorage
 
     public IRepositoryAccessKey AccessKey { get; }
     public IRepository Repository { get; }
-    public IEnumerable<IRepositoryObject> Objects => _innerStorage.SelectMany(storage => storage.Objects);
+    public IReadOnlyCollection<IRepositoryObject> Objects => _innerStorage.SelectMany(storage => storage.Objects).ToList();
 
     public override string ToString()
     {

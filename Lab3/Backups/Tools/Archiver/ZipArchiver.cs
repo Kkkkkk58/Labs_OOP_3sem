@@ -31,7 +31,7 @@ public class ZipArchiver : IArchiver
             repositoryObject.Accept(visitor);
         }
 
-        IEnumerable<IArchivedObject> archivedObjects = visitor.GetArchivedObjects();
+        IReadOnlyCollection<IArchivedObject> archivedObjects = visitor.GetArchivedObjects();
 
         return new ZipStorage(repository, archiveKey, archivedObjects);
     }

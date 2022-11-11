@@ -11,10 +11,10 @@ public class ArchivedDirectory : IArchivedDirectory
     public ArchivedDirectory(string name, IEnumerable<IArchivedObject> children)
     {
         Name = name;
-        Children = children;
+        Children = children.ToList();
     }
 
-    public IEnumerable<IArchivedObject> Children { get; }
+    public IReadOnlyCollection<IArchivedObject> Children { get; }
 
     public string Name { get; }
 

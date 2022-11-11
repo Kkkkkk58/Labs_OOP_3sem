@@ -16,13 +16,13 @@ public class RepositoryAccessKey : IRepositoryAccessKey
         ArgumentNullException.ThrowIfNull(keyParts);
         ArgumentNullException.ThrowIfNull(keySeparator);
 
-        KeyParts = keyParts;
+        KeyParts = keyParts.ToList();
         _keySeparator = keySeparator;
     }
 
     public string FullKey => string.Join(_keySeparator, KeyParts);
     public string Name => KeyParts.Last();
-    public IEnumerable<string> KeyParts { get; }
+    public IReadOnlyCollection<string> KeyParts { get; }
 
     public IRepositoryAccessKey Combine(IRepositoryAccessKey other)
     {
@@ -43,7 +43,7 @@ public class RepositoryAccessKey : IRepositoryAccessKey
         ArgumentNullException.ThrowIfNull(extension);
 
         string nameWithExtension = $"{Name}.{extension}";
-        IEnumerable<string> partsWithoutName = KeyParts.Take(KeyParts.Count() - 1);
+        IEnumerable<string> partsWithoutName = KeyParts.SkipLast(1);
 
         IEnumerable<string> newKeyParts = partsWithoutName.Concat(new[] { nameWithExtension });
         return new RepositoryAccessKey(newKeyParts, _keySeparator);

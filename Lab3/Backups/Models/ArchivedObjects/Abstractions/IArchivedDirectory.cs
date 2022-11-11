@@ -2,5 +2,5 @@
 
 public interface IArchivedDirectory : IArchivedObject
 {
-    IEnumerable<IArchivedObject> Children { get; }
+    IReadOnlyCollection<IArchivedObject> Children { get; }
 }

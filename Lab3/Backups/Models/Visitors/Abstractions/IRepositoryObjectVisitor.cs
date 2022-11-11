@@ -8,5 +8,5 @@ public interface IRepositoryObjectVisitor
     void Visit(IFileRepositoryObject fileRepositoryObject);
     void Visit(IDirectoryRepositoryObject directoryRepositoryObject);
 
-    IEnumerable<IArchivedObject> GetArchivedObjects();
+    IReadOnlyCollection<IArchivedObject> GetArchivedObjects();
 }

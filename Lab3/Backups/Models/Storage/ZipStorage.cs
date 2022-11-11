@@ -10,7 +10,7 @@ namespace Backups.Models.Storage;
 
 public class ZipStorage : IStorage
 {
-    private readonly IEnumerable<IArchivedObject> _archivedObjects;
+    private readonly IReadOnlyCollection<IArchivedObject> _archivedObjects;
 
     public ZipStorage(IRepository repository, IRepositoryAccessKey accessKey, IEnumerable<IArchivedObject> objects)
     {
@@ -20,19 +20,19 @@ public class ZipStorage : IStorage
 
         AccessKey = accessKey;
         Repository = repository;
-        _archivedObjects = objects;
+        _archivedObjects = objects.ToList();
     }
 
     public IRepositoryAccessKey AccessKey { get; }
     public IRepository Repository { get; }
-    public IEnumerable<IRepositoryObject> Objects => GetRepositoryObjects();
+    public IReadOnlyCollection<IRepositoryObject> Objects => GetRepositoryObjects();
 
     public override string ToString()
     {
         return $"ZipStorage {AccessKey} saved into {Repository}";
     }
 
-    private IEnumerable<IRepositoryObject> GetRepositoryObjects()
+    private IReadOnlyCollection<IRepositoryObject> GetRepositoryObjects()
     {
         IRepositoryObject archiveRepoObject = Repository.GetComponent(AccessKey);
         if (archiveRepoObject is not IFileRepositoryObject archiveFile)
@@ -43,7 +43,7 @@ public class ZipStorage : IStorage
         return GetObjectsFromArchive(zipArchive);
     }
 
-    private IEnumerable<IRepositoryObject> GetObjectsFromArchive(ZipArchive zipArchive)
+    private IReadOnlyCollection<IRepositoryObject> GetObjectsFromArchive(ZipArchive zipArchive)
     {
         var objects = new List<IRepositoryObject>();
         foreach (IArchivedObject archivedObject in _archivedObjects)
@@ -55,6 +55,6 @@ public class ZipStorage : IStorage
             objects.Add(archivedObject.GetRepositoryObject(entry));
         }
 
-        return objects;
+        return objects.AsReadOnly();
     }
 }

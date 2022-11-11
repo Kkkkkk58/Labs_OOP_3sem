@@ -16,7 +16,7 @@ public class RestorePoint : IRestorePoint, IEquatable<RestorePoint>
 
         Id = id;
         CreationDate = creationDate;
-        BackupObjects = backupObjects;
+        BackupObjects = backupObjects.ToList();
         Storage = storage;
     }
 
@@ -24,7 +24,7 @@ public class RestorePoint : IRestorePoint, IEquatable<RestorePoint>
     public Guid Id { get; }
     public DateTime CreationDate { get; }
     public IStorage Storage { get; }
-    public IEnumerable<IBackupObject> BackupObjects { get; }
+    public IReadOnlyCollection<IBackupObject> BackupObjects { get; }
 
     public override string ToString()
     {

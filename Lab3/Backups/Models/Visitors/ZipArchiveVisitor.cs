@@ -55,7 +55,7 @@ public class ZipArchiveVisitor : IRepositoryObjectVisitor
         _archivedObjects.Peek().Add(archivedDirectory);
     }
 
-    public IEnumerable<IArchivedObject> GetArchivedObjects()
+    public IReadOnlyCollection<IArchivedObject> GetArchivedObjects()
     {
         return _archivedObjects.Peek();
     }
