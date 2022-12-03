@@ -1,5 +1,6 @@
 ﻿using Banks.Console.Handlers.Abstractions;
 using Banks.Console.ReadWrite.Abstractions;
+using Banks.Exceptions;
 using Banks.Models.Abstractions;
 using Banks.Services.Abstractions;
 using Banks.Tools.Abstractions;
@@ -24,8 +25,15 @@ public class App
         {
             while (true)
             {
-                string[] command = _context.Reader.ReadLine().Split(" ", StringSplitOptions.RemoveEmptyEntries);
-                _baseHandler.Handle(command);
+                try
+                {
+                    string[] command = _context.Reader.ReadLine().Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                    _baseHandler.Handle(command);
+                }
+                catch (BanksException e)
+                {
+                    _context.Writer.WriteLine(e);
+                }
             }
         }
         catch (Exception e)
