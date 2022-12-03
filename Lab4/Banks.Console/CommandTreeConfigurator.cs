@@ -1,10 +1,10 @@
-﻿using Banks.Console.Chains;
-using Banks.Console.Controllers;
-using Banks.Console.Controllers.AccountHandlers;
-using Banks.Console.Controllers.BankHandlers;
-using Banks.Console.Controllers.CustomerHandlers;
-using Banks.Console.Controllers.OperationsHandlers;
-using Banks.Console.Controllers.TimeHandlers;
+﻿using Banks.Console.Handlers;
+using Banks.Console.Handlers.Abstractions;
+using Banks.Console.Handlers.AccountHandlers;
+using Banks.Console.Handlers.BankHandlers;
+using Banks.Console.Handlers.CustomerHandlers;
+using Banks.Console.Handlers.OperationsHandlers;
+using Banks.Console.Handlers.TimeHandlers;
 using Banks.Tools.Abstractions;
 
 namespace Banks.Console;
@@ -275,10 +275,10 @@ public class CommandTreeConfigurator
     {
         var timeSkipHandler = new TimeSkipHandler();
         timeSkipHandler
-            .AddSubHandler(new TimeSkipDaysHandler(_clock))
-            .AddSubHandler(new TimeSkipMonthsHandler(_clock))
-            .AddSubHandler(new TimeSkipTimeSpanHandler(_clock))
-            .AddSubHandler(new TimeSkipYearsHandler(_clock));
+            .AddSubHandler(new TimeSkipDaysHandler(_clock, _context))
+            .AddSubHandler(new TimeSkipMonthsHandler(_clock, _context))
+            .AddSubHandler(new TimeSkipTimeSpanHandler(_clock, _context))
+            .AddSubHandler(new TimeSkipYearsHandler(_clock, _context));
         return timeSkipHandler;
     }
 }

@@ -1,4 +1,5 @@
-﻿using Banks.Console.Chains;
+﻿using Banks.Console.Handlers.Abstractions;
+using Banks.Console.ReadWrite.Abstractions;
 using Banks.Models.Abstractions;
 using Banks.Services.Abstractions;
 using Banks.Tools.Abstractions;
@@ -7,18 +8,13 @@ namespace Banks.Console;
 
 public class App
 {
-    private readonly IFastForwardingClock _clock;
-    private readonly ICentralBank _centralBank;
-    private readonly IAccountFactory _accountFactory;
+    private readonly AppContext _context;
     private readonly IHandler _baseHandler;
 
-    // TODO IReader reader, IWriter writer
-    public App(IFastForwardingClock clock, ICentralBank centralBank, IAccountFactory accountFactory)
+    public App(IFastForwardingClock clock, ICentralBank centralBank, IAccountFactory accountFactory, IReader reader, IWriter writer)
     {
-        _clock = clock;
-        _centralBank = centralBank;
-        _accountFactory = accountFactory;
-        _baseHandler = new CommandTreeConfigurator(new AppContext(_centralBank, _clock, _accountFactory), _clock)
+        _context = new AppContext(centralBank, clock, accountFactory, reader, writer);
+        _baseHandler = new CommandTreeConfigurator(_context, clock)
             .Configure();
     }
 
@@ -28,8 +24,7 @@ public class App
         {
             while (true)
             {
-                string[] command = System.Console.ReadLine()?.Split(" ", StringSplitOptions.RemoveEmptyEntries) ??
-                                   throw new NotImplementedException();
+                string[] command = _context.Reader.ReadLine().Split(" ", StringSplitOptions.RemoveEmptyEntries);
                 _baseHandler.Handle(command);
             }
         }
@@ -37,10 +32,5 @@ public class App
         {
             throw new ApplicationException("An error occurred during the execution. Shutting down the app...", e);
         }
-    }
-
-    private IHandler ConfigureHandlers()
-    {
-        throw new NotImplementedException();
     }
 }

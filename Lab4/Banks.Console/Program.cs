@@ -1,5 +1,7 @@
 ﻿using System.Globalization;
 using Banks.Console;
+using Banks.Console.ReadWrite;
+using Banks.Console.ReadWrite.Abstractions;
 using Banks.Models;
 using Banks.Models.Abstractions;
 using Banks.Services;
@@ -31,6 +33,8 @@ static IHostBuilder CreateHostBuilder(string[] args)
             services.AddScoped<ICentralBank, CentralBank>(x => new CentralBank(x.GetRequiredService<IFastForwardingClock>()));
             services.AddTransient<IAccountFactory, BankAccountFactory>(x =>
                 new BankAccountFactory(x.GetRequiredService<IFastForwardingClock>(), new GregorianCalendar()));
+            services.AddTransient<IReader, BasicConsoleReader>();
+            services.AddTransient<IWriter, BasicConsoleWriter>();
             services.AddScoped<App>();
         });
 }
