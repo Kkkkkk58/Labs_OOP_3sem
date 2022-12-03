@@ -14,7 +14,7 @@ public class BankTypeDepositChangeInterestCalculationPeriodHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var bankId = args[1].ToGuid();
         var typeId = args[2].ToGuid();
@@ -22,7 +22,5 @@ public class BankTypeDepositChangeInterestCalculationPeriodHandler : Handler
 
         INoTransactionalBank bank = _context.CentralBank.Banks.Single(b => b.Id.Equals(bankId));
         bank.AccountTypeManager.ChangeInterestCalculationPeriod(typeId, interestCalculationPeriod);
-        base.Handle(args);
-        base.Handle(args);
     }
 }

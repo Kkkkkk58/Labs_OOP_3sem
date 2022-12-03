@@ -13,7 +13,7 @@ public class AccountOperationHistoryHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var accountId = args[1].ToGuid();
 
@@ -24,7 +24,5 @@ public class AccountOperationHistoryHandler : Handler
         {
             _context.Writer.WriteLine(operationInformation);
         }
-
-        base.Handle(args);
     }
 }

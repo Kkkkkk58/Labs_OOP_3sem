@@ -13,7 +13,7 @@ public class OverallOperationHistoryHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         // TODO Top(n)
         // TODO OperationInfo toString or make DTO
@@ -21,7 +21,5 @@ public class OverallOperationHistoryHandler : Handler
         {
             _context.Writer.WriteLine(operationInformation);
         }
-
-        base.Handle(args);
     }
 }

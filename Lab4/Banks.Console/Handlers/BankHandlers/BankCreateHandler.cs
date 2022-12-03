@@ -14,15 +14,14 @@ public class BankCreateHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         IBank bank = GetBank();
         _context.CentralBank.RegisterBank(bank);
         _context.Writer.WriteLine(bank.Id);
-        base.Handle(args);
     }
 
-    public IBank GetBank()
+    private IBank GetBank()
     {
         _context.Writer.Write("Enter bank's name: ");
         string name = System.Console.ReadLine() ?? throw new NotImplementedException();

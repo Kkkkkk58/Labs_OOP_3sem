@@ -15,12 +15,11 @@ public class TimeSkipMonthsHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         int months = int.Parse(args[1]);
         _clock.SkipMonths(months);
 
         _context.Writer.WriteLine(_clock.Now);
-        base.Handle(args);
     }
 }

@@ -15,7 +15,7 @@ public class CustomerInformationPassportDataSetterHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var customerId = args[1].ToGuid();
         var passportData = new PassportData(DateOnly.Parse(args[3]), args[2]);
@@ -23,7 +23,5 @@ public class CustomerInformationPassportDataSetterHandler : Handler
         ICustomer customer = _context.CentralBank.Banks.SelectMany(bank => bank.Customers).Distinct()
             .Single(customer => customer.Id.Equals(customerId));
         customer.SetPassportData(passportData);
-
-        base.Handle(args);
     }
 }

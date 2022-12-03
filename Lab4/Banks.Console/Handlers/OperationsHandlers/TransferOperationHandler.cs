@@ -13,12 +13,11 @@ public class TransferOperationHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var fromAccountId = args[1].ToGuid();
         var toAccountId = args[2].ToGuid();
         var moneyAmount = args[3].ToMoneyAmount();
         _context.CentralBank.Transfer(fromAccountId, toAccountId, moneyAmount);
-        base.Handle(args);
     }
 }

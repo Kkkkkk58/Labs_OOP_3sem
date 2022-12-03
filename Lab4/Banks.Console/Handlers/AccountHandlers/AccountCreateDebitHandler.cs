@@ -17,7 +17,7 @@ public class AccountCreateDebitHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var bankId = args[1].ToGuid();
         INoTransactionalBank bank = _context.CentralBank.Banks.Single(b => b.Id.Equals(bankId));
@@ -34,6 +34,5 @@ public class AccountCreateDebitHandler : Handler
 
         IUnchangeableBankAccount account = bank.CreateDebitAccount(type, customer, balance);
         _context.Writer.WriteLine(account.Id);
-        base.Handle(args);
     }
 }

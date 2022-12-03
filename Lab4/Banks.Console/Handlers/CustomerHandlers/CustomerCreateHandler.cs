@@ -18,7 +18,7 @@ public class CustomerCreateHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var bankId = args[1].ToGuid();
         INoTransactionalBank bank = _context.CentralBank.Banks.Single(bank => bank.Id.Equals(bankId));
@@ -49,6 +49,5 @@ public class CustomerCreateHandler : Handler
         ICustomer customer = optionalInfoBuilder.Build();
         bank.RegisterCustomer(customer);
         _context.Writer.WriteLine(customer.Id);
-        base.Handle(args);
     }
 }

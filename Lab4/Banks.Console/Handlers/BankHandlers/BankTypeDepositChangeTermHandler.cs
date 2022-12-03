@@ -13,7 +13,7 @@ public class BankTypeDepositChangeTermHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var bankId = args[1].ToGuid();
         var typeId = args[2].ToGuid();
@@ -21,6 +21,5 @@ public class BankTypeDepositChangeTermHandler : Handler
 
         INoTransactionalBank bank = _context.CentralBank.Banks.Single(b => b.Id.Equals(bankId));
         bank.AccountTypeManager.ChangeDepositTerm(typeId, ts);
-        base.Handle(args);
     }
 }

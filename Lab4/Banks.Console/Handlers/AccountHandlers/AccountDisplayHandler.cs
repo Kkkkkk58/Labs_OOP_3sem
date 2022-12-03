@@ -13,13 +13,12 @@ public class AccountDisplayHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var accountId = args[1].ToGuid();
         IUnchangeableBankAccount account = _context.CentralBank.Banks
             .Single(bank => bank.FindAccount(accountId) is not null).GetAccount(accountId);
 
         _context.Writer.WriteLine(account);
-        base.Handle(args);
     }
 }

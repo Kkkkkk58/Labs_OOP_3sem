@@ -15,7 +15,7 @@ public class CustomerInformationAddressSetterHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var customerId = args[1].ToGuid();
         var address = new Address(args[2]);
@@ -23,7 +23,5 @@ public class CustomerInformationAddressSetterHandler : Handler
         ICustomer customer = _context.CentralBank.Banks.SelectMany(bank => bank.Customers).Distinct()
             .Single(customer => customer.Id.Equals(customerId));
         customer.SetAddress(address);
-
-        base.Handle(args);
     }
 }

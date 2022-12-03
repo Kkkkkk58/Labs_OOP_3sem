@@ -14,13 +14,12 @@ public class BankChangeSuspiciousOperationsLimitHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var bankId = args[1].ToGuid();
         var suspiciousOperationsLimit = args[2].ToMoneyAmount();
 
         INoTransactionalBank bank = _context.CentralBank.Banks.Single(b => b.Id.Equals(bankId));
         bank.AccountTypeManager.SetSuspiciousOperationsLimit(suspiciousOperationsLimit);
-        base.Handle(args);
     }
 }

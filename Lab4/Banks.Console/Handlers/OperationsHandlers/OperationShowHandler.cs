@@ -13,12 +13,11 @@ public class OperationShowHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var operationId = args[1].ToGuid();
         IOperationInformation operationInformation =
             _context.CentralBank.Operations.Single(operation => operation.Id.Equals(operationId));
         _context.Writer.WriteLine(operationInformation);
-        base.Handle(args);
     }
 }

@@ -13,10 +13,9 @@ public class OperationCancellationHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var operationId = args[1].ToGuid();
         _context.CentralBank.CancelTransaction(operationId);
-        base.Handle(args);
     }
 }

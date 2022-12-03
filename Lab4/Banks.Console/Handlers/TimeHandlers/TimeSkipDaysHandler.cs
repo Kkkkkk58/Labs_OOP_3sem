@@ -15,12 +15,11 @@ public class TimeSkipDaysHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         int days = int.Parse(args[1]);
         _clock.SkipDays(days);
 
         _context.Writer.WriteLine(_clock.Now);
-        base.Handle(args);
     }
 }

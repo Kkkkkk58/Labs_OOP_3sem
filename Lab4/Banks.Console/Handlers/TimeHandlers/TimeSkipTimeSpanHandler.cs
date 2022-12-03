@@ -15,12 +15,11 @@ public class TimeSkipTimeSpanHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var ts = TimeSpan.Parse(args[1]);
         _clock.Skip(ts);
 
         _context.Writer.WriteLine(_clock.Now);
-        base.Handle(args);
     }
 }

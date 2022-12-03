@@ -2,22 +2,19 @@
 
 public abstract class Handler : IHandler
 {
-    private IHandler? _next;
-
     protected Handler(string handledRequest)
     {
         HandledRequest = handledRequest;
     }
 
     public string HandledRequest { get; }
-    public virtual void Handle(params string[] args)
+    public void Handle(params string[] args)
     {
-        _next?.Handle(args[1..]);
+        if (!args[0].Equals(HandledRequest))
+            throw new NotImplementedException();
+
+        HandleImpl(args);
     }
 
-    public IHandler SetNext(IHandler handler)
-    {
-        _next = handler;
-        return _next;
-    }
+    protected abstract void HandleImpl(string[] args);
 }

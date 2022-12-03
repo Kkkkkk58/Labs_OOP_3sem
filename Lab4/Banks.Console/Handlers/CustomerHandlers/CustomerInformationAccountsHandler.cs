@@ -13,7 +13,7 @@ public class CustomerInformationAccountsHandler : Handler
         _context = context;
     }
 
-    public override void Handle(params string[] args)
+    protected override void HandleImpl(string[] args)
     {
         var customerId = args[1].ToGuid();
 
@@ -21,7 +21,5 @@ public class CustomerInformationAccountsHandler : Handler
         {
             _context.Writer.WriteLine(account);
         }
-
-        base.Handle(args);
     }
 }
