@@ -66,13 +66,20 @@ public class CommandTreeConfigurator
         BankChangeHandler bankChangeHandler = ConfigureBankChangeHandler();
         BankCreateHandler bankCreateHandler = ConfigureBankCreateHandler();
         BankTypeHandler bankTypeHandler = ConfigureBankTypeHandler();
+        BankDisplayHandler bankDisplayHandler = ConfigureBankDisplayHandler();
 
         bankHandler
             .AddSubHandler(bankTypeHandler)
             .AddSubHandler(bankChangeHandler)
-            .AddSubHandler(bankCreateHandler);
+            .AddSubHandler(bankCreateHandler)
+            .AddSubHandler(bankDisplayHandler);
 
         return bankHandler;
+    }
+
+    private BankDisplayHandler ConfigureBankDisplayHandler()
+    {
+        return new BankDisplayHandler(_context);
     }
 
     private BankChangeHandler ConfigureBankChangeHandler()

@@ -23,7 +23,7 @@ public class BankTypeDepositCreateHandler : Handler
         var interestOnBalancePolicy = new InterestOnBalancePolicy();
         _context.Writer.Write("Enter layer: ");
         string input = string.Empty;
-        while ((input = System.Console.ReadLine() ?? throw new NotImplementedException()) != "\n")
+        while ((input = _context.Reader.ReadLine()) != "\n")
         {
             string[] values = input.Split(" ", StringSplitOptions.RemoveEmptyEntries);
             var requiredBalance = values[0].ToMoneyAmount();
@@ -33,13 +33,12 @@ public class BankTypeDepositCreateHandler : Handler
         }
 
         _context.Writer.Write("Enter deposit term: ");
-        var term = TimeSpan.Parse(System.Console.ReadLine() ?? throw new NotImplementedException());
+        var term = TimeSpan.Parse(_context.Reader.ReadLine());
         _context.Writer.Write("Enter interest calculation period: ");
-        var period = TimeSpan.Parse(System.Console.ReadLine() ?? throw new NotImplementedException());
+        var period = TimeSpan.Parse(_context.Reader.ReadLine());
 
         IDepositAccountType type = bank.AccountTypeManager.CreateDepositAccountType(term, interestOnBalancePolicy, period);
 
-        // TODO
-        _context.Writer.WriteLine(type.Id);
+        _context.Writer.WriteLine($"Successfully created deposit type {type.Id}");
     }
 }

@@ -8,5 +8,4 @@ public interface IOperationInformation
     public DateTime InitTime { get; }
     public DateTime? CompletionTime { get; }
     public bool IsCompleted { get; }
-    public string Description { get; }
 }

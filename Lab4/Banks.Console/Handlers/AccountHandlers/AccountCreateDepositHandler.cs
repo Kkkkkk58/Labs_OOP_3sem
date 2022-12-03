@@ -33,6 +33,6 @@ public class AccountCreateDepositHandler : Handler
         }
 
         IUnchangeableBankAccount account = bank.CreateDepositAccount(type, customer, balance);
-        _context.Writer.WriteLine(account.Id);
+        _context.Writer.WriteLine($"Successfully created new deposit account {account.Id}");
     }
 }

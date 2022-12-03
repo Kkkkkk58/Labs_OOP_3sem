@@ -1,4 +1,5 @@
 ﻿using Banks.Console.Handlers.Abstractions;
+using Banks.Console.ViewModels;
 using Banks.Models.Abstractions;
 
 namespace Banks.Console.Handlers.OperationsHandlers;
@@ -15,11 +16,9 @@ public class OverallOperationHistoryHandler : Handler
 
     protected override void HandleImpl(string[] args)
     {
-        // TODO Top(n)
-        // TODO OperationInfo toString or make DTO
         foreach (IOperationInformation operationInformation in _context.CentralBank.Operations)
         {
-            _context.Writer.WriteLine(operationInformation);
+            _context.Writer.WriteLine(new OperationInformationViewModel(operationInformation));
         }
     }
 }

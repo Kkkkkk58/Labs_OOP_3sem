@@ -5,13 +5,12 @@ namespace Banks.Models;
 
 public class OperationInformation : IOperationInformation
 {
-    public OperationInformation(ICommandExecutingBankAccount account, MoneyAmount operatedAmount, DateTime initTime, string description)
+    public OperationInformation(ICommandExecutingBankAccount account, MoneyAmount operatedAmount, DateTime initTime)
     {
         Id = Guid.NewGuid();
         BankAccount = account;
         OperatedAmount = operatedAmount;
         InitTime = initTime;
-        Description = description;
     }
 
     public Guid Id { get; }
@@ -21,7 +20,6 @@ public class OperationInformation : IOperationInformation
     public DateTime InitTime { get; }
     public DateTime? CompletionTime { get; private set; }
     public bool IsCompleted => CompletionTime.HasValue;
-    public string Description { get; private set; }
 
     public void SetCompletionTime(DateTime completionTime)
     {
@@ -34,10 +32,5 @@ public class OperationInformation : IOperationInformation
     public void SetOperatedAmount(MoneyAmount operatedAmount)
     {
         OperatedAmount = operatedAmount;
-    }
-
-    public void SetDescription(string description)
-    {
-        Description = description;
     }
 }

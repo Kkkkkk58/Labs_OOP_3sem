@@ -20,8 +20,15 @@ public class CustomerInformationPassportDataSetterHandler : Handler
         var customerId = args[1].ToGuid();
         var passportData = new PassportData(DateOnly.Parse(args[3]), args[2]);
 
-        ICustomer customer = _context.CentralBank.Banks.SelectMany(bank => bank.Customers).Distinct()
+        ICustomer customer = _context
+            .CentralBank
+            .Banks
+            .SelectMany(bank => bank.Customers)
+            .Distinct()
             .Single(customer => customer.Id.Equals(customerId));
+
         customer.SetPassportData(passportData);
+
+        _context.Writer.WriteLine($"Set new passport data for customer {customerId}");
     }
 }

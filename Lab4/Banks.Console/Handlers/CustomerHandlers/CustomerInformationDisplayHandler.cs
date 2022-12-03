@@ -1,5 +1,6 @@
 ﻿using Banks.Console.Extensions;
 using Banks.Console.Handlers.Abstractions;
+using Banks.Console.ViewModels;
 using Banks.Entities.Abstractions;
 
 namespace Banks.Console.Handlers.CustomerHandlers;
@@ -17,9 +18,13 @@ public class CustomerInformationDisplayHandler : Handler
     protected override void HandleImpl(string[] args)
     {
         var customerId = args[1].ToGuid();
-        ICustomer customer = _context.CentralBank.Banks.SelectMany(bank => bank.Customers).Distinct()
+        ICustomer customer = _context
+            .CentralBank
+            .Banks
+            .SelectMany(bank => bank.Customers)
+            .Distinct()
             .Single(c => c.Id.Equals(customerId));
 
-        _context.Writer.WriteLine(customer);
+        _context.Writer.WriteLine(new CustomerViewModel(customer));
     }
 }

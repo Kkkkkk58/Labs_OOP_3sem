@@ -1,5 +1,6 @@
 ﻿using Banks.Console.Extensions;
 using Banks.Console.Handlers.Abstractions;
+using Banks.Console.ViewModels;
 using Banks.Models.Abstractions;
 
 namespace Banks.Console.Handlers.OperationsHandlers;
@@ -18,6 +19,6 @@ public class OperationShowHandler : Handler
         var operationId = args[1].ToGuid();
         IOperationInformation operationInformation =
             _context.CentralBank.Operations.Single(operation => operation.Id.Equals(operationId));
-        _context.Writer.WriteLine(operationInformation);
+        _context.Writer.WriteLine(new OperationInformationViewModel(operationInformation));
     }
 }

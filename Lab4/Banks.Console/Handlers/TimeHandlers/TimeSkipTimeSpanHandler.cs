@@ -20,6 +20,6 @@ public class TimeSkipTimeSpanHandler : Handler
         var ts = TimeSpan.Parse(args[1]);
         _clock.Skip(ts);
 
-        _context.Writer.WriteLine(_clock.Now);
+        _context.Writer.WriteLine($"Current time is {_clock.Now}");
     }
 }

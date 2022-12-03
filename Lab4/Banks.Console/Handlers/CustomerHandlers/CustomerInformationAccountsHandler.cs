@@ -1,6 +1,7 @@
 ﻿using Banks.BankAccounts.Abstractions;
 using Banks.Console.Extensions;
 using Banks.Console.Handlers.Abstractions;
+using Banks.Console.ViewModels;
 
 namespace Banks.Console.Handlers.CustomerHandlers;
 
@@ -19,7 +20,7 @@ public class CustomerInformationAccountsHandler : Handler
 
         foreach (IUnchangeableBankAccount account in _context.CentralBank.Banks.SelectMany(bank => bank.GetAccounts(customerId)))
         {
-            _context.Writer.WriteLine(account);
+            _context.Writer.WriteLine(new AccountViewModel(account));
         }
     }
 }

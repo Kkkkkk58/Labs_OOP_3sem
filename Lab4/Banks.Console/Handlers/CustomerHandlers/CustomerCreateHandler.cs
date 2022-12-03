@@ -25,13 +25,13 @@ public class CustomerCreateHandler : Handler
 
         ICustomerBuilder customerBuilder = Customer.Builder;
         _context.Writer.Write("Enter first name: ");
-        ICustomerLastNameBuilder lastNameBuilder = customerBuilder.SetFirstName(System.Console.ReadLine() ?? throw new NotImplementedException());
+        ICustomerLastNameBuilder lastNameBuilder = customerBuilder.SetFirstName(_context.Reader.ReadLine() ?? throw new NotImplementedException());
         _context.Writer.Write("Enter last name: ");
         IOptionalCustomerInformationBuilder optionalInfoBuilder =
-            lastNameBuilder.SetLastName(System.Console.ReadLine() ?? throw new NotImplementedException());
+            lastNameBuilder.SetLastName(_context.Reader.ReadLine() ?? throw new NotImplementedException());
         optionalInfoBuilder.SetNotifier(new ConsoleNotifier());
         _context.Writer.Write("Enter passport data [optional]: ");
-        string[]? input = System.Console.ReadLine()?.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+        string[]? input = _context.Reader.ReadLine()?.Split(" ", StringSplitOptions.RemoveEmptyEntries);
         if (input is not null && input.Length == 2)
         {
             var passportData = new PassportData(DateOnly.Parse(input[1]), input[0]);
@@ -39,7 +39,7 @@ public class CustomerCreateHandler : Handler
         }
 
         _context.Writer.Write("Enter address [optional]: ");
-        input = System.Console.ReadLine()?.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+        input = _context.Reader.ReadLine()?.Split(" ", StringSplitOptions.RemoveEmptyEntries);
         if (input is not null && input.Length == 1)
         {
             var address = new Address(input[0]);
@@ -48,6 +48,6 @@ public class CustomerCreateHandler : Handler
 
         ICustomer customer = optionalInfoBuilder.Build();
         bank.RegisterCustomer(customer);
-        _context.Writer.WriteLine(customer.Id);
+        _context.Writer.WriteLine($"Successfully created customer {customer.Id}");
     }
 }

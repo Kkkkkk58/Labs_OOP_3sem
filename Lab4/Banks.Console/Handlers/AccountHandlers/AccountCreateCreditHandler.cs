@@ -33,6 +33,6 @@ public class AccountCreateCreditHandler : Handler
         }
 
         IUnchangeableBankAccount account = bank.CreateCreditAccount(type, customer, balance);
-        _context.Writer.WriteLine(account.Id);
+        _context.Writer.WriteLine($"Successfully created new credit account {account.Id}");
     }
 }

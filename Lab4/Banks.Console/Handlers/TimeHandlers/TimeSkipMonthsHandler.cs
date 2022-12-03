@@ -20,6 +20,6 @@ public class TimeSkipMonthsHandler : Handler
         int months = int.Parse(args[1]);
         _clock.SkipMonths(months);
 
-        _context.Writer.WriteLine(_clock.Now);
+        _context.Writer.WriteLine($"Current time is {_clock.Now}");
     }
 }

@@ -18,15 +18,15 @@ public class BankCreateHandler : Handler
     {
         IBank bank = GetBank();
         _context.CentralBank.RegisterBank(bank);
-        _context.Writer.WriteLine(bank.Id);
+        _context.Writer.WriteLine($"Successfully created new bank {bank.Id}");
     }
 
     private IBank GetBank()
     {
         _context.Writer.Write("Enter bank's name: ");
-        string name = System.Console.ReadLine() ?? throw new NotImplementedException();
+        string name = _context.Reader.ReadLine();
         _context.Writer.Write("Enter suspicious operations limit: ");
-        string limit = System.Console.ReadLine() ?? throw new NotImplementedException();
+        string limit = _context.Reader.ReadLine();
 
         return new BankBuilder()
             .SetName(name)

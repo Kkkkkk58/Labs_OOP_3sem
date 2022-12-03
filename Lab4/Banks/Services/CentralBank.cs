@@ -45,42 +45,48 @@ public class CentralBank : ICentralBank
     }
 
     // TODO Common transaction creation
-    public void Withdraw(Guid accountId, MoneyAmount moneyAmount)
+    public IOperationInformation Withdraw(Guid accountId, MoneyAmount moneyAmount)
     {
         ICommandExecutingBankAccount commandExecutingBankAccount = GetCommandExecutingBankAccount(accountId);
-        var operationInformation = new OperationInformation(commandExecutingBankAccount, moneyAmount, _clock.Now, "\\");
+        var operationInformation = new OperationInformation(commandExecutingBankAccount, moneyAmount, _clock.Now);
         var transaction = new Transaction(operationInformation, new WithdrawalCommand());
         _transactions.Add(transaction);
 
         transaction.Perform();
         transaction.Information.SetCompletionTime(_clock.Now);
         transaction.ChangeState(new SuccessfulTransactionState(transaction));
+
+        return transaction.Information;
     }
 
-    public void Replenish(Guid accountId, MoneyAmount moneyAmount)
+    public IOperationInformation Replenish(Guid accountId, MoneyAmount moneyAmount)
     {
         ICommandExecutingBankAccount commandExecutingBankAccount = GetCommandExecutingBankAccount(accountId);
-        var operationInformation = new OperationInformation(commandExecutingBankAccount, moneyAmount, _clock.Now, "\\");
+        var operationInformation = new OperationInformation(commandExecutingBankAccount, moneyAmount, _clock.Now);
         var transaction = new Transaction(operationInformation, new ReplenishmentCommand());
         _transactions.Add(transaction);
 
         transaction.Perform();
         transaction.Information.SetCompletionTime(_clock.Now);
         transaction.ChangeState(new SuccessfulTransactionState(transaction));
+
+        return transaction.Information;
     }
 
-    public void Transfer(Guid fromAccountId, Guid toAccountId, MoneyAmount moneyAmount)
+    public IOperationInformation Transfer(Guid fromAccountId, Guid toAccountId, MoneyAmount moneyAmount)
     {
         ICommandExecutingBankAccount from = GetCommandExecutingBankAccount(fromAccountId);
         ICommandExecutingBankAccount to = GetCommandExecutingBankAccount(toAccountId);
 
-        var operationInformation = new OperationInformation(from, moneyAmount, _clock.Now, "\\");
+        var operationInformation = new OperationInformation(from, moneyAmount, _clock.Now);
         var transaction = new Transaction(operationInformation, new TransferCommand(to));
         _transactions.Add(transaction);
 
         transaction.Perform();
         transaction.Information.SetCompletionTime(_clock.Now);
         transaction.ChangeState(new SuccessfulTransactionState(transaction));
+
+        return transaction.Information;
     }
 
     private ICommandExecutingBankAccount GetCommandExecutingBankAccount(Guid accountId)

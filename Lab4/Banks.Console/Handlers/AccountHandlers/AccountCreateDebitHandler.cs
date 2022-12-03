@@ -33,6 +33,6 @@ public class AccountCreateDebitHandler : Handler
         }
 
         IUnchangeableBankAccount account = bank.CreateDebitAccount(type, customer, balance);
-        _context.Writer.WriteLine(account.Id);
+        _context.Writer.WriteLine($"Successfully created new debit account {account.Id}");
     }
 }

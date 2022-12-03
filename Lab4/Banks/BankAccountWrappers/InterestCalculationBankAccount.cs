@@ -48,7 +48,7 @@ public class InterestCalculationBankAccount : BaseBankAccountWrapper, ISubscribe
             return;
 
         var transaction = new Transaction(
-            new OperationInformation(this, _savings, _date, "//TODO"),
+            new OperationInformation(this, _savings, _date),
             new ReplenishmentCommand());
         AddPercents(percentCalculationTimes, transaction);
         _lastUpdate = _lastUpdate.AddMonths(percentCalculationTimes);

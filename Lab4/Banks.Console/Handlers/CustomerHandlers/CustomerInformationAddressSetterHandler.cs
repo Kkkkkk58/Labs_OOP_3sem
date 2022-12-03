@@ -23,5 +23,7 @@ public class CustomerInformationAddressSetterHandler : Handler
         ICustomer customer = _context.CentralBank.Banks.SelectMany(bank => bank.Customers).Distinct()
             .Single(customer => customer.Id.Equals(customerId));
         customer.SetAddress(address);
+
+        _context.Writer.WriteLine($"Set new address for customer {customerId}");
     }
 }

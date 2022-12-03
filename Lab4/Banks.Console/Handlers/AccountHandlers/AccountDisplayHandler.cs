@@ -1,6 +1,7 @@
 ﻿using Banks.BankAccounts.Abstractions;
 using Banks.Console.Extensions;
 using Banks.Console.Handlers.Abstractions;
+using Banks.Console.ViewModels;
 
 namespace Banks.Console.Handlers.AccountHandlers;
 
@@ -19,6 +20,6 @@ public class AccountDisplayHandler : Handler
         IUnchangeableBankAccount account = _context.CentralBank.Banks
             .Single(bank => bank.FindAccount(accountId) is not null).GetAccount(accountId);
 
-        _context.Writer.WriteLine(account);
+        _context.Writer.WriteLine(new AccountViewModel(account));
     }
 }

@@ -20,12 +20,11 @@ public class BankTypeCreditCreateHandler : Handler
         var bankId = args[1].ToGuid();
         INoTransactionalBank bank = _context.CentralBank.Banks.Single(b => b.Id.Equals(bankId));
         _context.Writer.Write("Enter debt limit: ");
-        MoneyAmount debtLimit = System.Console.ReadLine()?.ToMoneyAmount() ?? throw new NotImplementedException();
+        MoneyAmount debtLimit = _context.Reader.ReadLine()?.ToMoneyAmount() ?? throw new NotImplementedException();
         _context.Writer.Write("Enter charge: ");
-        MoneyAmount charge = System.Console.ReadLine()?.ToMoneyAmount() ?? throw new NotImplementedException();
+        MoneyAmount charge = _context.Reader.ReadLine()?.ToMoneyAmount() ?? throw new NotImplementedException();
         ICreditAccountType type = bank.AccountTypeManager.CreateCreditAccountType(debtLimit, charge);
 
-        // TODO
-        _context.Writer.WriteLine(type.Id);
+        _context.Writer.WriteLine($"Successfully created credit type {type.Id}");
     }
 }

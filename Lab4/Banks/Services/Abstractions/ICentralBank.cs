@@ -10,7 +10,7 @@ public interface ICentralBank
     IReadOnlyCollection<IOperationInformation> Operations { get; }
     INoTransactionalBank RegisterBank(IBank bank);
     void CancelTransaction(Guid transactionId);
-    void Withdraw(Guid accountId, MoneyAmount moneyAmount);
-    void Replenish(Guid accountId, MoneyAmount moneyAmount);
-    void Transfer(Guid fromAccountId, Guid toAccountId, MoneyAmount moneyAmount);
+    IOperationInformation Withdraw(Guid accountId, MoneyAmount moneyAmount);
+    IOperationInformation Replenish(Guid accountId, MoneyAmount moneyAmount);
+    IOperationInformation Transfer(Guid fromAccountId, Guid toAccountId, MoneyAmount moneyAmount);
 }

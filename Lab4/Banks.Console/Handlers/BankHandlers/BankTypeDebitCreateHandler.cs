@@ -19,13 +19,12 @@ public class BankTypeDebitCreateHandler : Handler
         var bankId = args[1].ToGuid();
         INoTransactionalBank bank = _context.CentralBank.Banks.Single(b => b.Id.Equals(bankId));
         _context.Writer.Write("Enter interest on balance: ");
-        decimal interestOnBalance = decimal.Parse(System.Console.ReadLine() ?? throw new NotImplementedException());
+        decimal interestOnBalance = decimal.Parse(_context.Reader.ReadLine() ?? throw new NotImplementedException());
         _context.Writer.Write("Enter interest calculation period: ");
-        var period = TimeSpan.Parse(System.Console.ReadLine() ?? throw new NotImplementedException());
+        var period = TimeSpan.Parse(_context.Reader.ReadLine() ?? throw new NotImplementedException());
 
         IDebitAccountType type = bank.AccountTypeManager.CreateDebitAccountType(interestOnBalance, period);
 
-        // TODO
-        _context.Writer.WriteLine(type.Id);
+        _context.Writer.WriteLine($"Successfully created debit type {type.Id}");
     }
 }

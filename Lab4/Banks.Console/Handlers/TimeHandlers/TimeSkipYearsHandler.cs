@@ -20,6 +20,6 @@ public class TimeSkipYearsHandler : Handler
         int days = int.Parse(args[1]);
         _clock.SkipYears(days);
 
-        _context.Writer.WriteLine(_clock.Now);
+        _context.Writer.WriteLine($"Current time is {_clock.Now}");
     }
 }
