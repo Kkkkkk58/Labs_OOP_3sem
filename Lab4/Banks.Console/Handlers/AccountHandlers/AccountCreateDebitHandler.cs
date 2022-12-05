@@ -1,37 +1,26 @@
 ﻿using Banks.AccountTypes.Abstractions;
 using Banks.BankAccounts.Abstractions;
-using Banks.Console.Extensions;
-using Banks.Console.Handlers.Abstractions;
 using Banks.Entities.Abstractions;
 using Banks.Models;
 
 namespace Banks.Console.Handlers.AccountHandlers;
 
-public class AccountCreateDebitHandler : Handler
+public class AccountCreateDebitHandler : AccountCreateHandlerBase
 {
     private readonly AppContext _context;
 
     public AccountCreateDebitHandler(AppContext context)
-        : base("debit")
+        : base("debit", context)
     {
         _context = context;
     }
 
-    protected override void HandleImpl(string[] args)
+    protected override void CreateAccount(
+        INoTransactionalBank bank,
+        IAccountType type,
+        ICustomer customer,
+        MoneyAmount? balance)
     {
-        var bankId = args[1].ToGuid();
-        INoTransactionalBank bank = _context.CentralBank.Banks.Single(b => b.Id.Equals(bankId));
-        var typeId = args[2].ToGuid();
-        IAccountType type = bank.AccountTypeManager.GetAccountType(typeId);
-        var clientId = args[3].ToGuid();
-        ICustomer customer = _context.CentralBank.Banks.SelectMany(b => b.Customers).Distinct()
-            .Single(c => c.Id.Equals(clientId));
-        MoneyAmount? balance = null;
-        if (args.Length > 4)
-        {
-            balance = args[4].ToMoneyAmount();
-        }
-
         IUnchangeableBankAccount account = bank.CreateDebitAccount(type, customer, balance);
         _context.Writer.WriteLine($"Successfully created new debit account {account.Id}");
     }

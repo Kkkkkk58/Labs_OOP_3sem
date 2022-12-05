@@ -1,4 +1,6 @@
-﻿namespace Banks.Console.Handlers.Abstractions;
+﻿using Banks.Console.Exceptions;
+
+namespace Banks.Console.Handlers.Abstractions;
 
 public abstract class Handler : IHandler
 {
@@ -8,11 +10,13 @@ public abstract class Handler : IHandler
     }
 
     public string HandledRequest { get; }
-
     public void Handle(params string[] args)
     {
+        ArgumentNullException.ThrowIfNull(args);
+        if (args.Length < 1)
+            throw HandlerException.InvalidRequestParametersLength(args.Length);
         if (!args[0].Equals(HandledRequest))
-            throw new NotImplementedException();
+            throw HandlerException.InvalidRequestType(HandledRequest, args[0]);
 
         HandleImpl(args);
     }

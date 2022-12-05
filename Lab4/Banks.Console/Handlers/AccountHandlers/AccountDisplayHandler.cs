@@ -17,10 +17,20 @@ public class AccountDisplayHandler : Handler
 
     protected override void HandleImpl(string[] args)
     {
-        var accountId = args[1].ToGuid();
-        IUnchangeableBankAccount account = _context.CentralBank.Banks
-            .Single(bank => bank.FindAccount(accountId) is not null).GetAccount(accountId);
+        IUnchangeableBankAccount account = GetAccount();
 
         _context.Writer.WriteLine(new AccountViewModel(account));
+    }
+
+    private IUnchangeableBankAccount GetAccount()
+    {
+        _context.Writer.WriteLine("Enter account id: ");
+        var accountId = _context.Reader.ReadLine().ToGuid();
+
+        return _context
+            .CentralBank
+            .Banks
+            .Single(bank => bank.FindAccount(accountId) is not null)
+            .GetAccount(accountId);
     }
 }

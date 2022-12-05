@@ -1,9 +1,10 @@
-﻿namespace Banks.Console.Handlers.Abstractions;
+﻿using Banks.Console.Exceptions;
+
+namespace Banks.Console.Handlers.Abstractions;
 
 public abstract class CompositeHandler : ICompositeHandler
 {
     private readonly List<IHandler> _subHandlers;
-    private IHandler? _next;
 
     protected CompositeHandler(string handledRequest)
     {
@@ -15,23 +16,16 @@ public abstract class CompositeHandler : ICompositeHandler
 
     public void Handle(params string[] args)
     {
-        if (HandledRequest.Equals(args[0], StringComparison.OrdinalIgnoreCase))
-        {
-            _subHandlers.Single(handler => handler.HandledRequest.Equals(args[1])).Handle(args[1..]);
-        }
-        else
-        {
-            if (_next is null)
-                throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(args);
+        if (args.Length < 2)
+            throw HandlerException.InvalidRequestParametersLength(args.Length);
 
-            _next.Handle(args[1..]);
-        }
-    }
+        if (!HandledRequest.Equals(args[0], StringComparison.OrdinalIgnoreCase))
+            throw HandlerException.InvalidRequestType(HandledRequest, args[0]);
 
-    public IHandler SetNext(IHandler handler)
-    {
-        _next = handler;
-        return _next;
+        _subHandlers
+            .Single(handler => handler.HandledRequest.Equals(args[1]))
+            .Handle(args[1..]);
     }
 
     public ICompositeHandler AddSubHandler(IHandler handler)

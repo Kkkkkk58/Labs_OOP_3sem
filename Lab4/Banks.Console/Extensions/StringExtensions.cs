@@ -11,6 +11,9 @@ public static class StringExtensions
 
     public static MoneyAmount ToMoneyAmount(this string s)
     {
+        if (string.IsNullOrWhiteSpace(s))
+            throw new ArgumentNullException(nameof(s));
+
         char currencySign = s[0];
         if (char.IsDigit(currencySign))
             return new MoneyAmount(decimal.Parse(s));
