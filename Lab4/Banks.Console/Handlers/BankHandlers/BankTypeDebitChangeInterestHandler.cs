@@ -16,11 +16,32 @@ public class BankTypeDebitChangeInterestHandler : Handler
 
     protected override void HandleImpl(string[] args)
     {
-        var bankId = args[1].ToGuid();
-        var typeId = args[2].ToGuid();
-        decimal interestOnBalance = decimal.Parse(args[3]);
-
-        INoTransactionalBank bank = _context.CentralBank.Banks.Single(b => b.Id.Equals(bankId));
+        INoTransactionalBank bank = GetBank();
+        Guid typeId = GetTypeId();
+        decimal interestOnBalance = GetInterestOnBalance();
         bank.AccountTypeManager.ChangeInterestOnBalance(typeId, interestOnBalance);
+    }
+
+    private INoTransactionalBank GetBank()
+    {
+        _context.Writer.Write("Enter bank id: ");
+        var bankId = _context.Reader.ReadLine().ToGuid();
+
+        return _context
+            .CentralBank
+            .Banks
+            .Single(b => b.Id.Equals(bankId));
+    }
+
+    private Guid GetTypeId()
+    {
+        _context.Writer.Write("Enter type id: ");
+        return _context.Reader.ReadLine().ToGuid();
+    }
+
+    private decimal GetInterestOnBalance()
+    {
+        _context.Writer.Write("Enter interest on balance: ");
+        return decimal.Parse(_context.Reader.ReadLine());
     }
 }

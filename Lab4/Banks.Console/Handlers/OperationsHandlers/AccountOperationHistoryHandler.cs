@@ -17,7 +17,7 @@ public class AccountOperationHistoryHandler : Handler
 
     protected override void HandleImpl(string[] args)
     {
-        var accountId = args[1].ToGuid();
+        Guid accountId = GetAccountId();
 
         IReadOnlyCollection<IOperationInformation> operationHistory = _context
             .CentralBank
@@ -30,5 +30,11 @@ public class AccountOperationHistoryHandler : Handler
         {
             _context.Writer.WriteLine(new OperationInformationViewModel(operationInformation));
         }
+    }
+
+    private Guid GetAccountId()
+    {
+        _context.Writer.Write("Enter account id: ");
+        return _context.Reader.ReadLine().ToGuid();
     }
 }

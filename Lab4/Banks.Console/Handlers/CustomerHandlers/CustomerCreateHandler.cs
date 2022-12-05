@@ -20,35 +20,63 @@ public class CustomerCreateHandler : Handler
 
     protected override void HandleImpl(string[] args)
     {
-        var bankId = args[1].ToGuid();
-        INoTransactionalBank bank = _context.CentralBank.Banks.Single(bank => bank.Id.Equals(bankId));
-
-        ICustomerBuilder customerBuilder = Customer.Builder;
-        _context.Writer.Write("Enter first name: ");
-        ICustomerLastNameBuilder lastNameBuilder =
-            customerBuilder.SetFirstName(_context.Reader.ReadLine() ?? throw new NotImplementedException());
-        _context.Writer.Write("Enter last name: ");
-        IOptionalCustomerInformationBuilder optionalInfoBuilder =
-            lastNameBuilder.SetLastName(_context.Reader.ReadLine() ?? throw new NotImplementedException());
-        optionalInfoBuilder.SetNotifier(new ConsoleNotifier());
-        _context.Writer.Write("Enter passport data [optional]: ");
-        string[]? input = _context.Reader.ReadLine()?.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-        if (input is not null && input.Length == 2)
-        {
-            var passportData = new PassportData(DateOnly.Parse(input[1]), input[0]);
-            optionalInfoBuilder.SetPassportData(passportData);
-        }
-
-        _context.Writer.Write("Enter address [optional]: ");
-        input = _context.Reader.ReadLine()?.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-        if (input is not null && input.Length == 1)
-        {
-            var address = new Address(input[0]);
-            optionalInfoBuilder.SetAddress(address);
-        }
-
-        ICustomer customer = optionalInfoBuilder.Build();
+        INoTransactionalBank bank = GetBank();
+        ICustomer customer = GetCustomer();
         bank.RegisterCustomer(customer);
         _context.Writer.WriteLine($"Successfully created customer {customer.Id}");
+    }
+
+    private INoTransactionalBank GetBank()
+    {
+        _context.Writer.Write("Enter bank id: ");
+        var bankId = _context.Reader.ReadLine().ToGuid();
+
+        return _context
+            .CentralBank
+            .Banks
+            .Single(bank => bank.Id.Equals(bankId));
+    }
+
+    private ICustomer GetCustomer()
+    {
+        ICustomerBuilder customerBuilder = Customer.Builder;
+        _context.Writer.Write("Enter first name: ");
+        ICustomerLastNameBuilder lastNameBuilder = customerBuilder
+            .SetFirstName(_context.Reader.ReadLine());
+        _context.Writer.Write("Enter last name: ");
+        IOptionalCustomerInformationBuilder optionalInfoBuilder = lastNameBuilder
+            .SetLastName(_context.Reader.ReadLine());
+        SetCustomerOptionalData(optionalInfoBuilder);
+
+        return optionalInfoBuilder.Build();
+    }
+
+    private void SetCustomerOptionalData(IOptionalCustomerInformationBuilder optionalInfoBuilder)
+    {
+        optionalInfoBuilder.SetNotifier(new ConsoleNotifier());
+        SetPassportData(optionalInfoBuilder);
+        SetAddress(optionalInfoBuilder);
+    }
+
+    private void SetPassportData(IOptionalCustomerInformationBuilder optionalInfoBuilder)
+    {
+        _context.Writer.Write("Enter passport data [optional]: ");
+        string[] input = _context.Reader.ReadLine().Split(" ", StringSplitOptions.RemoveEmptyEntries);
+        if (input.Length != 2)
+            return;
+
+        var passportData = new PassportData(DateOnly.Parse(input[1]), input[0]);
+        optionalInfoBuilder.SetPassportData(passportData);
+    }
+
+    private void SetAddress(IOptionalCustomerInformationBuilder optionalInfoBuilder)
+    {
+        _context.Writer.Write("Enter address [optional]: ");
+        string[] input = _context.Reader.ReadLine().Split(" ", StringSplitOptions.RemoveEmptyEntries);
+        if (input.Length != 1)
+            return;
+
+        var address = new Address(input[0]);
+        optionalInfoBuilder.SetAddress(address);
     }
 }

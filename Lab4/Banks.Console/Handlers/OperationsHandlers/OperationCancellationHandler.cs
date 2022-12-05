@@ -15,8 +15,14 @@ public class OperationCancellationHandler : Handler
 
     protected override void HandleImpl(string[] args)
     {
-        var operationId = args[1].ToGuid();
+        Guid operationId = GetOperationId();
         _context.CentralBank.CancelTransaction(operationId);
         _context.Writer.WriteLine($"Transaction {operationId} cancellation was successful");
+    }
+
+    private Guid GetOperationId()
+    {
+        _context.Writer.Write("Enter operation id: ");
+        return _context.Reader.ReadLine().ToGuid();
     }
 }

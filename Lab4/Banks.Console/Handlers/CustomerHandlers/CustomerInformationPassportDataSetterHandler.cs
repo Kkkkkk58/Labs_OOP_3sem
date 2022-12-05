@@ -17,18 +17,34 @@ public class CustomerInformationPassportDataSetterHandler : Handler
 
     protected override void HandleImpl(string[] args)
     {
-        var customerId = args[1].ToGuid();
-        var passportData = new PassportData(DateOnly.Parse(args[3]), args[2]);
+        ICustomer customer = GetCustomer();
+        PassportData passportData = GetPassportData();
 
-        ICustomer customer = _context
+        customer.SetPassportData(passportData);
+
+        _context.Writer.WriteLine($"Set new passport data for customer {customer.Id}");
+    }
+
+    private ICustomer GetCustomer()
+    {
+        _context.Writer.Write("Enter customer id: ");
+        var customerId = _context.Reader.ReadLine().ToGuid();
+
+        return _context
             .CentralBank
             .Banks
             .SelectMany(bank => bank.Customers)
             .Distinct()
             .Single(customer => customer.Id.Equals(customerId));
+    }
 
-        customer.SetPassportData(passportData);
+    private PassportData GetPassportData()
+    {
+        _context.Writer.Write("Enter passport of number: ");
+        string number = _context.Reader.ReadLine();
+        _context.Writer.Write("Enter date of issue: ");
+        var dateOfIssue = DateOnly.Parse(_context.Reader.ReadLine());
 
-        _context.Writer.WriteLine($"Set new passport data for customer {customerId}");
+        return new PassportData(dateOfIssue, number);
     }
 }

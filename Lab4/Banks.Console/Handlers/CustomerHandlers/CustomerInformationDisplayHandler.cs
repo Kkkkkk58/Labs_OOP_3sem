@@ -17,14 +17,21 @@ public class CustomerInformationDisplayHandler : Handler
 
     protected override void HandleImpl(string[] args)
     {
-        var customerId = args[1].ToGuid();
-        ICustomer customer = _context
+        ICustomer customer = GetCustomer();
+
+        _context.Writer.WriteLine(new CustomerViewModel(customer));
+    }
+
+    private ICustomer GetCustomer()
+    {
+        _context.Writer.Write("Enter customer id: ");
+        var customerId = _context.Reader.ReadLine().ToGuid();
+
+        return _context
             .CentralBank
             .Banks
             .SelectMany(bank => bank.Customers)
             .Distinct()
             .Single(c => c.Id.Equals(customerId));
-
-        _context.Writer.WriteLine(new CustomerViewModel(customer));
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Banks.Console.Extensions;
 using Banks.Console.Handlers.Abstractions;
 using Banks.Entities.Abstractions;
+using Banks.Models;
 
 namespace Banks.Console.Handlers.BankHandlers;
 
@@ -16,14 +17,26 @@ public class BankChangeSuspiciousOperationsLimitHandler : Handler
 
     protected override void HandleImpl(string[] args)
     {
-        var bankId = args[1].ToGuid();
-        var suspiciousOperationsLimit = args[2].ToMoneyAmount();
+        INoTransactionalBank bank = GetBank();
+        MoneyAmount suspiciousOperationsLimit = GetSuspiciousOperationsLimit();
 
-        INoTransactionalBank bank = _context
+        bank.AccountTypeManager.SetSuspiciousOperationsLimit(suspiciousOperationsLimit);
+    }
+
+    private INoTransactionalBank GetBank()
+    {
+        _context.Writer.Write("Enter bank id: ");
+        var bankId = _context.Reader.ReadLine().ToGuid();
+
+        return _context
             .CentralBank
             .Banks
             .Single(b => b.Id.Equals(bankId));
+    }
 
-        bank.AccountTypeManager.SetSuspiciousOperationsLimit(suspiciousOperationsLimit);
+    private MoneyAmount GetSuspiciousOperationsLimit()
+    {
+        _context.Writer.Write("Enter suspicious operations limit: ");
+        return _context.Reader.ReadLine().ToMoneyAmount();
     }
 }

@@ -10,6 +10,7 @@ public abstract class Handler : IHandler
     }
 
     public string HandledRequest { get; }
+
     public void Handle(params string[] args)
     {
         ArgumentNullException.ThrowIfNull(args);

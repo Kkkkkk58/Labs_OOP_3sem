@@ -17,13 +17,29 @@ public class CustomerInformationAddressSetterHandler : Handler
 
     protected override void HandleImpl(string[] args)
     {
-        var customerId = args[1].ToGuid();
-        var address = new Address(args[2]);
-
-        ICustomer customer = _context.CentralBank.Banks.SelectMany(bank => bank.Customers).Distinct()
-            .Single(customer => customer.Id.Equals(customerId));
+        ICustomer customer = GetCustomer();
+        Address address = GetAddress();
         customer.SetAddress(address);
 
-        _context.Writer.WriteLine($"Set new address for customer {customerId}");
+        _context.Writer.WriteLine($"Set new address for customer {customer.Id}");
+    }
+
+    private ICustomer GetCustomer()
+    {
+        _context.Writer.Write("Enter customer id: ");
+        var customerId = _context.Reader.ReadLine().ToGuid();
+
+        return _context
+            .CentralBank
+            .Banks
+            .SelectMany(bank => bank.Customers)
+            .Distinct()
+            .Single(customer => customer.Id.Equals(customerId));
+    }
+
+    private Address GetAddress()
+    {
+        _context.Writer.Write("Enter address: ");
+        return new Address(_context.Reader.ReadLine());
     }
 }
