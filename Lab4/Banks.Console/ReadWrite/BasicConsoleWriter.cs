@@ -12,5 +12,6 @@ public class BasicConsoleWriter : IWriter
     public void WriteLine(object value)
     {
         System.Console.WriteLine(value);
+        System.Console.WriteLine();
     }
 }

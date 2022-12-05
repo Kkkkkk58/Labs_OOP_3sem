@@ -14,6 +14,7 @@ public class CustomerViewModel
     public override string ToString()
     {
         return
-            $"Customer {_customer.FirstName}  {_customer.LastName} [{_customer.Id}]\nIs verified: {_customer.IsVerified}";
+            $"Customer {_customer.FirstName} {_customer.LastName} [{_customer.Id}]\n" +
+            $"Is verified: {_customer.IsVerified}";
     }
 }

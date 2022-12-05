@@ -24,7 +24,7 @@ public class AccountDisplayHandler : Handler
 
     private IUnchangeableBankAccount GetAccount()
     {
-        _context.Writer.WriteLine("Enter account id: ");
+        _context.Writer.Write("Enter account id: ");
         var accountId = _context.Reader.ReadLine().ToGuid();
 
         return _context

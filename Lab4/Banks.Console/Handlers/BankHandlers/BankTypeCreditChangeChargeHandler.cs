@@ -43,7 +43,7 @@ public class BankTypeCreditChangeChargeHandler : Handler
 
     private MoneyAmount GetCharge()
     {
-        _context.Writer.Write("Enter money amount: ");
+        _context.Writer.Write("Enter charge: ");
         return _context.Reader.ReadLine().ToMoneyAmount();
     }
 }

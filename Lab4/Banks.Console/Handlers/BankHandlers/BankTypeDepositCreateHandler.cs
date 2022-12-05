@@ -52,7 +52,7 @@ public class BankTypeDepositCreateHandler : Handler
         var interestOnBalancePolicyLayers = new List<InterestOnBalanceLayer>();
         _context.Writer.Write("Enter layer: ");
         string input;
-        while ((input = _context.Reader.ReadLine()) != "\n")
+        while ((input = _context.Reader.ReadLine()) != string.Empty)
         {
             string[] values = input.Split(" ", StringSplitOptions.RemoveEmptyEntries);
             var requiredBalance = values[0].ToMoneyAmount();

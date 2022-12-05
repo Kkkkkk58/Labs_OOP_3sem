@@ -89,6 +89,7 @@ public class InterestCalculationBankAccount : BaseBankAccountWrapper, ISubscribe
 
         transaction.Information.SetOperatedAmount(_savings);
         transaction.Perform();
+        transaction.Information.SetCompletionTime(_date);
         transaction.ChangeState(new SuccessfulTransactionState(transaction));
     }
 
