@@ -8,6 +8,7 @@ namespace Banks.Console.Handlers.BankHandlers;
 public class BankCreateHandler : Handler
 {
     private readonly AppContext _context;
+
     public BankCreateHandler(AppContext context)
         : base("create")
     {
@@ -27,12 +28,8 @@ public class BankCreateHandler : Handler
         string name = _context.Reader.ReadLine();
         _context.Writer.Write("Enter suspicious operations limit: ");
         string limit = _context.Reader.ReadLine();
+        var moneyLimit = limit.ToMoneyAmount();
 
-        return new BankBuilder()
-            .SetName(name)
-            .SetSuspiciousOperationsLimit(limit.ToMoneyAmount())
-            .SetAccountFactory(_context.AccountFactory)
-            .SetClock(_context.Clock)
-            .Build();
+        return new Bank(name, _context.AccountFactory, moneyLimit, _context.Clock);
     }
 }

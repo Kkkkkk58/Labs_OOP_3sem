@@ -8,6 +8,7 @@ public abstract class Handler : IHandler
     }
 
     public string HandledRequest { get; }
+
     public void Handle(params string[] args)
     {
         if (!args[0].Equals(HandledRequest))

@@ -8,6 +8,7 @@ namespace Banks.Console.Handlers.OperationsHandlers;
 public class AccountOperationHistoryHandler : Handler
 {
     private readonly AppContext _context;
+
     public AccountOperationHistoryHandler(AppContext context)
         : base("account")
     {

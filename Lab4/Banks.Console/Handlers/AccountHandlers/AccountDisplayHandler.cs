@@ -8,6 +8,7 @@ namespace Banks.Console.Handlers.AccountHandlers;
 public class AccountDisplayHandler : Handler
 {
     private readonly AppContext _context;
+
     public AccountDisplayHandler(AppContext context)
         : base("display")
     {

@@ -7,7 +7,12 @@ namespace Banks.Console;
 
 public struct AppContext
 {
-    public AppContext(ICentralBank centralBank, IClock clock, IAccountFactory accountFactory, IReader reader, IWriter writer)
+    public AppContext(
+        ICentralBank centralBank,
+        IClock clock,
+        IAccountFactory accountFactory,
+        IReader reader,
+        IWriter writer)
     {
         CentralBank = centralBank;
         Clock = clock;

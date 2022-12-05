@@ -13,6 +13,7 @@ public class AccountViewModel
 
     public override string ToString()
     {
-        return $"Bank account [{_account.Id}]\nHolder: [{_account.Holder.Id}]\nBalance: {_account.Balance}\nDebt: {_account.Debt}\nCreation date: {_account.CreationDate}\n";
+        return
+            $"Bank account [{_account.Id}]\nHolder: [{_account.Holder.Id}]\nBalance: {_account.Balance}\nDebt: {_account.Debt}\nCreation date: {_account.CreationDate}\n";
     }
 }

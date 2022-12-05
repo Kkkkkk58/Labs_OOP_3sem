@@ -19,7 +19,8 @@ public class TransferOperationHandler : Handler
         var fromAccountId = args[1].ToGuid();
         var toAccountId = args[2].ToGuid();
         var moneyAmount = args[3].ToMoneyAmount();
-        IOperationInformation operationInformation = _context.CentralBank.Transfer(fromAccountId, toAccountId, moneyAmount);
+        IOperationInformation operationInformation =
+            _context.CentralBank.Transfer(fromAccountId, toAccountId, moneyAmount);
         _context.Writer.WriteLine($"Transaction {operationInformation.Id} was successful");
     }
 }

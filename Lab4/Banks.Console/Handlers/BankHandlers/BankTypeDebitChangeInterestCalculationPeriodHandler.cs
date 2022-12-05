@@ -7,6 +7,7 @@ namespace Banks.Console.Handlers.BankHandlers;
 public class BankTypeDebitChangeInterestCalculationPeriodHandler : Handler
 {
     private readonly AppContext _context;
+
     public BankTypeDebitChangeInterestCalculationPeriodHandler(AppContext context)
         : base("period")
     {

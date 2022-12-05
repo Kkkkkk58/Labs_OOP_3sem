@@ -25,7 +25,8 @@ public class CustomerCreateHandler : Handler
 
         ICustomerBuilder customerBuilder = Customer.Builder;
         _context.Writer.Write("Enter first name: ");
-        ICustomerLastNameBuilder lastNameBuilder = customerBuilder.SetFirstName(_context.Reader.ReadLine() ?? throw new NotImplementedException());
+        ICustomerLastNameBuilder lastNameBuilder =
+            customerBuilder.SetFirstName(_context.Reader.ReadLine() ?? throw new NotImplementedException());
         _context.Writer.Write("Enter last name: ");
         IOptionalCustomerInformationBuilder optionalInfoBuilder =
             lastNameBuilder.SetLastName(_context.Reader.ReadLine() ?? throw new NotImplementedException());

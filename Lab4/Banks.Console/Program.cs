@@ -29,8 +29,10 @@ static IHostBuilder CreateHostBuilder(string[] args)
     return Host.CreateDefaultBuilder(args)
         .ConfigureServices((_, services) =>
         {
-            services.AddScoped<IFastForwardingClock, BasicFastForwardingClock>(_ => new BasicFastForwardingClock(DateTime.Now));
-            services.AddScoped<ICentralBank, CentralBank>(x => new CentralBank(x.GetRequiredService<IFastForwardingClock>()));
+            services.AddScoped<IFastForwardingClock, BasicFastForwardingClock>(_ =>
+                new BasicFastForwardingClock(DateTime.Now));
+            services.AddScoped<ICentralBank, CentralBank>(x =>
+                new CentralBank(x.GetRequiredService<IFastForwardingClock>()));
             services.AddTransient<IAccountFactory, BankAccountFactory>(x =>
                 new BankAccountFactory(x.GetRequiredService<IFastForwardingClock>(), new GregorianCalendar()));
             services.AddTransient<IReader, BasicConsoleReader>();

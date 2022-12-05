@@ -1,8 +1,8 @@
-﻿using Banks.Console.Extensions;
+﻿using Banks.AccountTypes.Abstractions;
+using Banks.Console.Extensions;
 using Banks.Console.Handlers.Abstractions;
 using Banks.Entities.Abstractions;
 using Banks.Models;
-using Banks.Models.AccountTypes.Abstractions;
 
 namespace Banks.Console.Handlers.BankHandlers;
 

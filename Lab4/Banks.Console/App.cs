@@ -12,7 +12,12 @@ public class App
     private readonly AppContext _context;
     private readonly IHandler _baseHandler;
 
-    public App(IFastForwardingClock clock, ICentralBank centralBank, IAccountFactory accountFactory, IReader reader, IWriter writer)
+    public App(
+        IFastForwardingClock clock,
+        ICentralBank centralBank,
+        IAccountFactory accountFactory,
+        IReader reader,
+        IWriter writer)
     {
         _context = new AppContext(centralBank, clock, accountFactory, reader, writer);
         _baseHandler = new CommandTreeConfigurator(_context, clock)

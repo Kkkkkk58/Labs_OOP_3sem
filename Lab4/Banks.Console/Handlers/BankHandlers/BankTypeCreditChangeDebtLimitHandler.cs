@@ -7,6 +7,7 @@ namespace Banks.Console.Handlers.BankHandlers;
 public class BankTypeCreditChangeDebtLimitHandler : Handler
 {
     private readonly AppContext _context;
+
     public BankTypeCreditChangeDebtLimitHandler(AppContext context)
         : base("debtLimit")
     {

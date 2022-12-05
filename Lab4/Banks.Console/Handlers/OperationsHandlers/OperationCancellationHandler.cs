@@ -1,6 +1,5 @@
 ﻿using Banks.Console.Extensions;
 using Banks.Console.Handlers.Abstractions;
-using Banks.Models;
 
 namespace Banks.Console.Handlers.OperationsHandlers;
 

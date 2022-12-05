@@ -8,6 +8,7 @@ namespace Banks.Console.Handlers.OperationsHandlers;
 public class OperationShowHandler : Handler
 {
     private readonly AppContext _context;
+
     public OperationShowHandler(AppContext context)
         : base("show")
     {
