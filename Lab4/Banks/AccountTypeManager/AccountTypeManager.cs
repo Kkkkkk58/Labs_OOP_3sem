@@ -32,12 +32,17 @@ public class AccountTypeManager : IAccountTypeManager
 
         debitType.SetInterestPercent(newInterestOnBalance);
 
-        _updateHandler.Invoke(this, new BankTypeChangesEventArgs(debitType, $"New interest on balance is {newInterestOnBalance}"));
+        _updateHandler.Invoke(
+            this,
+            new BankTypeChangesEventArgs(debitType, $"New interest on balance is {newInterestOnBalance}"));
     }
 
     public IDebitAccountType CreateDebitAccountType(decimal interestOnBalance, TimeSpan interestCalculationPeriod)
     {
-        IDebitAccountType type = new DebitAccountType(interestOnBalance, interestCalculationPeriod, SuspiciousAccountsOperationsLimit);
+        IDebitAccountType type = new DebitAccountType(
+            interestOnBalance,
+            interestCalculationPeriod,
+            SuspiciousAccountsOperationsLimit);
         _types.Add(type);
 
         return type;
@@ -70,19 +75,13 @@ public class AccountTypeManager : IAccountTypeManager
         return type;
     }
 
-    public void ChangeInterestOnBalanceLayer(Guid depositTypeId, Guid layerToSubstituteId, InterestOnBalanceLayer newLayer)
+    public void ChangeInterestOnBalancePolicy(Guid depositTypeId, InterestOnBalancePolicy newPolicy)
     {
         if (GetAccountType(depositTypeId) is not IDepositAccountType type)
             throw AccountTypeManagerException.InvalidAccountType();
 
-        // TODO Better layer management
-        InterestOnBalanceLayer layer =
-            type.InterestOnBalancePolicy.Layers.Single(layer => layer.Id.Equals(layerToSubstituteId));
-
-        type.RemoveLayer(layer);
-        type.AddLayer(newLayer);
-
-        _updateHandler.Invoke(this, new BankTypeChangesEventArgs(type, "Substituted interest on balance layer"));
+        type.SetInterestOnBalancePolicy(newPolicy);
+        _updateHandler.Invoke(this, new BankTypeChangesEventArgs(type, $"New interest on balance policy is here!"));
     }
 
     public void ChangeDepositTerm(Guid depositTypeId, TimeSpan newDepositTerm)
@@ -94,9 +93,16 @@ public class AccountTypeManager : IAccountTypeManager
         _updateHandler.Invoke(this, new BankTypeChangesEventArgs(type, $"New deposit term is {newDepositTerm}"));
     }
 
-    public IDepositAccountType CreateDepositAccountType(TimeSpan depositTerm, InterestOnBalancePolicy interestOnBalancePolicy, TimeSpan interestCalculationPeriod)
+    public IDepositAccountType CreateDepositAccountType(
+        TimeSpan depositTerm,
+        InterestOnBalancePolicy interestOnBalancePolicy,
+        TimeSpan interestCalculationPeriod)
     {
-        IDepositAccountType type = new DepositAccountType(interestOnBalancePolicy, depositTerm, interestCalculationPeriod, SuspiciousAccountsOperationsLimit);
+        IDepositAccountType type = new DepositAccountType(
+            interestOnBalancePolicy,
+            depositTerm,
+            interestCalculationPeriod,
+            SuspiciousAccountsOperationsLimit);
         _types.Add(type);
 
         return type;
@@ -128,7 +134,9 @@ public class AccountTypeManager : IAccountTypeManager
 
         foreach (ISuspiciousLimitingAccountType type in suspiciousLimitingAccountTypes)
         {
-            _updateHandler.Invoke(this, new BankTypeChangesEventArgs(type, $"Updated suspicious operations policy: limit is {limit}"));
+            _updateHandler.Invoke(
+                this,
+                new BankTypeChangesEventArgs(type, $"Updated suspicious operations policy: limit is {limit}"));
         }
     }
 

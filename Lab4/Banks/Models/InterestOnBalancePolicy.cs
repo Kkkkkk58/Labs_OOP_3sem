@@ -1,30 +1,22 @@
-﻿namespace Banks.Models;
+﻿using Banks.Exceptions;
 
-public class InterestOnBalancePolicy
+namespace Banks.Models;
+
+public record InterestOnBalancePolicy
 {
-    private readonly List<InterestOnBalanceLayer> _layers;
-
-    public InterestOnBalancePolicy()
-        : this(new List<InterestOnBalanceLayer>())
+    public InterestOnBalancePolicy(IReadOnlyCollection<InterestOnBalanceLayer> layers)
     {
+        CheckForIntersections(layers);
+        Layers = layers
+            .OrderBy(layer => layer.RequiredInitialBalance)
+            .ToList();
     }
 
-    public InterestOnBalancePolicy(IEnumerable<InterestOnBalanceLayer> layers)
-    {
-        _layers = layers.OrderBy(layer => layer.RequiredInitialBalance).ToList();
-    }
+    public IReadOnlyCollection<InterestOnBalanceLayer> Layers { get; }
 
-    public IReadOnlyCollection<InterestOnBalanceLayer> Layers => _layers.AsReadOnly();
-
-    public InterestOnBalanceLayer AddLayer(InterestOnBalanceLayer layer)
+    private static void CheckForIntersections(IReadOnlyCollection<InterestOnBalanceLayer> layers)
     {
-        _layers.Add(layer);
-        _layers.Sort((a, b) => a.RequiredInitialBalance.CompareTo(b.RequiredInitialBalance));
-        return layer;
-    }
-
-    public void RemoveLayer(InterestOnBalanceLayer layer)
-    {
-        _layers.Remove(layer);
+        if (layers.DistinctBy(layer => layer.RequiredInitialBalance).Count() != layers.Count)
+            throw InterestOnBalancePolicyException.LayersWithIntersectionsByInitialBalance();
     }
 }

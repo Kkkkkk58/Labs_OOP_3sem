@@ -5,7 +5,11 @@ namespace Banks.AccountTypes;
 
 public class DepositAccountType : SuspiciousLimitingAccountType, IDepositAccountType
 {
-    public DepositAccountType(InterestOnBalancePolicy interestOnBalancePolicy, TimeSpan depositTerm, TimeSpan interestCalculationPeriod, MoneyAmount suspiciousAccountsOperationsLimit)
+    public DepositAccountType(
+        InterestOnBalancePolicy interestOnBalancePolicy,
+        TimeSpan depositTerm,
+        TimeSpan interestCalculationPeriod,
+        MoneyAmount suspiciousAccountsOperationsLimit)
         : base(suspiciousAccountsOperationsLimit)
     {
         InterestOnBalancePolicy = interestOnBalancePolicy;
@@ -13,18 +17,14 @@ public class DepositAccountType : SuspiciousLimitingAccountType, IDepositAccount
         InterestCalculationPeriod = interestCalculationPeriod;
     }
 
-    public InterestOnBalancePolicy InterestOnBalancePolicy { get; }
+    public InterestOnBalancePolicy InterestOnBalancePolicy { get; private set; }
     public TimeSpan DepositTerm { get; private set; }
     public TimeSpan InterestCalculationPeriod { get; private set; }
 
-    public InterestOnBalanceLayer AddLayer(InterestOnBalanceLayer layer)
+    public void SetInterestOnBalancePolicy(InterestOnBalancePolicy interestOnBalancePolicy)
     {
-        throw new NotImplementedException();
-    }
-
-    public void RemoveLayer(InterestOnBalanceLayer layer)
-    {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(interestOnBalancePolicy);
+        InterestOnBalancePolicy = interestOnBalancePolicy;
     }
 
     public void SetDepositTerm(TimeSpan depositTerm)

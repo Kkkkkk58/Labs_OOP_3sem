@@ -5,7 +5,11 @@ namespace Banks.AccountTypeManager.Abstractions;
 
 public interface IDepositTypeProvider : ISuspiciousLimitingTypeProvider, IInterestCalculatingTypeProvider
 {
-    IDepositAccountType CreateDepositAccountType(TimeSpan depositTerm, InterestOnBalancePolicy interestOnBalancePolicy, TimeSpan interestCalculationPeriod);
-    void ChangeInterestOnBalanceLayer(Guid depositTypeId, Guid layerToSubstituteId, InterestOnBalanceLayer newLayer);
+    IDepositAccountType CreateDepositAccountType(
+        TimeSpan depositTerm,
+        InterestOnBalancePolicy interestOnBalancePolicy,
+        TimeSpan interestCalculationPeriod);
+
+    void ChangeInterestOnBalancePolicy(Guid depositTypeId, InterestOnBalancePolicy newPolicy);
     void ChangeDepositTerm(Guid depositTypeId, TimeSpan newDepositTerm);
 }

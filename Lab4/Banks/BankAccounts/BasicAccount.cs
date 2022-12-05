@@ -13,7 +13,12 @@ public class BasicAccount : IBankAccount
 {
     private readonly List<IOperationInformation> _operations;
 
-    public BasicAccount(IAccountType type, ICustomer holder, MoneyAmount balance, IClock clock, List<IOperationInformation>? operationHistory = null)
+    public BasicAccount(
+        IAccountType type,
+        ICustomer holder,
+        MoneyAmount balance,
+        IClock clock,
+        List<IOperationInformation>? operationHistory = null)
     {
         ArgumentNullException.ThrowIfNull(type);
         ArgumentNullException.ThrowIfNull(holder);

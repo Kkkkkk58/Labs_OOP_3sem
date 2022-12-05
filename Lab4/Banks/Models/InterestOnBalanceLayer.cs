@@ -1,15 +1,16 @@
 ﻿namespace Banks.Models;
 
-public class InterestOnBalanceLayer
+public record InterestOnBalanceLayer
 {
     public InterestOnBalanceLayer(MoneyAmount requiredInitialBalance, decimal interestOnBalance)
     {
-        Id = Guid.NewGuid();
+        if (interestOnBalance < 0)
+            throw new ArgumentOutOfRangeException(nameof(interestOnBalance));
+
         RequiredInitialBalance = requiredInitialBalance;
         InterestOnBalance = interestOnBalance;
     }
 
-    public Guid Id { get; }
     public MoneyAmount RequiredInitialBalance { get; }
     public decimal InterestOnBalance { get; }
 }

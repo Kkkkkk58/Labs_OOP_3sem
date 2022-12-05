@@ -7,6 +7,7 @@ using Banks.EventArgs;
 using Banks.Exceptions;
 using Banks.Models;
 using Banks.Tools.Abstractions;
+using Banks.Transactions;
 using Banks.Transactions.Abstractions;
 
 namespace Banks.BankAccounts.Wrappers;

@@ -97,7 +97,10 @@ public class Bank : IBank, IEquatable<Bank>
         return _accounts.Single(account => account.Id.Equals(id));
     }
 
-    public IUnchangeableBankAccount CreateDebitAccount(IAccountType type, ICustomer customer, MoneyAmount? balance = null)
+    public IUnchangeableBankAccount CreateDebitAccount(
+        IAccountType type,
+        ICustomer customer,
+        MoneyAmount? balance = null)
     {
         ArgumentNullException.ThrowIfNull(type);
         ArgumentNullException.ThrowIfNull(customer);
@@ -112,7 +115,10 @@ public class Bank : IBank, IEquatable<Bank>
         return account;
     }
 
-    public IUnchangeableBankAccount CreateDepositAccount(IAccountType type, ICustomer customer, MoneyAmount? balance = null)
+    public IUnchangeableBankAccount CreateDepositAccount(
+        IAccountType type,
+        ICustomer customer,
+        MoneyAmount? balance = null)
     {
         ArgumentNullException.ThrowIfNull(type);
         ArgumentNullException.ThrowIfNull(customer);
@@ -127,7 +133,10 @@ public class Bank : IBank, IEquatable<Bank>
         return account;
     }
 
-    public IUnchangeableBankAccount CreateCreditAccount(IAccountType type, ICustomer customer, MoneyAmount? balance = null)
+    public IUnchangeableBankAccount CreateCreditAccount(
+        IAccountType type,
+        ICustomer customer,
+        MoneyAmount? balance = null)
     {
         ArgumentNullException.ThrowIfNull(type);
         ArgumentNullException.ThrowIfNull(customer);
@@ -183,6 +192,10 @@ public class Bank : IBank, IEquatable<Bank>
 
     private Message CreateMessage(BankTypeChangesEventArgs eventArgs)
     {
-        return new Message(Name, $"Changes in your account type {eventArgs.AccountType.Id} details", eventArgs.UpdateInfo, _clock.Now);
+        return new Message(
+            Name,
+            $"Changes in your account type {eventArgs.AccountType.Id} details",
+            eventArgs.UpdateInfo,
+            _clock.Now);
     }
 }
