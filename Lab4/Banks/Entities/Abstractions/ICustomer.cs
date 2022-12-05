@@ -1,4 +1,5 @@
-﻿using Banks.Models;
+﻿using Banks.EventArgs;
+using Banks.Models;
 
 namespace Banks.Entities.Abstractions;
 

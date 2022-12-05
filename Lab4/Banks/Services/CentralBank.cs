@@ -1,10 +1,13 @@
 ﻿using Banks.BankAccounts.Abstractions;
 using Banks.Commands;
 using Banks.Entities.Abstractions;
+using Banks.Exceptions;
 using Banks.Models;
 using Banks.Models.Abstractions;
 using Banks.Services.Abstractions;
 using Banks.Tools.Abstractions;
+using Banks.Transactions;
+using Banks.Transactions.Abstractions;
 
 namespace Banks.Services;
 
@@ -16,6 +19,8 @@ public class CentralBank : ICentralBank
 
     public CentralBank(IClock clock)
     {
+        ArgumentNullException.ThrowIfNull(clock);
+
         _banks = new List<IBank>();
         _transactions = new List<ITransaction>();
         _clock = clock;
@@ -30,33 +35,29 @@ public class CentralBank : ICentralBank
 
     public INoTransactionalBank RegisterBank(IBank bank)
     {
+        ArgumentNullException.ThrowIfNull(bank);
         if (_banks.Contains(bank))
-            throw new NotImplementedException();
+            throw CentralBankException.BankAlreadyExists(bank.Id);
+
         _banks.Add(bank);
         return bank;
     }
 
     public void CancelTransaction(Guid transactionId)
     {
-        ITransaction transaction =
-            _transactions.Single(transaction => transaction.Information.Id.Equals(transactionId));
+        ITransaction transaction = _transactions
+            .Single(transaction => transaction.Information.Id.Equals(transactionId));
 
         transaction.Cancel();
     }
 
-    // TODO Common transaction creation
     public IOperationInformation Withdraw(Guid accountId, MoneyAmount moneyAmount)
     {
         ICommandExecutingBankAccount commandExecutingBankAccount = GetCommandExecutingBankAccount(accountId);
         var operationInformation = new OperationInformation(commandExecutingBankAccount, moneyAmount, _clock.Now);
         var transaction = new Transaction(operationInformation, new WithdrawalCommand());
-        _transactions.Add(transaction);
 
-        transaction.Perform();
-        transaction.Information.SetCompletionTime(_clock.Now);
-        transaction.ChangeState(new SuccessfulTransactionState(transaction));
-
-        return transaction.Information;
+        return PerformTransaction(transaction);
     }
 
     public IOperationInformation Replenish(Guid accountId, MoneyAmount moneyAmount)
@@ -64,13 +65,8 @@ public class CentralBank : ICentralBank
         ICommandExecutingBankAccount commandExecutingBankAccount = GetCommandExecutingBankAccount(accountId);
         var operationInformation = new OperationInformation(commandExecutingBankAccount, moneyAmount, _clock.Now);
         var transaction = new Transaction(operationInformation, new ReplenishmentCommand());
-        _transactions.Add(transaction);
 
-        transaction.Perform();
-        transaction.Information.SetCompletionTime(_clock.Now);
-        transaction.ChangeState(new SuccessfulTransactionState(transaction));
-
-        return transaction.Information;
+        return PerformTransaction(transaction);
     }
 
     public IOperationInformation Transfer(Guid fromAccountId, Guid toAccountId, MoneyAmount moneyAmount)
@@ -80,6 +76,12 @@ public class CentralBank : ICentralBank
 
         var operationInformation = new OperationInformation(from, moneyAmount, _clock.Now);
         var transaction = new Transaction(operationInformation, new TransferCommand(to));
+
+        return PerformTransaction(transaction);
+    }
+
+    private IOperationInformation PerformTransaction(ITransaction transaction)
+    {
         _transactions.Add(transaction);
 
         transaction.Perform();
@@ -91,15 +93,8 @@ public class CentralBank : ICentralBank
 
     private ICommandExecutingBankAccount GetCommandExecutingBankAccount(Guid accountId)
     {
-        foreach (IBank bank in _banks)
-        {
-            IUnchangeableBankAccount? account = bank.FindAccount(accountId);
-            if (account is null)
-                continue;
-
-            return bank.GetExecutingAccount(accountId);
-        }
-
-        throw new NotImplementedException();
+        return _banks
+            .Single(bank => bank.FindAccount(accountId) is not null)
+            .GetExecutingAccount(accountId);
     }
 }

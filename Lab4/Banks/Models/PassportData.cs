@@ -7,7 +7,7 @@ public record PassportData : IDocumentData
     public PassportData(DateOnly dateOfIssue, string number)
     {
         if (string.IsNullOrWhiteSpace(number))
-            throw new NotImplementedException();
+            throw new ArgumentNullException(nameof(number));
 
         DateOfIssue = dateOfIssue;
         Number = number;

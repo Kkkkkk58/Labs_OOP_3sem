@@ -1,6 +1,6 @@
-﻿using Banks.BankAccounts.Abstractions;
+﻿using Banks.AccountTypes.Abstractions;
+using Banks.BankAccounts.Abstractions;
 using Banks.Entities.Abstractions;
-using Banks.Models.AccountTypes.Abstractions;
 
 namespace Banks.Models.Abstractions;
 

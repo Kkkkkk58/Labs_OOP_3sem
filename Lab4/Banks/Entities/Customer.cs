@@ -1,16 +1,24 @@
 ﻿using Banks.Builders.Abstractions;
 using Banks.Entities.Abstractions;
+using Banks.EventArgs;
+using Banks.Exceptions;
 using Banks.Models;
 
 namespace Banks.Entities;
 
-public class Customer : ICustomer
+public class Customer : ICustomer, IEquatable<Customer>
 {
     private Address? _address;
     private PassportData? _passportData;
     private ICustomerNotifier? _notifier;
 
-    private Customer(Guid id, string firstName, string lastName, ICustomerNotifier? notifier, Address? address, PassportData? passportData)
+    private Customer(
+        Guid id,
+        string firstName,
+        string lastName,
+        ICustomerNotifier? notifier,
+        Address? address,
+        PassportData? passportData)
     {
         Id = id;
         FirstName = firstName;
@@ -44,22 +52,45 @@ public class Customer : ICustomer
 
     public ICustomerNotifier SetNotifier(ICustomerNotifier notifier)
     {
+        ArgumentNullException.ThrowIfNull(notifier);
+
         _notifier = notifier;
         return _notifier;
     }
 
     public ICustomerNotifier AddNotifier(ICustomerNotifierDecoratorBuilder decoratorBuilder)
     {
-        if (_notifier is null)
-            throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(decoratorBuilder);
 
-        _notifier = decoratorBuilder.SetWrapped(_notifier).Build();
+        if (_notifier is null)
+            throw CustomerException.NotifierIsNotSet(Id);
+
+        _notifier = decoratorBuilder
+            .SetWrapped(_notifier)
+            .Build();
         return _notifier;
     }
 
     public void Update(object? sender, CustomerAccountChangesEventArgs eventArgs)
     {
+        ArgumentNullException.ThrowIfNull(eventArgs);
+
         _notifier?.Send(eventArgs.Message);
+    }
+
+    public bool Equals(Customer? other)
+    {
+        return other is not null && Id.Equals(other.Id);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as Customer);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 
     private class CustomerBuilder : ICustomerBuilder, ICustomerLastNameBuilder, IOptionalCustomerInformationBuilder
@@ -102,10 +133,13 @@ public class Customer : ICustomer
 
         public ICustomer Build()
         {
-            if (string.IsNullOrWhiteSpace(_firstName) || string.IsNullOrWhiteSpace(_lastName))
-                throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(_firstName))
+                throw new ArgumentNullException(nameof(_firstName));
+            if (string.IsNullOrWhiteSpace(_lastName))
+                throw new ArgumentNullException(nameof(_lastName));
 
-            ICustomer customer = new Customer(Guid.NewGuid(), _firstName, _lastName, _notifier, _address, _passportData);
+            ICustomer customer =
+                new Customer(Guid.NewGuid(), _firstName, _lastName, _notifier, _address, _passportData);
             Reset();
 
             return customer;

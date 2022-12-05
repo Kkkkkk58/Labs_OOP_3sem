@@ -1,8 +1,7 @@
-﻿using Banks.BankAccountWrappers;
+﻿using Banks.EventArgs;
 
 namespace Banks.Tools.Abstractions;
 
-// TODO Use IObservable
 public interface IClock
 {
     DateTime Now { get; }

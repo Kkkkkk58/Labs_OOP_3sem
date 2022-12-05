@@ -1,13 +1,16 @@
-﻿using Banks.BankAccounts.Abstractions;
+﻿using Banks.AccountTypeManager.Abstractions;
+using Banks.AccountTypes.Abstractions;
+using Banks.BankAccounts.Abstractions;
 using Banks.Entities.Abstractions;
+using Banks.EventArgs;
+using Banks.Exceptions;
 using Banks.Models;
 using Banks.Models.Abstractions;
-using Banks.Models.AccountTypes.Abstractions;
 using Banks.Tools.Abstractions;
 
 namespace Banks.Entities;
 
-public class Bank : IBank
+public class Bank : IBank, IEquatable<Bank>
 {
     private readonly IAccountFactory _accountFactory;
     private readonly List<IBankAccount> _accounts;
@@ -17,6 +20,10 @@ public class Bank : IBank
 
     public Bank(string name, IAccountFactory accountFactory, MoneyAmount suspiciousOperationsLimit, IClock clock)
     {
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(accountFactory);
+        ArgumentNullException.ThrowIfNull(clock);
+
         Id = Guid.NewGuid();
         Name = name;
         _accountFactory = accountFactory;
@@ -24,7 +31,7 @@ public class Bank : IBank
         _subscribers = new List<ISubscriber<CustomerAccountChangesEventArgs>>();
         _customers = new List<ICustomer>();
         _clock = clock;
-        AccountTypeManager = new AccountTypeManager(suspiciousOperationsLimit, NotifySubscribers);
+        AccountTypeManager = new AccountTypeManager.AccountTypeManager(suspiciousOperationsLimit, NotifySubscribers);
     }
 
     public Guid Id { get; }
@@ -35,8 +42,10 @@ public class Bank : IBank
 
     public ICustomer RegisterCustomer(ICustomer customer)
     {
+        ArgumentNullException.ThrowIfNull(customer);
         if (_customers.Contains(customer))
-            throw new NotImplementedException();
+            throw BankException.CustomerAlreadyExists(Id, customer.Id);
+
         _customers.Add(customer);
         Subscribe(customer);
         return customer;
@@ -44,18 +53,20 @@ public class Bank : IBank
 
     public void Subscribe(ISubscriber<CustomerAccountChangesEventArgs> subscriber)
     {
+        ArgumentNullException.ThrowIfNull(subscriber);
         if (_subscribers.Contains(subscriber))
-            throw new NotImplementedException();
+            throw SubscriptionException.AlreadySubscribed(subscriber.Id);
         if (_customers.All(customer => !customer.Id.Equals(subscriber.Id)))
-            throw new NotImplementedException();
+            throw BankException.CustomerNotFound(subscriber.Id);
 
         _subscribers.Add(subscriber);
     }
 
     public void Unsubscribe(ISubscriber<CustomerAccountChangesEventArgs> subscriber)
     {
+        ArgumentNullException.ThrowIfNull(subscriber);
         if (!_subscribers.Remove(subscriber))
-            throw new NotImplementedException();
+            throw SubscriptionException.SubscriberNotFound(subscriber.Id);
     }
 
     public void SetSuspiciousAccountsOperationsLimit(MoneyAmount limit)
@@ -78,8 +89,7 @@ public class Bank : IBank
 
     public IUnchangeableBankAccount GetAccount(Guid accountId)
     {
-        IUnchangeableBankAccount? account = FindAccount(accountId);
-        return account ?? throw new NotImplementedException();
+        return FindAccount(accountId) ?? throw BankException.AccountNotFound(accountId);
     }
 
     public ICommandExecutingBankAccount GetExecutingAccount(Guid id)
@@ -89,8 +99,11 @@ public class Bank : IBank
 
     public IUnchangeableBankAccount CreateDebitAccount(IAccountType type, ICustomer customer, MoneyAmount? balance = null)
     {
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(customer);
+
         if (type is not IDebitAccountType debitType)
-            throw new NotImplementedException();
+            throw BankException.InvalidAccountTypeCreation();
 
         IBankAccount account =
             _accountFactory.CreateDebitAccount(debitType, customer, balance);
@@ -101,8 +114,11 @@ public class Bank : IBank
 
     public IUnchangeableBankAccount CreateDepositAccount(IAccountType type, ICustomer customer, MoneyAmount? balance = null)
     {
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(customer);
+
         if (type is not IDepositAccountType depositType)
-            throw new NotImplementedException();
+            throw BankException.InvalidAccountTypeCreation();
 
         IBankAccount account =
             _accountFactory.CreateDepositAccount(depositType, customer, balance);
@@ -113,8 +129,11 @@ public class Bank : IBank
 
     public IUnchangeableBankAccount CreateCreditAccount(IAccountType type, ICustomer customer, MoneyAmount? balance = null)
     {
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(customer);
+
         if (type is not ICreditAccountType creditType)
-            throw new NotImplementedException();
+            throw BankException.InvalidAccountTypeCreation();
         IBankAccount account =
             _accountFactory.CreateCreditAccount(creditType, customer, balance);
         _accounts.Add(account);
@@ -122,23 +141,48 @@ public class Bank : IBank
         return account;
     }
 
+    public bool Equals(Bank? other)
+    {
+        return other is not null && Id.Equals(other.Id);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as Bank);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
+
     private void NotifySubscribers(object? sender, BankTypeChangesEventArgs eventArgs)
     {
+        ArgumentNullException.ThrowIfNull(eventArgs);
+
         Message message = CreateMessage(eventArgs);
         var messageEventArgs = new CustomerAccountChangesEventArgs(message);
 
         foreach (ISubscriber<CustomerAccountChangesEventArgs> subscriber in _subscribers)
         {
-            ICustomer customer = _customers.Single(customer => customer.Id.Equals(subscriber.Id));
-            if (GetAccounts(customer.Id).Any(account => account.Type.Equals(eventArgs.AccountType)))
-            {
-                subscriber.Update(this, messageEventArgs);
-            }
+            NotifySubscriberWithSuitableAccount(subscriber, messageEventArgs, eventArgs.AccountType);
+        }
+    }
+
+    private void NotifySubscriberWithSuitableAccount(
+        ISubscriber<CustomerAccountChangesEventArgs> subscriber,
+        CustomerAccountChangesEventArgs messageEventArgs,
+        IAccountType accountType)
+    {
+        ICustomer customer = _customers.Single(customer => customer.Id.Equals(subscriber.Id));
+        if (GetAccounts(customer.Id).Any(account => account.Type.Equals(accountType)))
+        {
+            subscriber.Update(this, messageEventArgs);
         }
     }
 
     private Message CreateMessage(BankTypeChangesEventArgs eventArgs)
     {
-        return new Message(Name, "Changes in your account details", eventArgs.UpdateInfo, _clock.Now);
+        return new Message(Name, $"Changes in your account type {eventArgs.AccountType.Id} details", eventArgs.UpdateInfo, _clock.Now);
     }
 }

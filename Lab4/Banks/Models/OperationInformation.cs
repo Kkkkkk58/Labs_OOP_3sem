@@ -1,9 +1,10 @@
 ﻿using Banks.BankAccounts.Abstractions;
+using Banks.Exceptions;
 using Banks.Models.Abstractions;
 
 namespace Banks.Models;
 
-public class OperationInformation : IOperationInformation
+public class OperationInformation : IOperationInformation, IEquatable<OperationInformation>
 {
     public OperationInformation(ICommandExecutingBankAccount account, MoneyAmount operatedAmount, DateTime initTime)
     {
@@ -24,7 +25,7 @@ public class OperationInformation : IOperationInformation
     public void SetCompletionTime(DateTime completionTime)
     {
         if (CompletionTime is not null)
-            throw new NotImplementedException();
+            throw OperationInformationException.IsAlreadyCompleted();
 
         CompletionTime = completionTime;
     }
@@ -32,5 +33,20 @@ public class OperationInformation : IOperationInformation
     public void SetOperatedAmount(MoneyAmount operatedAmount)
     {
         OperatedAmount = operatedAmount;
+    }
+
+    public bool Equals(OperationInformation? other)
+    {
+        return other is not null && Id.Equals(other.Id);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as OperationInformation);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }

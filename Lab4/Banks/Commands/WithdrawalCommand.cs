@@ -1,28 +1,32 @@
 ﻿using Banks.BankAccounts.Abstractions;
 using Banks.Commands.Abstractions;
-using Banks.Models.Abstractions;
+using Banks.Exceptions;
+using Banks.Transactions.Abstractions;
 
 namespace Banks.Commands;
 
-public class WithdrawalCommand : ICommand
+public class WithdrawalCommand : Command
 {
-    public WithdrawalCommand()
+    public override void Execute(IBankAccount bankAccount, ITransaction transaction)
     {
-        Id = Guid.NewGuid();
-    }
+        ArgumentNullException.ThrowIfNull(bankAccount);
+        ArgumentNullException.ThrowIfNull(transaction);
 
-    public Guid Id { get; }
-
-    public void Execute(IBankAccount bankAccount, ITransaction transaction)
-    {
-        if (!bankAccount.Id.Equals(transaction.Information.AccountId))
-            throw new NotImplementedException();
+        if (!HaveMatchingAccounts(bankAccount, transaction))
+            throw CommandException.InvalidTransactionData();
 
         bankAccount.Withdraw(transaction);
     }
 
-    public void Undo(ITransaction transaction)
+    public override void Undo(ITransaction transaction)
     {
+        ArgumentNullException.ThrowIfNull(transaction);
+
         transaction.Information.BankAccount.ExecuteCommand(new ReplenishmentCommand(), transaction);
+    }
+
+    private static bool HaveMatchingAccounts(IUnchangeableBankAccount bankAccount, ITransaction transaction)
+    {
+        return bankAccount.Id.Equals(transaction.Information.AccountId);
     }
 }

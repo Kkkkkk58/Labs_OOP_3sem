@@ -1,5 +1,5 @@
 ﻿using Banks.Commands.Abstractions;
-using Banks.Models.Abstractions;
+using Banks.Transactions.Abstractions;
 
 namespace Banks.BankAccounts.Abstractions;
 
