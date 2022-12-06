@@ -72,11 +72,7 @@ public class CustomerCreateHandler : Handler
     private void SetAddress(IOptionalCustomerInformationBuilder optionalInfoBuilder)
     {
         _context.Writer.Write("Enter address [optional]: ");
-        string[] input = _context.Reader.ReadLine().Split(" ", StringSplitOptions.RemoveEmptyEntries);
-        if (input.Length != 1)
-            return;
-
-        var address = new Address(input[0]);
+        var address = new Address(_context.Reader.ReadLine());
         optionalInfoBuilder.SetAddress(address);
     }
 }
