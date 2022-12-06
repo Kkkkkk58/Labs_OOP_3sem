@@ -59,7 +59,7 @@ public class BasicAccount : IBankAccount
 
         if (Balance < moneyAmount)
         {
-            Debt = moneyAmount - Balance;
+            Debt += moneyAmount - Balance;
             Balance = new MoneyAmount(0, Balance.CurrencySign);
         }
         else

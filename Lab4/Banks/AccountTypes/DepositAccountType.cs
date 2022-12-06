@@ -41,7 +41,8 @@ public class DepositAccountType : SuspiciousLimitingAccountType, IDepositAccount
     {
         return InterestOnBalancePolicy
             .Layers
-            .First(layer => layer.RequiredInitialBalance <= initialBalance)
-            .InterestOnBalance;
+            .LastOrDefault(layer => layer.RequiredInitialBalance <= initialBalance)?
+            .InterestOnBalance
+                ?? 0;
     }
 }

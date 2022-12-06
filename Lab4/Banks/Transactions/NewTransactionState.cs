@@ -9,8 +9,6 @@ public sealed class NewTransactionState : TransactionState
     public NewTransactionState(ITransaction transaction)
         : base(transaction)
     {
-        if (transaction.Information.IsCompleted)
-            throw TransactionStateException.InvalidTransactionState();
     }
 
     public override void Perform(ICommand command)

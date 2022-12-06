@@ -8,8 +8,6 @@ public abstract class CompletedTransactionState : TransactionState
     protected CompletedTransactionState(ITransaction transaction)
         : base(transaction)
     {
-        if (!transaction.Information.IsCompleted)
-            throw TransactionStateException.InvalidTransactionState();
     }
 
     public override void Perform(ICommand command)

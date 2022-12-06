@@ -9,8 +9,6 @@ public sealed class RunningTransactionState : TransactionState
     public RunningTransactionState(ITransaction transaction)
         : base(transaction)
     {
-        if (transaction.Information.IsCompleted)
-            throw TransactionStateException.InvalidTransactionState();
     }
 
     public override void Perform(ICommand command)

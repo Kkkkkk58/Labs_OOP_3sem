@@ -24,7 +24,7 @@ public class ChargeableAfterDebtBankAccount : BaseBankAccountWrapper
     {
         ArgumentNullException.ThrowIfNull(transaction);
 
-        ApplyCharge(transaction);
+        ApplyWithdrawalCharge(transaction);
 
         return base.Withdraw(transaction);
     }
@@ -33,12 +33,21 @@ public class ChargeableAfterDebtBankAccount : BaseBankAccountWrapper
     {
         ArgumentNullException.ThrowIfNull(transaction);
 
-        ApplyCharge(transaction);
+        ApplyReplenishCharge(transaction);
 
         base.Replenish(transaction);
     }
 
-    private void ApplyCharge(ITransaction transaction)
+    private void ApplyWithdrawalCharge(ITransaction transaction)
+    {
+        if (Debt.Value == 0)
+            return;
+
+        MoneyAmount moneyAmount = transaction.Information.OperatedAmount;
+        transaction.Information.SetOperatedAmount(moneyAmount + _type.Charge);
+    }
+
+    private void ApplyReplenishCharge(ITransaction transaction)
     {
         if (Debt.Value == 0)
             return;

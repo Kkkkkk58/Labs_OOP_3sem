@@ -22,11 +22,6 @@ public class TransactionStateException : BanksException
         return new TransactionStateException($"Cannot cancel failed operation {commandId}");
     }
 
-    public static TransactionStateException InvalidTransactionState()
-    {
-        return new TransactionStateException("Provided transaction state is invalid");
-    }
-
     public static TransactionStateException CancellingNewOperation(Guid commandId)
     {
         return new TransactionStateException($"Cannot cancel an operation {commandId} that wasn't performed");
