@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<WarningLevel>5</WarningLevel>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\.editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MediatR" Version="11.1.0" />
+		<PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+		<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.435">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Mapping\Accounts\" />
+	  <Folder Include="Mapping\MessageSources\MappingHandlers\" />
+	  <Folder Include="Mapping\Messages\MappingHandlers\" />
+	  <Folder Include="Mapping\Reports\" />
+	  <Folder Include="Exceptions\" />
+	  <Folder Include="Extensions\" />
+	  <Folder Include="Commands\" />
+	  <Folder Include="Messages\" />
+	  <Folder Include="MessageSources\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\MessageHandlingSystem.Application.Contracts\MessageHandlingSystem.Application.Contracts.csproj" />
+	  <ProjectReference Include="..\MessageHandlingSystem.Application.Abstractions\MessageHandlingSystem.Application.Abstractions.csproj" />
+	  <ProjectReference Include="..\MessageHandlingSystem.Application.Dto\MessageHandlingSystem.Application.Dto.csproj" />
+	</ItemGroup>
+
+</Project>
