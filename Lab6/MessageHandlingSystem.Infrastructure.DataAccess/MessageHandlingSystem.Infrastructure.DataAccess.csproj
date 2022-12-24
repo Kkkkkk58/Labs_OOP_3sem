@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<WarningLevel>5</WarningLevel>
+	 <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\.editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="7.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.1">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\MessageHandlingSystem.Application.Abstractions\MessageHandlingSystem.Application.Abstractions.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Configurations\" />
+	  <Folder Include="Extensions\" />
+	  <Folder Include="Migrations\" />
+	  <Folder Include="ValueConverters\" />
+	</ItemGroup>
+	
+</Project>

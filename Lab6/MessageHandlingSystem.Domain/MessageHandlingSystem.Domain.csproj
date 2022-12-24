@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<WarningLevel>5</WarningLevel>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\.editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="RichEntity" Version="1.1.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Employees\" />
+	  <Folder Include="Accounts\" />
+	  <Folder Include="Commands\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\MessageHandlingSystem.Domain.Common\MessageHandlingSystem.Domain.Common.csproj" />
+	</ItemGroup>
+	
+</Project>
