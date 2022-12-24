@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using MessageHandlingSystem.Application.Exceptions;
 
 namespace MessageHandlingSystem.Application.Mapping.Handlers;
 
@@ -12,7 +13,7 @@ public abstract class BaseMappingHandler<T, TDto> : IMappingHandler<T, TDto>
         if (TryHandle(value, out TDto? result))
             return result;
 
-        return _next?.Handle(value) ?? throw new NotImplementedException();
+        return _next?.Handle(value) ?? throw MappingHandlerException.MappingIsUndefined();
     }
 
     public IMappingHandler<T, TDto> SetNext(IMappingHandler<T, TDto> handler)

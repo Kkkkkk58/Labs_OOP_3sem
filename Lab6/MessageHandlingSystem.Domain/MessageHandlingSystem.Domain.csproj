@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
@@ -20,6 +20,10 @@
 	  <Folder Include="Employees\" />
 	  <Folder Include="Accounts\" />
 	  <Folder Include="Commands\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\MessageHandlingSystem.Domain.Common\MessageHandlingSystem.Domain.Common.csproj" />
 	</ItemGroup>
 	
 </Project>

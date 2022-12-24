@@ -1,4 +1,5 @@
 ﻿using MessageHandlingSystem.Domain.Commands;
+using MessageHandlingSystem.Domain.Common.Exceptions;
 
 namespace MessageHandlingSystem.Domain.Messages.MessageStates;
 
@@ -8,7 +9,7 @@ public class LoadedMessageState : IMessageState
 
     public void Load(Message message)
     {
-        throw new NotImplementedException();
+        throw MessageStateException.InvalidMessageState();
     }
 
     public void Handle(Message message, IMessageHandlingCommand command)

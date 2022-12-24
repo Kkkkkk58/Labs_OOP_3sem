@@ -1,4 +1,5 @@
-﻿using MessageHandlingSystem.Domain.Messages;
+﻿using MessageHandlingSystem.Domain.Common.Exceptions;
+using MessageHandlingSystem.Domain.Messages;
 using RichEntity.Annotations;
 
 namespace MessageHandlingSystem.Domain.MessageSources;
@@ -20,7 +21,7 @@ public abstract partial class MessageSource : IEntity<Guid>
         CheckMessageType(message);
 
         if (_receivedMessages.Contains(message))
-            throw new NotImplementedException();
+            throw MessageSourceException.MessageAlreadyReceived(message.Id, Id);
 
         _receivedMessages.Add(message);
         return message;

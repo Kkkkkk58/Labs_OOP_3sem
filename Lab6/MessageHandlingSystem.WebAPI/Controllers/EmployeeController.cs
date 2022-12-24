@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using MediatR;
+﻿using MediatR;
 using MessageHandlingSystem.Application.Contracts.Employees;
 using MessageHandlingSystem.Application.Dto.Accounts;
 using MessageHandlingSystem.Application.Dto.Employees;
@@ -22,7 +21,7 @@ public class EmployeeController : ControllerBase
 
     public CancellationToken CancellationToken => HttpContext.RequestAborted;
 
-    [HttpPost("create/manager/{name}")]
+    [HttpPost("[action]")]
     public async Task<ActionResult<ManagerDto>> CreateManagerAsync([FromBody] CreateManagerModel model)
     {
         var command = new CreateManager.Command(model.Name);
@@ -31,7 +30,7 @@ public class EmployeeController : ControllerBase
         return Ok(response.Manager);
     }
 
-    [HttpPost("create/subordinate/{name}")]
+    [HttpPost("[action]")]
     public async Task<ActionResult<SubordinateDto>> CreateSubordinateAsync([FromBody] CreateSubordinateModel model)
     {
         var command = new CreateSubordinate.Command(model.Name);
@@ -40,7 +39,7 @@ public class EmployeeController : ControllerBase
         return Ok(response.Subordinate);
     }
 
-    [HttpPatch("{id:guid}/account/{account_id:guid}/add")]
+    [HttpPatch("[action]")]
     public async Task<ActionResult> AddAccountAsync([FromBody] AddEmployeeAccountModel model)
     {
         var command = new AddEmployeeAccount.Command(model.EmployeeId, model.AccountId);
@@ -49,7 +48,7 @@ public class EmployeeController : ControllerBase
         return Ok();
     }
 
-    [HttpPatch("{id:guid}/account/{account_id:guid}/remove")]
+    [HttpPatch("[action]")]
     public async Task<ActionResult> RemoveAccountAsync([FromBody] RemoveEmployeeAccountModel model)
     {
         var command = new RemoveEmployeeAccount.Command(model.EmployeeId, model.AccountId);
@@ -58,7 +57,7 @@ public class EmployeeController : ControllerBase
         return Ok();
     }
 
-    [HttpPatch("{manager_id:guid}/subordinate/add/{subordinate_id:guid}")]
+    [HttpPatch("[action]")]
     public async Task<ActionResult> AddSubordinateAsync([FromBody] AddManagerSubordinateModel model)
     {
         var command = new AddManagerSubordinate.Command(model.ManagerId, model.SubordinateId);
@@ -67,7 +66,7 @@ public class EmployeeController : ControllerBase
         return Ok();
     }
 
-    [HttpPatch("{manager_id:guid}/subordinate/remove/{subordinate_id:guid}")]
+    [HttpPatch("[action]")]
     public async Task<ActionResult> RemoveSubordinateAsync([FromBody] RemoveManagerSubordinateModel model)
     {
         var command = new RemoveManagerSubordinate.Command(model.ManagerId, model.SubordinateId);
@@ -76,7 +75,7 @@ public class EmployeeController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("{id:guid}/accounts")]
+    [HttpGet("[action]")]
     public async Task<ActionResult<IEnumerable<AccountDto>>> GetAccountsAsync([FromBody] GetEmployeeAccountsModel model)
     {
         var query = new GetEmployeeAccounts.Query(model.EmployeeId);
@@ -85,7 +84,7 @@ public class EmployeeController : ControllerBase
         return Ok(response.Accounts);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("[action]")]
     public async Task<ActionResult<EmployeeDto>> GetInfoAsync([FromBody] GetEmployeeInformationModel model)
     {
         var query = new GetEmployeeInformation.Query(model.EmployeeId);
@@ -94,7 +93,7 @@ public class EmployeeController : ControllerBase
         return Ok(response.Employee);
     }
 
-    [HttpGet("{manager_id:guid}/subordinates")]
+    [HttpGet("[action]")]
     public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetSubordinatesAsync(
         [FromBody] GetManagerSubordinatesModel model)
     {
@@ -104,7 +103,7 @@ public class EmployeeController : ControllerBase
         return Ok(response.Subordinates);
     }
 
-    [HttpPatch("{id:guid}/{account_id:guid}/handle/{message_id:guid}")]
+    [HttpPatch("[action]")]
     public async Task<ActionResult<MessageDto>> HandleMessageAsync([FromBody] HandleMessageModel model)
     {
         // TODO make timer

@@ -19,7 +19,7 @@ public class MessageSourceController : ControllerBase
 
     public CancellationToken CancellationToken => HttpContext.RequestAborted;
 
-    [HttpPost("create/email/{email_address}")]
+    [HttpPost("[action]")]
     public async Task<ActionResult<MessageSourceDto>> CreateEmailSourceAsync(
         [FromBody] CreateEmailMessageSourceModel model)
     {
@@ -29,7 +29,7 @@ public class MessageSourceController : ControllerBase
         return Ok(response.Source);
     }
 
-    [HttpPost("create/messenger/{username}")]
+    [HttpPost("[action]")]
     public async Task<ActionResult<MessageSourceDto>> CreateMessengerSourceAsync(
         [FromBody] CreateMessengerMessageSourceModel model)
     {
@@ -39,7 +39,7 @@ public class MessageSourceController : ControllerBase
         return Ok(response.Source);
     }
 
-    [HttpPost("create/phone/{phone_number}")]
+    [HttpPost("[action]")]
     public async Task<ActionResult<MessageSourceDto>> CreatePhoneSourceAsync(
         [FromBody] CreatePhoneMessageSourceModel model)
     {

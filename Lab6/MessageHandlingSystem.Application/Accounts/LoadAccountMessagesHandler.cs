@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MessageHandlingSystem.Application.Abstractions.DataAccess;
+using MessageHandlingSystem.Application.Exceptions;
 using MessageHandlingSystem.Application.Extensions;
 using MessageHandlingSystem.Domain.Accounts;
 using MessageHandlingSystem.Domain.Employees;
@@ -22,7 +23,7 @@ public class LoadAccountMessagesHandler : IRequestHandler<Command>
         Account account = await _dbContext.Accounts.GetEntityAsync(request.AccountId, cancellationToken);
 
         if (!employee.Accounts.Contains(account))
-            throw new NotImplementedException();
+            throw RestrictedAccessException.NoAccessToAccount(employee.Id, account.Id);
 
         account.LoadMessages(request.MessageSourceId);
         await _dbContext.SaveChangesAsync(cancellationToken);

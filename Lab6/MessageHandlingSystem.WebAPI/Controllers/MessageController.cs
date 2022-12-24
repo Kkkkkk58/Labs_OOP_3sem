@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using MediatR;
+﻿using MediatR;
 using MessageHandlingSystem.Application.Contracts.Messages;
 using MessageHandlingSystem.Application.Dto.Messages;
 using MessageHandlingSystem.WebAPI.Models.Messages;
@@ -20,7 +19,7 @@ public class MessageController : ControllerBase
 
     public CancellationToken CancellationToken => HttpContext.RequestAborted;
 
-    [HttpPost("create/email/{sender_address},{topic},{content}")]
+    [HttpPost("[action]")]
     public async Task<ActionResult<EmailMessageDto>> CreateEmailMessageAsync([FromBody] CreateEmailMessageModel model)
     {
         var command = new CreateEmailMessage.Command(DateTime.Now, model.SenderAddress, model.Topic, model.Content);
@@ -29,7 +28,7 @@ public class MessageController : ControllerBase
         return Ok(response.Message);
     }
 
-    [HttpPost("create/phone/{sender_phone},{content}")]
+    [HttpPost("[action]")]
     public async Task<ActionResult<PhoneMessageDto>> CreatePhoneMessageAsync([FromBody] CreatePhoneMessageModel model)
     {
         var command = new CreatePhoneMessage.Command(DateTime.Now, model.SenderPhoneNumber, model.Content);
@@ -38,7 +37,7 @@ public class MessageController : ControllerBase
         return Ok(response.Message);
     }
 
-    [HttpPost("create/messenger/{sender_username},{content}")]
+    [HttpPost("[action]")]
     public async Task<ActionResult<MessengerMessageDto>> CreateMessengerMessageAsync([FromBody] CreateMessengerMessageModel model)
     {
         var command = new CreateMessengerMessage.Command(DateTime.Now, model.SenderUserName, model.Content);
@@ -47,7 +46,7 @@ public class MessageController : ControllerBase
         return Ok(response.Message);
     }
 
-    [HttpPatch("{id:guid}/send/{source_id:guid}")]
+    [HttpPatch("[action]")]
     public async Task<ActionResult<MessageDto>> SendMessageToSource([FromBody] SendMessageToSourceModel model)
     {
         var command = new SendMessageToSource.Command(model.MessageId, model.MessageSourceId);

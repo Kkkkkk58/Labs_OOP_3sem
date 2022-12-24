@@ -19,7 +19,7 @@ public class ReportController : ControllerBase
 
     public CancellationToken CancellationToken => HttpContext.RequestAborted;
 
-    [HttpPost("create/{manager_id:guid},{from:datetime},{to:datetime}")]
+    [HttpPost("[action]")]
     public async Task<ActionResult<ReportDto>> CreateAsync([FromBody] MakeReportModel model)
     {
         var command = new MakeReport.Command(model.ManagerId, model.From, model.To);

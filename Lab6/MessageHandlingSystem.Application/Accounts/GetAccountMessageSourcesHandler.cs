@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MessageHandlingSystem.Application.Abstractions.DataAccess;
+using MessageHandlingSystem.Application.Exceptions;
 using MessageHandlingSystem.Application.Extensions;
 using MessageHandlingSystem.Application.Mapping.MessageSources;
 using MessageHandlingSystem.Domain.Accounts;
@@ -22,7 +23,7 @@ public class GetAccountMessageSourcesHandler : IRequestHandler<Query, Response>
         Employee employee = await _dbContext.Employees.GetEntityAsync(request.EmployeeId, cancellationToken);
         Account account = await _dbContext.Accounts.GetEntityAsync(request.AccountId, cancellationToken);
         if (!employee.Accounts.Contains(account))
-            throw new NotImplementedException();
+            throw RestrictedAccessException.NoAccessToAccount(employee.Id, account.Id);
 
         return await new Task<Response>(() => new Response(account.MessageSources.Select(x => x.AsDto()).ToArray()));
     }

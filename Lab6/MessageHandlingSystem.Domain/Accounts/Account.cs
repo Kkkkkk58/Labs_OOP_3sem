@@ -1,4 +1,5 @@
-﻿using MessageHandlingSystem.Domain.Messages;
+﻿using MessageHandlingSystem.Domain.Common.Exceptions;
+using MessageHandlingSystem.Domain.Messages;
 using MessageHandlingSystem.Domain.Messages.MessageStates;
 using MessageHandlingSystem.Domain.MessageSources;
 using RichEntity.Annotations;
@@ -24,7 +25,7 @@ public partial class Account : IEntity<Guid>
     {
         MessageSource? source = _messageSources.Find(src => src.Id.Equals(messageSourceId));
         if (source is null)
-            throw new NotImplementedException();
+            throw AccountException.MessageSourceNotFound(messageSourceId, Id);
 
         // TODO Set<Message>
         foreach (Message message in source.ReceivedMessages)
@@ -43,13 +44,13 @@ public partial class Account : IEntity<Guid>
     public void AddMessageSource(MessageSource messageSource)
     {
         if (_messageSources.Contains(messageSource))
-            throw new NotImplementedException();
+            throw AccountException.MessageSourceAlreadyExists(messageSource.Id, Id);
         _messageSources.Add(messageSource);
     }
 
     public void RemoveMessageSource(MessageSource messageSource)
     {
         if (!_messageSources.Remove(messageSource))
-            throw new NotImplementedException();
+            throw AccountException.MessageSourceNotFound(messageSource.Id, Id);
     }
 }

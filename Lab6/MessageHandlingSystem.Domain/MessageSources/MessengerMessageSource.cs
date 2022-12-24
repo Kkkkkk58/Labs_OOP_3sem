@@ -1,4 +1,5 @@
-﻿using MessageHandlingSystem.Domain.Messages;
+﻿using MessageHandlingSystem.Domain.Common.Exceptions;
+using MessageHandlingSystem.Domain.Messages;
 
 namespace MessageHandlingSystem.Domain.MessageSources;
 
@@ -15,6 +16,6 @@ public partial class MessengerMessageSource : MessageSource
     protected override void CheckMessageType(Message message)
     {
         if (message is not MessengerMessage)
-            throw new NotImplementedException();
+            throw MessageSourceException.InvalidMessageType(message.Id, Id);
     }
 }

@@ -21,7 +21,7 @@ public class AccountController : ControllerBase
 
     public CancellationToken CancellationToken => HttpContext.RequestAborted;
 
-    [HttpPost("create")]
+    [HttpPost("[action]")]
     public async Task<ActionResult<AccountDto>> CreateAsync()
     {
         var command = default(CreateAccount.Command);
@@ -30,7 +30,7 @@ public class AccountController : ControllerBase
         return Ok(response.Account);
     }
 
-    [HttpPatch("source/add/{employee_id:guid},{account_id:guid},{message_source_id:guid}")]
+    [HttpPatch("[action]")]
     public async Task<ActionResult> AddMessageSourceAsync([FromBody] AddAccountMessageSourceModel model)
     {
         var command = new AddAccountMessageSource.Command(model.EmployeeId, model.AccountId, model.MessageSourceId);
@@ -39,7 +39,7 @@ public class AccountController : ControllerBase
         return Ok();
     }
 
-    [HttpPatch("source/remove/{employee_id:guid},{account_id:guid},{message_source_id:guid}")]
+    [HttpPatch("[action]")]
     public async Task<ActionResult> RemoveMessageSourceAsync([FromBody] RemoveAccountMessageSourceModel model)
     {
         var command = new RemoveAccountMessageSource.Command(model.EmployeeId, model.AccountId, model.MessageSourceId);
@@ -48,7 +48,7 @@ public class AccountController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("loaded")]
+    [HttpGet("[action]")]
     public async Task<ActionResult<IEnumerable<MessageDto>>> GetLoadedMessagesAsync(
         [FromBody] GetAccountLoadedMessagesModel model)
     {
@@ -58,7 +58,7 @@ public class AccountController : ControllerBase
         return Ok(response.Messages);
     }
 
-    [HttpGet("source/get")]
+    [HttpGet("[action]")]
     public async Task<ActionResult<IEnumerable<MessageSourceDto>>> GetMessageSourcesAsync(
         [FromBody] GetAccountMessageSourcesModel model)
     {
@@ -68,7 +68,7 @@ public class AccountController : ControllerBase
         return Ok(response.Accounts);
     }
 
-    [HttpPatch("load_msg")]
+    [HttpPatch("[action]")]
     public async Task<ActionResult> LoadMessagesAsync([FromBody] LoadAccountMessagesModel model)
     {
         var command = new LoadAccountMessages.Command(model.EmployeeId, model.AccountId, model.MessageSourceId);

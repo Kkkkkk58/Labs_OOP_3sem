@@ -1,5 +1,6 @@
 ﻿using MessageHandlingSystem.Domain.Accounts;
 using MessageHandlingSystem.Domain.Commands;
+using MessageHandlingSystem.Domain.Common.Exceptions;
 using MessageHandlingSystem.Domain.Messages;
 using MessageHandlingSystem.Domain.Reports;
 using RichEntity.Annotations;
@@ -34,7 +35,7 @@ public abstract partial class Employee : IEntity<Guid>
     public Account AddAccount(Account account)
     {
         if (_accounts.Contains(account))
-            throw new NotImplementedException();
+            throw EmployeeException.AccountAlreadyExists(account.Id, Id);
 
         _accounts.Add(account);
         return account;
@@ -43,7 +44,7 @@ public abstract partial class Employee : IEntity<Guid>
     public void RemoveAccount(Account account)
     {
         if (!_accounts.Remove(account))
-            throw new NotImplementedException();
+            throw EmployeeException.AccountNotFound(account.Id, Id);
     }
 
     public abstract void Accept(IReportingVisitor reportingVisitor);

@@ -8,7 +8,7 @@ public class MessageSourceConfiguration : IEntityTypeConfiguration<MessageSource
 {
     public void Configure(EntityTypeBuilder<MessageSource> builder)
     {
-        builder.Navigation(x => x.ReceivedMessages).HasField("_receivedMessages");
+        builder.Navigation(x => x.ReceivedMessages).HasField("_receivedMessages").UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.HasDiscriminator<string>("Discriminator").HasValue<EmailMessageSource>(nameof(EmailMessageSource))
             .HasValue<PhoneMessageSource>(nameof(PhoneMessageSource)).HasValue<MessengerMessageSource>(nameof(MessengerMessageSource));

@@ -1,4 +1,5 @@
-﻿using MessageHandlingSystem.Domain.Reports;
+﻿using MessageHandlingSystem.Domain.Common.Exceptions;
+using MessageHandlingSystem.Domain.Reports;
 
 namespace MessageHandlingSystem.Domain.Employees;
 
@@ -24,7 +25,7 @@ public partial class Manager : Employee
     public Employee AddSubordinate(Employee employee)
     {
         if (_subordinates.Contains(employee))
-            throw new NotImplementedException();
+            throw EmployeeException.SubordinateAlreadyExists(employee.Id, Id);
 
         _subordinates.Add(employee);
         return employee;
@@ -33,7 +34,7 @@ public partial class Manager : Employee
     public void RemoveSubordinate(Employee employee)
     {
         if (!_subordinates.Remove(employee))
-            throw new NotImplementedException();
+            throw EmployeeException.SubordinateNotFound(employee.Id, Id);
     }
 
     public override void Accept(IReportingVisitor reportingVisitor)
